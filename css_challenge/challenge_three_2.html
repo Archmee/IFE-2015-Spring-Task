@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+	<meta charset="UTF-8">
+	<title>CSS Challenge 3 Another Way</title>
+	<style>
+	body {
+		margin: 0;
+		padding: 0;
+		background-color: #364371;
+		font-family: Helvetica, Arial, sans-serif;
+		line-height: 1.3;
+	}
+	h1, h2 {
+		text-align: center;
+	}
+	h1, h2, p, ul {
+		margin: 0 0 .6em 0;
+	}
+	ul {
+		padding: 0;
+	}
+	
+	#wrap {
+		margin: 0 10%;
+		padding: 0;
+		background-color: #B0CFFF;
+	}
+	#nav {
+		float: left;
+		width: 30%;
+		padding: 2em 0;
+	}
+	#nav ul {
+		margin: 0 auto;
+		width: 30%;
+	}
+	#content {
+		padding: 2em;
+		background-color: #5B7FBD;
+		margin-left: 30%;
+		text-align: center;
+	}
+	#content ul {
+		padding-left: 0;
+		list-style-type: none;
+	}
+	#footer {
+		clear: both;
+		margin: 0;
+		background-color: #364371;
+	}
+	#footer p {
+		padding: 1em 0;
+		margin-left: 30%;
+		text-align: center;
+	}
+
+	a, a:link, a:visited, a:active {
+		color: blue;
+	}
+	a:hover {
+		color: white;
+	}
+	</style>
+</head>
+<body>
+	<div id="wrap">
+      <div id="nav">
+        <h2>Sonnet Index</h2>
+        <ul>
+          <li><a href="#">Sonnet #1</a></li>
+          <li><a href="#">Sonnet #6</a></li>
+          <li><a href="#">Sonnet #11</a></li>
+          <li><a href="#">Sonnet #15</a></li>
+          <li><a href="#">Sonnet #18</a></li>
+        </ul>
+      </div>
+      <div id="content">
+        <h1>Shakespeare's Sonnet #18</h1>
+        <p>This is one of the most famous of the sonnets. It is referenced
+           in the film Dead Poets Society and gave names to the band The
+           Darling Buds and the book and television series The Darling Buds
+           of May. Read it and weep!</p>
+        <ul>
+          <li>Shall I compare thee to a summer's day?</li>
+          <li>Thou art more lovely and more temperate:</li>
+          <li>Rough winds do shake the darling buds of May,</li>
+          <li>And summer's lease hath all too short a date:</li>
+          <li>Sometime too hot the eye of heaven shines,</li>
+          <li>And often is his gold complexion dimm'd,</li>
+          <li>And every fair from fair sometime declines,</li>
+          <li>By chance, or nature's changing course untrimm'd:</li>
+          <li>But thy eternal summer shall not fade,</li>
+          <li>Nor lose possession of that fair thou ow'st,</li>
+          <li>Nor shall death brag thou wander'st in his shade,</li>
+          <li>When in eternal lines to time thou grow'st,</li>
+          <li>So long as men can breathe, or eyes can see,</li>
+          <li>So long lives this, and this gives life to thee.</li>
+        </ul>
+      </div>
+      <div id="footer">
+		<p>See the <a href="http://en.wikipedia.org/wiki/Shakespeare%27s_Sonnets">
+		Shakespeare's sonnets</a> Wikipedia article for more information
+		</p>
+      </div>
+    </div>
+</body>
+</html>
