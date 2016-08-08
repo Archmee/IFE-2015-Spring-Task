@@ -1,0 +1,174 @@
+body {
+	margin: 0;
+	padding: 0;
+	background-color: #eee;
+	font-family: "宋体", SimSun, Helvetica, Arial, Verdana, sans-serif;
+	font-size: 12px;
+}
+/*p, .header-bottom ul, .footer, ul {
+	font-family: "宋体", SimSun;
+}*/
+h1, ul{
+	margin: 0;
+}
+a {
+	text-decoration: none;
+}
+a:focus {
+	outline: 0;
+}
+/*引入了一个特殊字体*/
+@font-face {
+	font-family: "Century Gothic";
+	src: url(../fonts/CenturyGothic.TTF);
+}
+/*每个区域都需要一个wrap控制宽度并且居中*/
+.wrap {
+	width: 980px;
+	height: 100%;
+	margin: 0 auto;
+}
+/*--@header-------*/
+
+.header {
+	width: 100%;
+	height: 80px;
+	background-color: #522A5C;
+}
+/*.header-content {}*/
+.header-bottom {
+	color: #fff;
+	position: relative;
+	height: 100%;
+}
+.header-bottom .logo{
+	display: inline;
+	font-family:  Helvetica;
+	font-weight: normal;
+	
+	position: absolute;
+	left: 0;
+	bottom: 10px;
+}
+.header-bottom ul {
+	font-size: 0; /*为了消除inline-block带来的空白间距*/
+	list-style: none;
+
+	position: absolute;
+	right: 0;
+	bottom: 10px;
+}
+.header-bottom ul li {
+	display: inline-block;
+	margin-left: 28px;
+}
+.header-bottom ul li a {
+	color: #fff;
+	font-size: 14px; /*间距已经去掉，现在要让字体显示出来*/
+}
+
+/*屏幕宽度小于980px就隐藏头部github图标*/
+@media screen and (max-width: 980px) {
+	#github-icon {
+		display: none;
+	}
+}
+#github-icon {
+	float: right;
+	margin-top: -34px;
+	margin-right: 10px;
+	/*border: none;*/
+	/*position: absolute;
+	bottom: 0;
+	right: 10px;*/
+}
+#github-icon img {
+	border: none; /*for IE*/
+	display: block; /*去除内联元素导致的幽灵空白节点，即图片下面多出来的空白*/
+}
+
+/*--中间应该放置中间区域的css，但是考虑到每个页面中间不一样，而且导致css文件不易读，所以中间的内容css将会单独成文件而在相应页面才导入--*/
+
+
+/*--@footer-----*/
+.footer {
+	clear: both;
+	width: 100%;
+	height: 395px;
+	color: #fff;
+	background-color: #000;
+}
+.footer .nav {
+	height: 36px;
+	line-height: 36px;
+	text-align: center;
+	border-bottom: 1px solid #bbb;
+}
+.footer .nav ul {
+	display: inline-block; /*inline-block为ul提供可根据内容伸缩的宽度*/
+	padding: 0;
+	height: 100%; /*保持一个和nav区域一样的高度*/
+	font-size: 0; /*为了消除inline-block带来的空白间距*/
+	/* margin: 0 auto; */ /*这个不需要，因为nav的text-align:center*/
+	 list-style: none; /*这个不需要，因为li设置了display为inlie或inline-block之后会消失*/
+}
+.footer .nav ul li {
+	display: inline-block;
+	margin: 0 13px;
+	height: 100%;
+}
+.footer .nav ul li a {
+	color: #fff;
+	font-size: 14px;/*间距已经去掉，现在要让字体显示出来*/
+}
+
+.footer .links {
+	height: 240px;
+	padding-top: 40px;
+	
+}
+.footer .links .links-item {
+	width: 200px;
+	height: 100%;
+	float: left;
+}
+.footer .links .links-item:last-child {
+	width: auto; /*防止最后一个固定宽度导致列表换行*/
+}
+.footer .links h2 {
+	color: #ddd;
+	font-size: 14px;
+	font-weight: normal;
+	margin: 0 0 24px 0;
+	
+}
+.footer .links ul {
+	padding: 0;
+	list-style: none;
+	line-height: 2;
+}
+.footer .links a {
+	color: #fff;
+}
+.footer .links a:hover {
+	text-decoration: underline;
+}
+.footer .copyright {
+	height: 78px;
+	text-align: center;
+	position: relative;
+}
+.footer .copyright div.icon {
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+}
+.footer .copyright a {
+	display: block;
+	position: relative;
+	left: -50%;
+}
+.footer .copyright img {
+	border: none;
+	display: block;
+}
