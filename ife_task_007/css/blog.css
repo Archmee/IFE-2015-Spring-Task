@@ -123,7 +123,7 @@
 	height: 80px;
 }
 #blog .sidebar .search form {
-	margin: 19px;
+	margin: 20px;
 	/*word-spacing: -1em;*/
 	letter-spacing: -1em;
 	/*font-size: 0;*/ /*使左右两个内联块元素没有间距，用word-spacing或者letter-spacing设置一个负字符宽度都可以，如上。但是测试word-spacing好像表现有点过了*/
@@ -134,7 +134,6 @@
 	padding: 0;
 	outline: none;
 	height: 40px; /*42-2*/
-	border: 1px solid #ddd;
 	vertical-align: top; /*！！！这条对inline-block元素的对齐很重要，不然会导致两个元素不在同一条水平线上*/
 }
 /*注意在设置text input和submit input的大小时的区别，因为text input大小和其他盒子模型一样，真正宽高=设置的宽高+padding+margin+border，而submit input就不一样了
@@ -145,20 +144,23 @@ type="button"和type="submit"效果一样， type="text" 和type="password"效�
 */
 #blog .sidebar .search form input[type="text"] {
 	width: 123px; /*170-1-46*/
-	border-right: none;
 	padding-left: 46px;
+	border: 1px solid #ddd;
+	border-right: none;
 	
 	background: #fff url(../img/search-tool.jpg) top left no-repeat;
 	font-family: "宋体", SimSun;
 }
 #blog .sidebar .search form input[type="submit"] {
-	width: 51px;/*52-1*/
+	width: 49px;/*52-1*/
+	border: 1px solid #999;
 	border-left: none;
 	box-sizing: content-box; /*css3：设置为正常的盒子模型*/
 	
 	font-size: 20px;
 	letter-spacing: 2px;
 	color: #fff;
+	background-color: #999;
 }
 
 /*分类列表*/
