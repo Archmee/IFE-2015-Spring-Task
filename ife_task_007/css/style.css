@@ -20,7 +20,7 @@ a:focus {
 /*引入了一个特殊字体*/
 @font-face {
 	font-family: "Century Gothic";
-	src: url(../fonts/CenturyGothic.TTF);
+	src: url(../assets/fonts/CenturyGothic.TTF);
 }
 /*每个区域都需要一个wrap控制宽度并且居中*/
 .wrap {
@@ -69,28 +69,35 @@ a:focus {
 
 /*屏幕宽度小于980px就隐藏头部github图标*/
 @media screen and (max-width: 980px) {
-	#github-icon {
+	#top-icon {
 		display: none;
 	}
 }
-#github-icon {
+
+a.github-icon {
+	width: 30px;
+	height: 34px;
+	display: inline-block;
+	text-indent: -9999px; /*隐藏说明文字*/
+	background: url(../assets/img/icon-github.png) left top no-repeat;
+}
+
+#top-icon {
 	float: right;
-	margin-top: -34px;
+	margin-top: -34px;/*上移盒子高度的位置*/
 	margin-right: 10px;
-	/*border: none;*/
-	/*position: absolute;
-	bottom: 0;
-	right: 10px;*/
+	background-color: #522A5C;
 }
-#github-icon img {
-	border: none; /*for IE*/
-	display: block; /*去除内联元素导致的幽灵空白节点，即图片下面多出来的空白*/
-}
+/*改用背景图的方式就不用下面的样式了*/
+/*#top-icon img {*/
+	/*border: none;*/ /*for IE*/
+	/*display: block; *//*去除内联元素导致的幽灵空白节点，即图片下面多出来的空白*/
+/*}*/
 
 /*--中间应该放置中间区域的css，但是考虑到每个页面中间不一样，而且导致css文件不易读，所以中间的内容css将会单独成文件而在相应页面才导入--*/
 
 
-/*--@footer-----*/
+/*--@footer nav-----*/
 .footer {
 	clear: both;
 	width: 100%;
@@ -122,29 +129,28 @@ a:focus {
 	font-size: 14px;/*间距已经去掉，现在要让字体显示出来*/
 }
 
+/*--@footer links--*/
 .footer .links {
 	height: 240px;
 	padding-top: 40px;
 	
 }
-.footer .links .links-item {
+.footer .links dl {
 	width: 200px;
-	height: 100%;
+	margin: 0;
 	float: left;
 }
-.footer .links .links-item:last-child {
+.footer .links dl:last-child {
 	width: auto; /*防止最后一个固定宽度导致列表换行*/
 }
-.footer .links h2 {
+.footer .links dt {
 	color: #ddd;
 	font-size: 14px;
 	font-weight: normal;
 	margin: 0 0 24px 0;
-	
 }
-.footer .links ul {
-	padding: 0;
-	list-style: none;
+.footer .links dd {
+	margin: 0;
 	line-height: 2;
 }
 .footer .links a {
@@ -153,12 +159,24 @@ a:focus {
 .footer .links a:hover {
 	text-decoration: underline;
 }
+
+/*--@footer copyright--*/
 .footer .copyright {
 	height: 78px;
+	width: 100%;
 	text-align: center;
 	position: relative;
 }
-.footer .copyright div.icon {
+/*底部github图标公用github-icon类，各自id区别定位*/
+#bottom-icon {
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	margin-left: -15px;/*图片宽度的一半*/
+	background-color: #000;
+}
+/*原来使用图片时的样式*/
+/*.footer .copyright div.icon {
 	position: absolute;
 	bottom: 0;
 	left: 50%;
@@ -171,4 +189,4 @@ a:focus {
 .footer .copyright img {
 	border: none;
 	display: block;
-}
+}*/

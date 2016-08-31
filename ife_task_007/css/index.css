@@ -3,7 +3,7 @@
 	width: 100%;
 	height: 525px;
 	
-	background: url(../img/banner-bg.jpg) no-repeat left top;
+	background: url(../assets/img/banner-bg.jpg) no-repeat left top;
 	background-size: cover; /*控制背景图片的大小适应整个盒子*/
 }
 #index  .cover {

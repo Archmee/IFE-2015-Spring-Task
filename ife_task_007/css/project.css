@@ -54,6 +54,7 @@
 }
 #project .main .massory-pic div.row:first-child {
 	height: 300px;
+	width: 460px;
 	text-align: left;
 }
 #project .main .massory-pic div.col {
@@ -65,8 +66,25 @@
 
 #project .main .massory-pic a {
 	display: inline-block;
+	vertical-align: top; /*for inline-block*/
 	margin-bottom: 10px;
 	position: relative; /*这个是为了给其中的.preview box定位用*/
+}
+
+/*顶部大图特殊设置*/
+#project .main .massory-pic a.big-pic {
+	position: absolute;
+	margin-left: 5px;
+}
+#project .main .massory-pic a.big-pic img {
+	width: 450px;
+}
+
+#project .main .massory-pic img {
+	width: 220px;
+	border: none;
+	display: block;/*已经很多次出现图片的下边空白问题了，虽然网上说解决方式还可以用veritical-align，但是在这里不行，不知道什么原因，而且图片比a框高一点*/
+	vertical-align: top;
 }
 
 /*hover box*/
@@ -95,20 +113,6 @@
 	height: 35%;
 }
 
-#project .main .massory-pic img {
-	width: 220px;
-	border: none;
-	display: block;/*已经很多次出现图片的下边空白问题了，虽然网上说解决方式还可以用veritical-align，但是在这里不行，不知道什么原因，而且图片比a框高一点*/
-	vertical-align: top;
-}
-/*顶部大图特殊设置*/
-#project .main .massory-pic a.big-pic {
-	position: absolute;
-	margin-left: 5px;
-}
-#project .main .massory-pic a.big-pic img {
-	width: 450px;
-}
 
 /*瀑布流下边加载更多*/
 #project .main .load-more {
@@ -116,13 +120,16 @@
 	height: 50px;
 	line-height: 50px;
 	text-align: center;
-	font-size: 14px;
-	color: #ccc;
-
+	
 	cursor: pointer;
 }
-#project .main .load-more img {
-	vertical-align: middle;
+#project .main .load-more a {
+	display: inline-block;
+	width: 100px;
+	font-size: 14px;
+	color: #ccc;
+	text-align: right;
+	background: #fff url(../assets/img/load-more.jpg) left 50% no-repeat;
 }
 
 /*右边栏布局*/
@@ -160,7 +167,7 @@
 	border: 1px solid #ddd;
 	border-right: none;
 	
-	background: #fff url(../img/search-tool.jpg) top left no-repeat;
+	background: #fff url(../assets/img/search-tool.jpg) top left no-repeat;
 	font-family: "宋体", SimSun;
 }
 #project .sidebar .search form input[type="submit"] {

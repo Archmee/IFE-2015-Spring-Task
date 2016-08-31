@@ -148,7 +148,7 @@ type="button"和type="submit"效果一样， type="text" 和type="password"效�
 	border: 1px solid #ddd;
 	border-right: none;
 	
-	background: #fff url(../img/search-tool.jpg) top left no-repeat;
+	background: #fff url(../assets/img/search-tool.jpg) top left no-repeat;
 	font-family: "宋体", SimSun;
 }
 #blog .sidebar .search form input[type="submit"] {
