@@ -1,0 +1,287 @@
+#blog {
+	width: 980px;
+	margin: 0 auto;
+	margin-top: 20px;
+}
+/*左边内容区布局*/
+#blog .main {
+	width: 710px;
+	float: left;
+	margin-right: 10px;
+	
+}
+/*右边栏布局*/
+#blog .sidebar {
+	width: 260px;
+	float: left;
+	font-size: 14px;
+}
+
+/*正文*/
+#blog .main .post {
+	line-height: 1.7;
+	padding: 20px;
+	margin-bottom: 10px;
+	background-color: #fff;
+
+	position: relative;
+}
+#blog .post h2, #blog .post h3, #blog .post p {
+	margin: 0;
+}
+#blog .post h2 {
+	font-size: 16px;
+	color: #A660B7;
+}
+#blog .post h3 {
+	font-size: 12px;
+	color: #666;
+}
+#blog .post p {
+	text-indent: 2em;
+}
+#blog .post p:nth-of-type(1){
+	margin-top: 10px;
+}
+#blog .post .post-detail {
+	color: #999;
+	margin-top: 20px;
+	text-align: right;
+}
+#blog .post .post-side {
+	width: 100px; /*100足矣*/
+	overflow: hidden;
+	/* text-align: right; */ /*本以为这样就不用对span做float了，但好像不管用*/
+	position: absolute;
+	top: 20px;
+	left: -100px;
+
+	font-size: 14px;
+	font-family: Helvetica;
+}
+#blog .post span {
+	display: inline-block;
+	height: 40px;
+	line-height: 40px;
+	padding: 0 13px;
+	/*min-width: 50px;*//*不固定宽度，采用padding来填充*/
+	text-align: center;
+	color: #fff;
+
+	float: right;
+}
+#blog .post span.date {
+	background-color: #522A5C;
+}
+#blog .post span.cat {
+	clear: right;
+	background-color: #A660B7;
+}
+
+/* 分页导航 */
+#blog .main ul {
+	padding: 0;
+	margin: 50px 0;
+	list-style: none;
+	text-align: center;
+	font-size: 0;
+}
+#blog .main ul li {
+	display: inline-block;
+	margin: 0 5px;
+	background-color: #fff;
+}
+/*a元素实现了整个li元素区域都可以点击*/
+#blog .main ul li a {
+	display: inline-block;
+	height: 36px;
+	line-height: 36px;
+	/* width: auto;  *//*保持宽度随着内容扩展，并且扩展为内容宽度后，还有padding撑开左右*/
+	padding: 0 15px;
+	
+	color: #000;
+	font-size: 12px;	
+}
+#blog .main ul li a:hover,  #blog .main ul li a.active-link {
+	color: #fff;
+	background-color: #A660B7;
+}
+#blog .main ul li a.disabled-link {
+	color: #808080;
+	pointer-events: none; /*禁用a链接，IE9要对a添加disabled属性*/
+}
+
+
+/*右边栏*/
+#blog .sidebar > div {
+	background-color: #fff;
+	margin-bottom: 10px;
+}
+/*搜索框*/
+#blog .sidebar .search {
+	width: 100%;
+	height: 80px;
+}
+#blog .sidebar .search form {
+	margin: 20px;
+	/*word-spacing: -1em;*/
+	letter-spacing: -1em;
+	/*font-size: 0;*/ /*使左右两个内联块元素没有间距，用word-spacing或者letter-spacing设置一个负字符宽度都可以，如上。但是测试word-spacing好像表现有点过了*/
+	display: inline-block;
+}
+#blog .sidebar .search form input {
+	margin: 0;
+	padding: 0;
+	outline: none;
+	height: 40px; /*42-2*/
+	vertical-align: top; /*！！！这条对inline-block元素的对齐很重要，不然会导致两个元素不在同一条水平线上*/
+}
+/*注意在设置text input和submit input的大小时的区别，因为text input大小和其他盒子模型一样，真正宽高=设置的宽高+padding+margin+border，而submit input就不一样了
+他的宽高=你设置的宽高+margin=可见区域+padding+border+margin
+用另一种方式来说就是，你设置的text input的宽高并不包括内边距和边框，而submit input的宽高则包括内边距和边框，注意我们讨论的区别都不包括margin，因为margin在其两者上表现上是相同的。
+type="button"和type="submit"效果一样， type="text" 和type="password"效果一样
+解决方式有两种，第一种是单独设置宽高，使其达到理想的盒子模型，第二种是使用css3属性box-sizing: content-box;设置盒子的大小控制方式，content-box就是可以让该盒子和其他盒子一样，指定的宽高不包括padding、border、margin等，而border-box就是默认的表现，padding、border都在指定的宽高内进行
+*/
+#blog .sidebar .search form input[type="text"] {
+	width: 123px; /*170-1-46*/
+	padding-left: 46px;
+	border: 1px solid #ddd;
+	border-right: none;
+	
+	background: #fff url(../assets/img/search-tool.jpg) top left no-repeat;
+	font-family: "宋体", SimSun;
+}
+#blog .sidebar .search form input[type="submit"] {
+	width: 49px;/*52-1*/
+	border: 1px solid #999;
+	border-left: none;
+	box-sizing: content-box; /*css3：设置为正常的盒子模型*/
+	
+	font-size: 20px;
+	letter-spacing: 2px;
+	color: #fff;
+	background-color: #999;
+}
+
+/*分类列表*/
+#blog .sidebar .category {
+	height: 200px;
+	width: 100%;
+	color: #666;
+	border-top: 1px solid #DDD;
+}
+#blog .sidebar .category ul {
+	list-style: none;
+	padding: 0;
+}
+#blog .sidebar .category ul li {
+	height: 49px; /*50-1*/
+	line-height: 49px;
+	border-bottom: 1px solid #DDD;
+}
+
+#blog .sidebar .category a {
+	color: #666;
+	height: 49px;
+	width: 256px;/*260px-4px*/
+	border-left: 4px solid #DFC6E6;
+	text-indent: 18px;
+	display: inline-block;
+}
+#blog .sidebar .category ul a:hover, #blog .sidebar .category ul a.active {
+	border-left: 4px solid #522A5C;
+}
+
+/*calendar*/
+#blog .sidebar .calendar {
+	width: 220; /*260-20-20*/
+	min-height: 200px;/*240-20-20*/
+	padding: 20px;
+	font-size: 12px;
+}
+
+#blog .sidebar .calendar table {
+	text-align: center;
+	width: 100%;
+	height: 100%;
+	border-spacing: 0;
+}
+#blog .sidebar .calendar caption {
+	font-size: 14px;
+	letter-spacing: 3px;
+	color: #773C88;
+	font-weight: bold;
+	padding: 0 10px;
+}
+#blog .sidebar .calendar caption span:first-child {
+	float: left;
+}
+#blog .sidebar .calendar caption span:last-child {
+	float: right;
+}
+#blog .sidebar .calendar caption span a {
+	color: #773C88;
+}
+#blog .sidebar .calendar table tr {
+	height: 33px;
+	color: #999;
+}
+#blog .sidebar .calendar table th {
+	font-weight: normal;
+}
+#blog .sidebar .calendar table td {
+	font-weight: normal;
+	border-bottom: 1px solid #eee;
+}
+#blog .sidebar .calendar table td a {
+	display: inline-block;
+	width: 26px;
+	height: 20px;
+	line-height: 20px;
+	color: #999;
+}
+#blog .sidebar .calendar table td a.valid-date {
+	color: #773C88;
+	font-weight: bold;
+}
+#blog .sidebar .calendar table td a.active, #blog .sidebar .calendar table td a:hover {
+	color: #fff;
+	background-color: #773C88;
+}
+
+/*tags*/
+#blog .sidebar .tags {
+	width: 234px;/*260-13-13*/
+	min-height: 174px;/*200-13-13*/
+	color: #773C88;
+	padding: 13px;
+	
+	font-family: Helvetica;
+	font-size: 16px;
+}
+#blog .sidebar .tags h3 {
+	color: #666;
+	font-size: 14px;
+	font-weight: normal;
+	margin-top: 0;
+}
+#blog .sidebar .tags a, #blog .sidebar .tags a:active {
+	display: inline-block;
+	color: #773C88;
+}
+#blog .sidebar .tags a:hover {
+	color: #fff;
+	background-color: #773C88;
+}
+#blog .sidebar .tags a.smaller {
+	font-size: .7em;
+}
+#blog .sidebar .tags a.small {
+	font-size: 1em;
+}
+#blog .sidebar .tags a.big {
+	font-size: 1.5em;
+}
+#blog .sidebar .tags a.biger {
+	font-size: 2em;
+}

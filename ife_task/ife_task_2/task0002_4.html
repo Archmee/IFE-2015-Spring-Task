@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>task 2-4</title>
+	<style>
+		ul {
+			margin: 0;
+			padding: 0;
+			list-style-type: none;
+			width: 172px;
+			visibility: hidden;		
+		}
+		li {
+			padding: 5px 0 0 5px;
+			height: 20px;
+			background-color: #eee;
+		}
+		li.active {
+			color: #fff;
+			cursor: pointer;
+			background-color: blue;
+		}
+		b {
+			color: #ff0000;
+		}
+	</style>
+</head>
+<body>
+	<input type="text" id="search">
+	<ul id="search-result"></ul>
+
+	<script>
+		var data = ['jason', 'e', 'jack', 'eric', 'ai', 'UI', 'UE',  'ae', 'UX'];
+
+		var searchText = document.getElementById('search');
+		var searchList = document.getElementById('search-result');
+		var index = -1;
+		var list = searchList.children;
+
+		searchText.onkeyup = searchText.onfocus = searchText.onclick = function(e) {
+			if (searchText.value == '') { //每次按键检测是否为空或者删除完了
+				searchList.style.visibility = 'hidden';
+				return;
+			}
+
+			e = e || window.event;
+			if (e.type != 'keyup') {
+				if (e.stopPropagation) {
+				    e.stopPropagation();
+				} else {
+				    e.cancelBubble = true;
+				}
+			}
+			
+			searchList.innerHTML = '';
+			// 寻找匹配项
+			for (var i = 0, len = data.length; i < len; i++) {
+				var l = data[i].toLowerCase().indexOf(searchText.value.toLowerCase());
+				if (l > -1) {
+					var res = data[i].replace(new RegExp(searchText.value, 'i'), '<b>' + "$&" + '</b>');
+					searchList.appendChild(createLi(res));
+				}
+			}
+			
+			searchList.style.visibility = 'visible';
+			
+			document.onkeyup = function(e) { //原是监听keyup的，但要阻止光标发生移动，所以改为keydown
+				e = e || window.event;
+				if (e.keyCode != 13 && e.keyCode != 38 && e.keyCode != 40) {
+					return ;
+				}
+				
+				if (list.length <= 0) {
+					return ;
+				}
+
+				if (e.keyCode == 13) {
+					if (index >= 0) {
+						searchText.value = list[index].innerText;
+						searchList.style.visibility = 'hidden';
+						index = -1;
+					}
+					return false;
+				}
+
+				if (e.keyCode == 38) index--; //up
+				if (e.keyCode == 40) index++; //down
+				if (index < 0) index = list.length-1;
+				if (index > list.length-1) index = 0;
+
+				clearClass();
+
+				list[index].className = 'active';
+				document.onkeyup = null;
+				
+				return false;
+			};
+
+		}
+
+		function createLi(text) {
+			var li = document.createElement('li');
+			li.innerHTML = text;
+			return li;
+		}
+
+
+		function clearClass() {
+			for (var i = 0, len = list.length; i < len; i++) {
+				list[i].className = '';
+			}
+		}
+
+		searchList.onclick = function(e) {
+			e = e || window.event;
+			var target = e.target || e.srcElement;
+			searchText.value = target.innerText;
+			index = -1;
+			// 最后隐藏列表，但是通过冒泡实现了
+		}
+		searchList.onmouseover = function(e) {
+			e = e || window.event;
+			var target = e.target || e.srcElement;
+			clearClass();
+			e.target.className = 'active';
+			index = -1;
+		}
+
+		document.onclick = function() {
+			searchList.style.visibility = 'hidden';
+		}
+
+		// indexOf
+		// MDN https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
+		if (!Array.prototype.indexOf) {
+		  	Array.prototype.indexOf = function(searchElement, fromIndex) {
+
+		    var k;
+		    if (this == null) {
+		      throw new TypeError('"this" is null or not defined');
+		    }
+		    var O = Object(this);
+
+		    var len = O.length >>> 0;
+		    if (len === 0) {
+		      return -1;
+		    }
+
+		    var n = +fromIndex || 0;
+		    if (Math.abs(n) === Infinity) {
+		      n = 0;
+		    }
+		    if (n >= len) {
+		      return -1;
+		    }
+
+		    k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
+
+		    while (k < len) {
+		      if (k in O && O[k] === searchElement) {
+		        return k;
+		      }
+		      k++;
+		    }
+		    return -1;
+		  };
+		}
+	</script>
+</body>
+</html>

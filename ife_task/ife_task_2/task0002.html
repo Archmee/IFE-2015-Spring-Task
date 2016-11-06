@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>ife task0002</title>
+	<style>
+		body {
+			margin: 0;
+		}
+		.wrap {
+			height: 1000px;
+			background-color: #eee;
+			position: relative;
+		}
+		/*css id和class区分大小写*/
+		.new-class {
+			width: 100px;
+			height: 50px;
+			background-color: #00ff00;
+			position: absolute;
+			bottom: 0;
+			left: 0;
+		}
+		/*div {
+			font-size: 20px;
+		}*/
+	</style>
+</head>
+<body class="wrap" id="boddd">
+	<h1>JS DOM</h1>
+	<article>
+		<input id="number1" data-log class="abc 123" type="text">
+		<input id="number2" class="classa" type="text">
+		<span id="result" data-log="123"><span>123</span></span>
+		<button id="addbtn" data-time=2015>计算</button>
+		<a id="link" href="">aa</a>
+		<!-- test $("#adom .classa span") -->
+		<div class="panel" id="adom">
+			<span id="span1">span1</span>
+			<span id="span2">span2</span>
+			<div class="classa">
+			</div>
+		</div>
+		<div class="panel" id="adom">
+			<div class="classa">
+				
+			</div>
+			<div class="classa">
+				<span id="span7">span7</span>
+				<span id="span8">span8</span>
+			</div>
+		</div>
+		<div class="panel" id="adom" ><span class="classa">test ...</span></div>
+	</article>
+
+	<ul id="list">
+	    <li id="item1">Simon</li>
+	    <li id="item2">Kenner</li>
+	    <li id="item3">Erik</li>
+	</ul>
+	<button id="btn">Change</button>
+
+	<script src="util.js" type="text/javascript"></script>
+	<!-- <script src="test.js" type="text/javascript"></script> -->
+	<script>
+		
+
+		// 测试用例：
+		// var srcObj = {
+		//     a: 1,
+		//     b: {
+		//         b1: ["hello", "hi"],
+		//         b2: "JavaScript"
+		//     },
+		//     c: new Date(),
+		//     d: function () {
+		//     	return 1;
+		//     },
+		//     e: /[a]/
+
+		// };
+		// var abObj = srcObj;
+		// var tarObj = cloneObject(srcObj);
+
+		// srcObj.a = 2;
+		// srcObj.b.b1[0] = "wwwwww";
+		// srcObj.c = new Date("July 24, 2017");
+
+		// console.log(abObj);
+		// console.log(tarObj);
+
+		// console.log(abObj.a);
+		// console.log(abObj.b.b1[0]);
+		// console.log(abObj.c.getFullYear()+','+abObj.c.getMonth());
+
+		// // console.log(tarObj);
+		// console.log(tarObj.a); // 1
+		// console.log(tarObj.b.b1[0]);  //hello
+		// console.log(tarObj.c.getFullYear()+','+tarObj.c.getMonth());
+
+
+		// // 使用示例
+		// var a = [1, 3, false, false, 5, 7, 5, 3];
+		// var b = uniqArray(a);
+
+		// console.log(a);
+		// console.log(Object.keys(b));
+		// console.log(b); // [1, 3, 5, 7]
+
+		// // 实现一个简单的trim函数，用于去除一个字符串，头部和尾部的空白字符
+		// // 假定空白字符只有半角空格、Tab
+		// // 练习通过循环，以及字符串的一些基本方法，分别扫描字符串str头部和尾部是否有连续的空白字符，并且删掉他们，最后返回一个完成去除的字符串
+		// function simpleTrim(str) { //
+		// 	var start=0,
+		// 		end=str.length;
+		// 	for (var i = 0; i < str.length; i++) {
+				
+		// 		if(str[i] !== ' ' && str[i] !== '\t') {
+		// 			start = i;
+		// 			break;
+		// 		}
+		// 	}
+		// 	for (var i = str.length - 1; i >= 0; i--) {
+		// 		if(str[i] !== ' ' && str[i] !== '\t') {
+		// 			end = i+1;
+		// 			break;
+		// 		}
+		// 	}
+
+		// 	return str.substring(start, end);
+		// }
+		
+		// // 对字符串头尾进行空格字符的去除、包括全角半角空格、Tab等，返回一个字符串
+		// // 尝试使用一行简洁的正则表达式完成该题目
+		// function trim(str) {
+		// 	return str.replace(/^\s*|\s*$/g, "");
+		// }
+
+		// // 使用示例
+		// var str = ' 	hi!　  ';
+		// var retStr = trim(str);
+		// console.log(str+'('+str.length+')');
+		// console.log(retStr+'('+retStr.length+')'); // 'hi!'
+
+		// // 实现一个遍历数组的方法，针对数组中每一个元素执行fn函数，并将数组索引和元素作为参数传递
+		// function each(arr, fn) {
+		//     for (var i = 0; i < arr.length; i++) {
+		//     	if (fn) {
+		//     		fn(arr[i], i);
+		//     	}
+		//     }
+		// }
+
+		// // 其中fn函数可以接受两个参数：item和index
+
+		// // 使用示例
+		// var arr = ['java', 'c', 'php', 'html'];
+		// function output1(item) {
+		//     console.log(item)
+		// }
+		// each(arr, output1);  // java, c, php, html
+
+		// // 使用示例
+		// var arr = ['java', 'c', 'php', 'html'];
+		// function output2(item, index) {
+		//     console.log(index + ': ' + item)
+		// }
+		// each(arr, output2);  // 0:java, 1:c, 2:php, 3:html
+
+
+		// // 获取一个对象里面第一层元素的数量，返回一个整数
+		// function getObjectLength(obj) {
+		// 	var count = 0;
+		// 	for(var item in obj) {
+		// 		count++;
+		// 	}
+		// 	return count;
+		// }
+
+		// // 使用示例
+		// var obj = {
+		//     a: 1,
+		//     b: 2,
+		//     c: {
+		//         c1: 3,
+		//         c2: 4
+		//     }
+		// };
+		// console.log(getObjectLength(obj)); // 3
+
+		// // 判断是否为邮箱地址
+		// function isEmail(emailStr) {
+		//     var pattern = /[\w-]+@[\w-]+(\.[a-zA-Z]+){1,2}[a-zA-Z]$/;
+		//     return pattern.test(emailStr);
+		// }
+
+		// // 判断是否为手机号
+		// function isMobilePhone(phone) {
+		// 	var pattern = /^(\+?86)?1[0-9]{10}$/;
+		// 	return pattern.test(phone);
+		// }
+
+		// console.log('mail is '+isEmail("a@163.im"));
+		// console.log('phone is '+isMobilePhone("182000a333"));
+
+		// // 为element增加一个样式名为newClassName的新样式
+		// function addClass(element, newClassName) {
+		// 	// 这虽然不算好的方式，但是效率高，即使添加了重复的类，也不影响效果
+		//     if (element.className) {
+		//     	element.className += ' ';
+		//     }
+		//     element.className += newClassName;
+		// }
+
+		// // 移除element中的样式oldClassName
+		// function removeClass(element, oldClassName) {
+		// 	// var re = new RegExp('(^'+oldClassName+')|(\\s+'+oldClassName+'\\s+)|('+oldClassName+'$)', 'g');
+		// 	var re = new RegExp('(^|\\s+)+'+oldClassName+'(\\s+|$)+', 'g');//要么以字符串开头/结尾，要么字符串前后都有1或多个空格
+			
+		//     element.className = element.className.replace(re, ' ');
+		// }
+
+		// // 判断siblingNode和element是否为同一个父元素下的同一级的元素，返回bool值
+		// function isSiblingNode(element, siblingNode) {
+		//     return element.parentNode === siblingNode.parentNode;
+		// }
+
+		// // 获取element相对于浏览器窗口的位置，返回一个对象{x, y}
+		// function getPosition(element) {
+		//     var pos = {};
+		//     console.log(element.offsetLeft);
+		//     console.log(element.offsetTop);
+
+		//     pos.x = element.offsetLeft - (document.body.scrollLeft || document.documentElement.scrollLeft);
+		//     pos.y = element.offsetTop - (document.body.scrollTop || document.documentElement.scrollTop);
+		//     return pos;
+		// }
+		// var clog = console.log;
+
+		// var oDiv = document.getElementsByTagName('div')[0];
+		// var oDiv2 = document.getElementsByTagName('div')[1];
+
+		// addClass(oDiv, "new-class    panel-  panel");
+		// removeClass(oDiv, "panel");
+		// clog(oDiv.className);
+
+
+		// console.log(isSiblingNode(oDiv, oDiv2));
+		// console.log(getPosition(oDiv));
+		var clog = console.log;
+		// if (document.compatMode == "CSS1Compat") {
+		// 	clog('Standard mode');
+		// } else {
+		// 	clog('Quirks mode');
+		// }
+
+		// clog(getByClass(document.documentElement, 'new-class'));
+
+		// // 递归遍历节点（深度优先）
+		// function traversalByRecursive(element, className) {
+			
+		// 	if (containClass(element.className, className)) {
+		// 		clog(element.tagName);
+		// 	}
+
+		// 	element = element.children;
+		// 	for (var i = 0, length = element.length; i < length; i++) {
+		// 		arguments.callee(element[i], className);
+		// 	}
+
+		// }
+		// traversalByRecursive(document.documentElement, 'new-class');
+		
+		// clog(document.getElementsByTagName('*'));
+
+		// var node = document.getElementById('number1');
+		// clog(node);
+		// clog(node.nodeType);
+		// clog(typeof node);
+		// clog(node instanceof Element);
+		// clog(node.classList);
+		// clog(Object.prototype.toString.call(node));
+		// clog(typeof node.nodeType);
+		// clog(isNode(node));
+		// addClass(node, "abc 123 abc abc-123");
+		// removeClass(node, "abc 123");
+
+		// var num = 5;
+		// clog(Object.prototype.toString.call(NaN));
+		// clog(document.body.getElementsByTagName('*'));
+		// clog(node.className);
+
+		// clog(document.body.getElementsByTagName('input'));
+		// clog(traversalNodes(document.body));
+		// clog(getByClass(document.body, 'panel'));
+		// clog(document.body.getElementsByClassName('wrap'));
+		// clog(document.body.getElementsByTagName('body'));
+		
+
+		// 封装选择器见util.js
+		
+		// // 可以通过id获取DOM对象，通过#标示，例如
+		// $("#adom");   // 返回id为adom的DOM对象
+		// $("#number2");
+
+		// // 可以通过tagName获取DOM对象，例如
+		// $("a");  // 返回第一个<a>对象
+		// $("h1");
+
+		// // 可以通过样式名称获取DOM对象，例如
+		// $(".panel"); // 返回第一个样式定义包含classa的对象
+
+		// // 可以通过attribute匹配获取DOM对象，例如
+		// $("[data-log]"); // 返回第一个包含属性data-log的对象
+
+		// $("[data-time=2015]"); // 返回第一个包含属性data-time且值为2015的对象
+
+		// // 可以通过简单的组合提高查询便利性，例如
+		// $(".wrap .wrap"); // 返回id为adom的DOM所包含的所有子节点中，第一个样式定义包含classa的对象
+		// $("[data-log] span"); // 返回第一个包含属性data-log的对象	
+		// $("[data-time=2015] span");
+		// $("#adom .classa span"); //下面是内置函数，测试结果和我的一样，所以它不会只检测第一个id为adom的元素
+		// clog(document.querySelector("#adom .classa span"));
+		
+		// clog(document.body.getElementsByTagName('div')[1].querySelector('#adom span'));
+
+
+		// 任务四：事件
+		// // 给一个element绑定一个针对event事件的响应，响应函数为listener
+		// function addEvent(element, eventType, listener) {
+		//     if (element.addEventListener) {
+		//     	element.addEventListener(eventType, listener, false);
+		//     } else if (element.attachEvent) {
+		//     	element.attachEvent('on'+eventType, listener);
+		//     } else {
+		//     	element['on'+eventType] = listener;
+		//     }
+		// }
+
+		// // 移除element对象对于event事件发生时执行listener的响应
+		// function removeEvent(element, eventType, listener) {
+		//     if (element.removeEventListener) {
+		//     	element.removeEventListener(eventType, listener, false);
+		//     } else if (element.detachEvent) {
+		//     	element.detachEvent('on'+eventType, listener);
+		//     } else {
+		//     	element['on'+eventType] = null;
+		//     }
+		// }
+
+		// // 实现对click事件的绑定
+		// function addClickEvent(element, listener) {
+		//     addEvent(element, 'click', listener);
+		// }
+
+		// // 实现对于按Enter键时的事件绑定
+		// function addEnterEvent(element, listener) {
+		// 	addEvent(element, 'keyup', function(event) {
+		// 		event = event || window.event;
+		// 		if (event.keyCode === 13) { //enter键
+		// 			listener.call(element, event);
+		// 		}
+		// 	});
+		// }
+		// // 例如：
+		// function clicklistener(event) {
+		//     alert(event.target.id);
+		// }
+
+		// addEvent($("#adom"), "click", clicklistener);
+		// removeEvent($("#adom"), "click", clicklistener);
+		// addEnterEvent(document, function(e) {
+		// 	console.log('done');
+		// });
+
+		
+		// $.on = addEvent;
+		// $.un = removeEvent;
+		// $.click = addClickEvent;
+		// $.enter = addEnterEvent;
+
+		// function clicklistener(event) {
+		//     alert(event.target.tagName);
+		//     return false;
+		// }
+
+		// 这里的问题时$对象和$函数怎么解决冲突
+		// $.on($("#adom"), "click", clicklistener);
+		// $.un($("#adom"), "click", clicklistener);
+		// $.click(document, clicklistener);
+		// $.enter(document, clicklistener);
+
+		// function a(str) {
+		// 	alert('123');
+
+		// 	return str;
+		// }
+		// a.on = function() {
+		// 	alert('on function');
+		// }
+
+		// a('str');
+		// a.on();
+
+
+		function clicklistener(event) {
+		    console.log(event.target.nodeName);
+		}
+		
+		// each($("#list").getElementsByTagName('li'), function(li) {
+		// 	 $.click(li, clickListener);
+		// });
+
+
+		function renderList() {
+		    $("#list").innerHTML += '<li>new item</li>';
+		}
+		// function init() {
+		//     each($("#list").getElementsByTagName('li'), function(li) {
+		//         $.click(li, clicklistener);
+		//     });
+
+		//     $.click($("#btn"), renderList);
+		// }
+		// init();
+
+
+		// 先简单一些
+		// function delegateEvent(element, tag, eventName, listener) {
+		//    addEvent(element, eventName, function(event) {
+		//    		var e = event || window.event,
+		//    			target = e.target || e.srcElement;
+		//    		if (target.nodeName.toLowerCase() === tag) {
+		//    			listener.call(target, e);
+		//    		}
+		//    });
+		// }
+		// $.delegate = delegateEvent;
+
+		// // 使用示例
+		// // 还是上面那段HTML，实现对list这个ul里面所有li的click事件进行响应
+		// $.click($("#btn"), renderList);
+		// $.delegate($("#list"), "li", "click", clicklistener);
+
+		// 估计有同学已经开始吐槽了，函数里面一堆$看着晕啊，那么接下来把我们的事件函数做如下封装改变：
+		// $.on = function(selector, event, listener) {
+		//     addEvent($(selector), event, listener);
+		// }
+
+		// $.un = function(selector, event, listener) {
+		//     removeEvent($(selector), event, listener);
+		// }
+
+		// $.click = function(selector, listener) {
+		//     addClickEvent($(selector), listener);
+		// }
+
+		// $.delegate = function(selector, tag, event, listener) {
+		//     delegateEvent($(selector), tag, event, listener);
+		// }
+
+		// 使用示例：
+		// $.click("[data-log]", clicklistener);
+		// $.delegate('#list', "li", "click", clicklistener);
+
+		// // 判断是否为IE浏览器，返回-1或者版本号
+		// function isIE() {
+		// 	return !window.opera && /MSIE ([^;]+)/.test(window.navigator.userAgent);
+		// }
+
+		// // 设置cookie
+		// function setCookie(cookieName, cookieValue, expiredays) {
+		//     var date = new Date(),
+		//     	expires = date.getDate()+expiredays;
+		//     date.setDate(expires);
+
+		//     document.cookie = encodeURIComponent(cookieName) + '=' +
+		//     				  encodeURIComponent(cookieValue) + 
+		//     				  (expiredays == null ? '' : '; expires=' + date.toGMTString());		  
+		// }
+
+		// // 获取cookie值
+		// function getCookie(cookieName) {
+		// 	cookieName = encodeURIComponent(cookieName) + '=';
+		// 	var cookieStart = document.cookie.indexOf(cookieName),
+		// 		cookieValue = null;
+
+		// 	if (cookieStart > -1) { //Found
+		// 		var cookieEnd = document.cookie.indexOf(';', cookieStart);
+		// 		if (cookieEnd == -1) {
+		// 			cookieEnd = document.cookie.length;
+		// 		}
+
+		// 		cookieValue = decodeURIComponent(document.cookie.substring(cookieStart+cookieName.length, cookieEnd));
+		// 	}
+
+		// 	return cookieValue;
+		// }
+
+		// function unsetCookie(cookieName) {
+		// 	setCookie(cookieName, '', new Date(0));
+		// }
+
+		// if (!window.opera && /MSIE ([^;]+)/.test(window.navigator.userAgent)) {
+		// 	console.log('IE');
+		// 	console.log(RegExp["$_"]);
+		// 	clog(RegExp["$`"]);
+		// 	clog(RegExp["$'"]);
+		// 	clog(RegExp["$&"]);
+		// 	clog(RegExp["$+"]);
+		// 	clog(RegExp["$*"]);
+		// }
+
+		// setCookie('username', 'y', 1);
+		// setCookie('password', 'mima', 1);
+		// clog(getCookie('username'));
+		// clog(getCookie('password'));
+		// unsetCookie('password');
+		// clog(getCookie('password'));
+
+		// 学习Ajax，并尝试自己封装一个Ajax方法
+		function ajax(url, options) {
+		    var xhr = null;
+
+		    if (window.XMLHttpRequest) { //IE7+
+		    	xhr = new XMLHttpRequest();
+		    } else { //IE5,6
+		    	xhr = new ActiveXObject("Microsoft.XMLHTTP");
+		    }
+
+		    xhr.onreadystatechange = function() {
+		    	if (xhr.readyState == 4 ) {
+		    		if (((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) && options.onsuccess) {
+		    			options.onsuccess.call(null, xhr.responseText, xhr);
+		    		} else if (options.onfail) {
+		    			options.onfail.call(null, xhr);
+		    		}
+		    	}
+		    }
+
+		    var params = '';
+		    if (options.data) {
+		    	
+		    	if (typeof options.data === "string") {//split for encodeURIComponent
+		    		options.data = {};
+
+		    		params = options.data.split('&');
+		    		for (var i = 0, len = params.length; i < len; i++) {
+		    			var tmp = params[i].split('=');
+		    			options.data[tmp[0]] = tmp[1];
+		    		}
+		    	}
+
+		    	var plist = [];
+		    	for (var item in options.data) {
+		    		plist.push( encodeURIComponent(item) + '=' + 
+		    					encodeURIComponent(options.data[item]) );
+		    	}
+		    	params = plist.join('&');
+		    }
+
+		    if (!options.type) {
+		    	options.type = "GET";
+		    }
+		    options.type = options.type.toUpperCase();
+
+		    if (options.type === "GET") {
+		    	xhr.open("GET", url+'?'+params, true);
+		    	xhr.send(null);
+		    } else if (options.type === "POST") {
+		    	xhr.open("POST", url, true);
+		    	xhr.send(params);
+		    }
+		}
+		// options是一个对象，里面可以包括的参数为：
+		// type: post或者get，可以有一个默认值
+		// data: 发送的数据，为一个键值对象或者为一个用&连接的赋值字符串
+		// onsuccess: 成功时的调用函数
+		// onfail: 失败时的调用函数
+
+		// 使用示例：
+		ajax(
+		    'http://localhost:8080/server/ajaxtest', 
+		    {
+		        data: {
+		            name: 'simon',
+		            password: '123456'
+		        },
+		        onsuccess: function (responseText, xhr) {
+		            console.log(responseText);
+		        },
+		        type: 'post'
+		    }
+		);
+
+
+	</script>
+</body>
+</html>

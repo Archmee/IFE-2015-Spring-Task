@@ -1,0 +1,101 @@
+/*----@banner--*/
+#index .banner {
+	width: 100%;
+	height: 525px;
+	
+	background: url(../assets/img/banner-bg.jpg) no-repeat left top;
+	background-size: cover; /*控制背景图片的大小适应整个盒子*/
+}
+#index  .cover {
+	position: relative;
+}
+#index .desc {
+	width: 400px;
+	position: absolute;
+	right: 0;
+	bottom: 0;
+
+	color: #fff;
+	padding: 10px 10px 30px 10px;
+	/*opacity: 0.4;这个会导致文字也透明，不是我们期望的*/
+	background-color: rgba(255, 255, 255, 0.2); /*for IE<10*/
+	
+	/*background: -webkit-linear-gradient(to bottom, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.2) 75%,rgba(255, 255, 255, 0));
+	background: -moz-linear-gradient(to bottom, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.2) 75%,rgba(255, 255, 255, 0));
+	background: -o-linear-gradient(to bottom, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.2) 75%,rgba(255, 255, 255, 0));*/
+	background: linear-gradient(to bottom, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.2) 75%,rgba(255, 255, 255, 0)); /*背景渐变，IE10+*/
+}
+#index .desc h2 {
+	text-align: right;
+	font-size: 14px;
+	margin-bottom: 12px;
+}
+#index .desc p {
+	margin: 0;
+	text-indent: 2em; /*段落缩进2个汉字*/
+	line-height: 150%;
+}
+
+/* ----@content */
+#index .content {
+	width: 100%;
+	height: 480px;
+}
+#index .blog-intro {
+	min-height: 325px;/*360-35padding=325*/
+	width: 300px;
+	float: left;
+
+	margin: 10px 10px 0 0;
+	padding: 10px 10px 25px 10px;
+	background-color: #fff;
+	
+	line-height: 170%;
+}
+#index .blog-intro:last-child {
+	margin-right: 0;
+}
+#index .blog-intro p {
+	text-indent: 2em;
+	margin: 0;
+	padding: 0 20px;/*20+10=30*/
+}
+#index .blog-intro img {
+	margin-bottom: 15px;
+}
+
+/*----@people--*/
+#index .people {
+	height: 520px;
+	width: 100%;
+	background-color: #fff;
+}
+#index .self {
+	text-align: center;
+}
+#index .self img {
+	width: 160px;
+	height: 160px;
+	border: none;
+
+	border-radius: 50%;
+	
+	/*margin-top: -50px;
+	margin-bottom: 50px;*/
+	/*用margin实现的效果，用相对定位也能实现，relative后未来图像位置还保留，只是图像向上相对位移了50px，而下面仍然还保留着50px的距离，所以不用单独设置下面的距离*/
+	position: relative;
+	top: -50px;
+}
+#index .self h2 {
+	font-family: "Century Gothic";
+	font-size: 20px;
+	font-weight: normal;
+}
+#index .self p {
+	width: 600px;
+	margin: 0 auto;
+	text-align: left;/*段落继承了居中对齐，重置为左对齐*/
+	text-indent: 2em;
+	font-size: 14px;
+	line-height: 170%;
+}

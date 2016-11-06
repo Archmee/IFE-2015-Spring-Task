@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>倒计时</title>
+	<style>
+		h1 {
+			font-family: Helvetica, 'Arial', sans-serif;
+			font-size: 98px;
+			color:purple;
+			text-align: center;
+		}
+	</style>
+</head>
+<body>
+	<input type="text" id="ttgo">
+	<input type="button" id="gotit" value="搞定">
+	<p id="show-title"></p>
+	<h1 id="show-time"></h1>
+
+	<script>
+		var btn = document.getElementById('gotit'),
+			timeText = document.getElementById('ttgo'),
+			timer = null;
+
+
+		btn.onclick = function(ev) {
+			var timeValue = timeText.value;
+			if (!/\d{4}-\d{2}-\d{2}/.test(timeValue)) {//格式不符
+				return false;
+			}
+			clearTimeout(timer);
+
+			var timeArr = timeValue.split('-')
+			var now = (new Date()).getTime(),
+				inputDate = (new Date(timeArr.join('/'))).getTime(),
+				d, h, m, s,
+				diff = (inputDate - now)/1000; //ms to s
+			
+			var showTitle = document.getElementById('show-title'),
+				showTime = document.getElementById('show-time');
+
+			showTitle.innerHTML = '距离'+timeArr[0]+'年'+timeArr[1]+'天'+timeArr[2]+'日还有：';
+
+			var showFunc = function() {
+				if (diff <= 0) {
+					return false;
+				}
+				var tmp = diff;
+				d = parseInt(tmp/(60*60*24));
+				tmp = tmp%(60*60*24);
+				h = parseInt(tmp/(60*60));
+				tmp = tmp % (60*60);
+				m = parseInt(tmp / 60);
+				s = parseInt(tmp % 60);
+
+				showTime.innerHTML = d+'天'+h+'小时'+m+'分'+s+'秒';
+				
+				diff--; //减去1秒
+
+				timer = setTimeout(showFunc, 1000);
+			};
+
+			showFunc();
+		}
+
+	</script>
+</body>
+</html>

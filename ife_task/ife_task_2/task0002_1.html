@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>task 1</title>
+	<style>
+		label {
+			/*vertical-align: top;*/
+		}
+		textarea {
+			height: 100px;
+			width: 200px;
+		}
+		#warning {
+			color: red;
+			display: inline-block;
+			/*visibility: hidden;*/ /*visible*/
+		}
+	</style>
+</head>
+<body>
+	<label for="lover">兴趣爱好：</label><br />
+	<textarea id="lover"></textarea><br /> 
+	<span id="warning"></span><br/>
+	<input id="got" type="button" value="OK">
+	
+	<script src="util.js"></script>
+	<script>
+		var clog = console.log;
+
+		var oBtn = document.getElementById('got');
+		var text = document.getElementById('lover');
+		var spanEle = document.getElementById('warning');
+
+		addEvent(oBtn, 'click', function() {
+			var e = event || window.event;
+
+			var textArr = text.value.split(/[\n  ,，、;；]/);
+			var outArr = [];
+			for (var i = 0, len = textArr.length; i < len; i++) {
+				var tmp = trim(textArr[i]);
+				if (tmp != '' && outArr.indexOf(tmp) <= -1) {
+					outArr.push(tmp);
+				}
+			}
+
+			try {
+				if (outArr.length < 1 || outArr.length > 10) {
+					throw new Error('输入兴趣不能为0个也不能超过10个');
+				}
+				spanEle.innerHTML = '';
+			} catch(e) {
+				spanEle.innerHTML = e.message;
+				return false;
+			}			
+
+			var output = document.getElementById('output');
+			if (output == null) {
+				output = document.createElement('fieldset');
+				output.id = 'output';
+				
+				var legend = document.createElement('legend');
+				legend.innerHTML = '个人兴趣爱好展示';
+				output.appendChild(legend);
+
+				document.body.appendChild(output);
+			}
+			// 清空已存在的
+			var tmp = output.children[0];
+			output.innerHTML = '';
+			output.appendChild(tmp);
+			tmp = null;
+
+			for (var i = 0, len = outArr.length; i < len; i++) {
+				var checkbox = document.createElement('input');
+				checkbox.type = 'checkbox';
+				checkbox.id = 'id-'+i;
+				checkbox.checked = 'true';
+
+				var label = document.createElement('label');
+				label.htmlFor = 'id-'+i;
+				label.innerHTML = outArr[i];
+
+				output.appendChild(checkbox);
+				output.appendChild(label);
+				output.appendChild(document.createElement('br'));
+			}
+
+			// text.value = '';
+		})
+	</script>
+</body>
+</html>
