@@ -471,13 +471,11 @@ function isIE() {
 
 // 设置cookie
 function setCookie(cookieName, cookieValue, expiredays) {
-    var date = new Date(),
-    	expires = date.getDate()+expiredays;
-    date.setDate(expires);
+    var expireMS = new Date(Date.now() + expiredays*24*60*60*1000);
 
     document.cookie = encodeURIComponent(cookieName) + '=' +
     				  encodeURIComponent(cookieValue) + 
-    				  (expiredays == null ? '' : '; expires=' + date.toGMTString());		  
+    				  (expiredays == null ? '' : '; expires=' + expireMS.toGMTString()); //toUTCString
 }
 
 // 获取cookie值
@@ -488,7 +486,7 @@ function getCookie(cookieName) {
 
 	if (cookieStart > -1) { //Found
 		var cookieEnd = document.cookie.indexOf(';', cookieStart);
-		if (cookieEnd == -1) { //not found
+		if (cookieEnd == -1) { //if not found
 			cookieEnd = document.cookie.length;
 		}
 
