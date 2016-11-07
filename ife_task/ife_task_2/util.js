@@ -354,10 +354,10 @@ function getBySelector(element, selector) {
 function $(selector) {
 	var tempNodeList = [document.documentElement]; //根节点开始
 	var selectorArr = selector.split(/\s+/); //拆分组合选择器
-	var selectorIndex = 0; //从第0个选择器开始
+	var currSelIndex = 0; //从第0个选择器开始
 
 	// 值得注意的是对节点的递归调用并没有回溯过程，在递归的过程中找到答案，立即终止递归过程
-	var res = (function(nodeList, currSelIndex) {
+	var res = (function(nodeList) {
 		for (var i = 0, len = nodeList.length; i < len && nodeList[i].children.length > 0; i++) {
 			//如果有孩子节点才会进入循环，因为getBySelector也只计算孩子节点
 			var tempList = getBySelector(nodeList[i], selectorArr[currSelIndex]);
@@ -372,14 +372,14 @@ function $(selector) {
 
 			currSelIndex++; //递增选择器
 			
-			var ret = arguments.callee(tempList, currSelIndex); //递归调用本函数
+			var ret = arguments.callee(tempList); //递归调用本函数
 			if (ret != null) { //如果接到任何结果返回，就立即返回
 				return ret;
 			}
 		}
 
 		return null; //循环结束都没有找到，那就是null了
-	})(tempNodeList, selectorIndex); //立即执行并传入参数
+	})(tempNodeList); //立即执行并传入参数
 
 	// clog(res);
 	return res; //返回
