@@ -1,14 +1,50 @@
 // --------------------
 // Basic
 // --------------------
-
-function isArray(arr) { // x
-	return arr instanceof Array; //ES3
-	// return Array.isArray(arr); //ES5
+var protoToString = Object.prototype.toString;
+var DataType = {
+	NUMBER: 	"[object Number]",
+	STRING: 	"[object String]",
+	BOOL: 		"[object Boolean]",
+	ARRAY: 		"[object Array]",
+	FUNCTION: 	"[object Function]",
+	OBJECT: 	"[object Object]",
+	DATE: 		"[object Date]",
+	REGEXP: 	"[object RegExp]",
+};
+// 是否是数字
+function isNumber(arg) {
+	return protoToString.call(arg) === DataType.NUMBER;
 }
-
-function isFunction(fn) { // x
-	return typeof fn === "function";
+// 是否是字符串
+function isString(arg) {
+	return protoToString.call(arg) === DataType.STRING;
+}
+// 是否是布尔值
+function isBoolean(arg) {
+	return protoToString.call(arg) === DataType.BOOL;
+}
+// 是否是数组
+function isArray(arg) {
+	// return arr instanceof Array; //ES3
+	// return Array.isArray(arr); //ES5
+	return protoToString.call(arg) === DataType.ARRAY;
+}
+// 是否是函数
+function isFunction(arg) {
+	return protoToString.call(arg) === DataType.FUNCTION;
+}
+// 是否是对象
+function isObject(arg) {
+	return protoToString.call(arg) === DataType.OBJECT;
+}
+// 是否是时间对象
+function isDate(arg) {
+	return protoToString.call(arg) === DataType.DATE;
+}
+// 是否是正则
+function isRegExp(arg) {
+	return protoToString.call(arg) === DataType.REGEXP;
 }
 
 // 使用递归来实现一个深度克隆，可以复制一个目标对象，返回一个完整拷贝
@@ -532,12 +568,11 @@ function ajax(url, options) {
     if (options.data) {
     	
     	if (typeof options.data === "string") {//split for encodeURIComponent
-    		options.data = {};
-
     		params = options.data.split('&');
+    		options.data = {}; //如果是字符串可以分割并保存到新对象中
     		for (var i = 0, len = params.length; i < len; i++) {
-    			var tmp = params[i].split('=');
-    			options.data[tmp[0]] = tmp[1];
+    			var pair = params[i].split('=');
+    			options.data[pair[0]] = pair[1];
     		}
     	}
 
