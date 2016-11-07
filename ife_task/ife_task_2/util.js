@@ -358,20 +358,23 @@ function $(selector) {
 
 	// 值得注意的是对节点的递归调用并没有回溯过程，在递归的过程中找到答案，立即终止递归过程
 	var res = (function(nodeList) {
-		for (var i = 0, len = nodeList.length; i < len && nodeList[i].children.length > 0; i++) {
-			//如果有孩子节点才会进入循环，因为getBySelector也只计算孩子节点
-			var tempList = getBySelector(nodeList[i], selectorArr[currSelIndex]);
+		
+		for (var i = 0, len = nodeList.length; i < len; i++) {
 			
-			if (tempList == null || tempList.length < 1) { //如果没有找到匹配currSelIndex的子节点
-				continue; //则继续循环
+			if (nodeList[i].children.length < 1) { //如果没有孩子节点(因为getBySelector也只算孩子节点)
+				continue; //则开始下次循环
 			}
 
-			if (currSelIndex === selectorArr.length-1) { //已经匹配到最后一个选择器，且有结果
-				return tempList[0]; //tempList不为null，第1个就是匹配成功的项
+			var tempList = getBySelector(nodeList[i], selectorArr[currSelIndex]);
+			if (tempList == null || tempList.length < 1) { //如果没有找到匹配currSelIndex的子节点
+				continue; //则开始下次循环
+			}
+
+			if (currSelIndex === selectorArr.length-1) { //已经匹配到最后一个选择器
+				return tempList[0]; //且结果tempList不为null，则返回第1个匹配成功的项
 			}
 
 			currSelIndex++; //递增选择器
-			
 			var ret = arguments.callee(tempList); //递归调用本函数
 			if (ret != null) { //如果接到任何结果返回，就立即返回
 				return ret;
@@ -426,7 +429,7 @@ function addEnterEvent(element, listener) {
 	});
 }
 
-function delegateEvent(element, tag, eventName, listener) {
+function delegateEvent(element, tag, eventName, listener) { //把tag换成selector会不会更好？
    addEvent(element, eventName, function(event) {
    		var e = event || window.event,
    			target = e.target || e.srcElement;
@@ -459,7 +462,11 @@ $.delegate = function(selector, tag, event, listener) {
 // -----------------
 // 判断是否为IE浏览器，返回-1或者版本号
 function isIE() {
-	return !window.opera && /MSIE ([^;]+)/.test(window.navigator.userAgent);
+	//如果不是opera且代理字符串能匹配正则表达式，则返回IE版本，否则返回-1
+	if (!window.opera && /MSIE ([^;]+)/.test(window.navigator.userAgent)) {
+		return parseFloat(RegExp["$1"]);
+	}
+	return -1;
 }
 
 // 设置cookie
