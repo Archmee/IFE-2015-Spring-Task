@@ -10,7 +10,7 @@ var DataType = {
 	FUNCTION: 	"[object Function]",
 	OBJECT: 	"[object Object]",
 	DATE: 		"[object Date]",
-	REGEXP: 	"[object RegExp]",
+	REGEXP: 	"[object RegExp]"
 };
 // 是否是数字
 function isNumber(arg) {
@@ -26,9 +26,12 @@ function isBoolean(arg) {
 }
 // 是否是数组
 function isArray(arg) {
-	// return arr instanceof Array; //ES3
-	// return Array.isArray(arr); //ES5
-	return protoToString.call(arg) === DataType.ARRAY;
+	// ES3：arr instanceof Array;
+	// ES5：Array.isArray(arr)
+	var isA = Array.isArray || function(a) {
+		return protoToString.call(a) === DataType.ARRAY;
+	};
+	return isA(arg);
 }
 // 是否是函数
 function isFunction(arg) {
@@ -49,48 +52,91 @@ function isRegExp(arg) {
 
 // 使用递归来实现一个深度克隆，可以复制一个目标对象，返回一个完整拷贝
 // 被复制的对象类型会被限制为数字、字符串、布尔、日期、数组、Object对象。不会包含函数、正则对象等
-function cloneObject(src) { // x
-	var obj = {};
-    for(var item in src) {
-    	
-    	var type = typeof src[item];
-    	switch(type) {
-    		case "number":
-    		case "string":
-    		case "boolean":
-    			obj[item] = src[item];
-    			break;
-    		case  "object":
-	    		if (src[item] instanceof Date) {//date
-	    			obj[item] = new Date(src[item].toString());
-				}  else if ( src[item] instanceof Object && !(src[item] instanceof RegExp) ) { //Object include Array but not RegExp
-					// console.log(src[item]);
-					obj[item] = cloneObject(src[item]);
-				}
-				break;
-    		default: //maybe function
-    			console.log(type);
-    	}
-    }
-   
-    return obj;
-}
+function cloneObject(src) {
+	var newValue;
 
-// 对数组进行去重操作，只考虑数组中元素为数字或字符串，返回一个去重后的数组
-function uniqArray(arr) { // x
-	var newArr = [];
-    for (var i = 0; i < arr.length; i++) {
-    	//O(>2n)
-    	if (typeof arr[i] === "number" || typeof arr[i] === "string") {
-    		if (newArr.indexOf(arr[i]) == -1) { // not found arr[i] in newArr
-    			newArr.push(arr[i]);
+   	if (isFunction(src) || isRegExp(src)) { //函数或正则
+   		newValue = null;
+    } else if (isArray(src)) { //数组
+    	// newValue = Array.prototype.slice.call(src, 0); //不能复制扩展属性
+    	newValue = [];
+    	for (var item in src) { //用forin遍历数组是为了访问扩展的属性（不是通过索引，类似对象属性）
+    		if (!src.hasOwnProperty(item)) { continue; } //防止继承属性
+    		var res = arguments.callee(src[item]);
+    		if (res != null) { // not null
+    			// newValue.push(res); //直接顺序插入（可以将不规则索引重新排列，反正值保存下来就ok了）
+    			newValue[item] = src[item] //还是用索引的方式（数组还是保持原样，有关联数组的地方还是关联的形式）
     		}
     	}
+    } else if (isObject(src)) { //非函数正则数组的对象
+    	newValue = {};
+    	for (var item in src) {
+    		if (!src.hasOwnProperty(item)) { continue; }
+    		var res = arguments.callee(src[item]);
+    		if (res != null) { // not null
+    			newValue[item] = res;
+    		}
+    	}
+    } else if (isDate(src)) { //日期
+    	newValue = new Date(src);
+    } else { //基本值
+    	newValue = src;
+    }
+
+    return newValue;
+}
+
+// Pollyfill: Array.indexOf
+// MDN https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
+Array.prototype.indexOf = Array.prototype.indexOf || function(searchElement, fromIndex) {
+
+	var k;
+	if (this == null) {
+		throw new TypeError('"this" is null or not defined');
+	}
+	var O = Object(this);
+
+	var len = O.length >>> 0;
+	if (len === 0) {
+		return -1;
+	}
+
+	var n = +fromIndex || 0;
+	if (Math.abs(n) === Infinity) {
+		n = 0;
+	}
+	if (n >= len) {
+		return -1;
+	}
+
+	k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
+	while (k < len) {
+		if (k in O && O[k] === searchElement) {
+			return k;
+		}
+		k++;
+	}
+
+	return -1;
+};
+
+// 对数组进行去重操作，只考虑数组中元素为数字或字符串，返回一个去重后的数组
+function uniqArray(arr) {
+	var newArr = [];
+
+    for (var i = 0, l = arr.length; i < l; i++) {
+    	//O(>2n)
+		// if (newArr.indexOf(arr[i]) == -1) { // not found arr[i] in newArr
+		// 	newArr.push(arr[i]);
+		// }
 
     	// hash O(n) 但是不好的是，这样处理其他数据类型就麻烦了
-    	// if (typeof arr[i] === "number" || typeof arr[i] === "string") {
-    	// 	newArr[arr[i]] = arr[i];
-    	// }
+    	if (isNumber(arr[i])) {
+    		newArr[arr[i]] = arr[i];
+    	} else if (isString(arr[i])) {
+    		newArr['s_'+arr[i]] = arr[i]; //区别类型，例如hash 1 和 '1' 不能覆盖
+    	}
+    	
     }
 
     return newArr;
@@ -99,24 +145,33 @@ function uniqArray(arr) { // x
 // 对字符串头尾进行空格字符的去除、包括全角半角空格、Tab等，返回一个字符串
 // 尝试使用一行简洁的正则表达式完成该题目
 function trim(str) {
-	return str.replace(/^\s*|\s*$/g, '');
+	return str.replace(/^\s+|\s+$/g, '');
 }
 
 // 实现一个遍历数组的方法，针对数组中每一个元素执行fn函数，并将数组索引和元素作为参数传递
-function each(arr, fn) { // x
-	if (typeof fn === "function") {
-		for (var i = 0, len=arr.length; i < len; i++) {
-			fn(arr[i], i);//i
-		}
+function each(arr, fn) { 
+	if (!isFunction(fn)) {
+		return false;
+	}
+	for (var i = 0, l = arr.length; i < l; i++) {
+		fn.call(arr, i, arr[i]);
 	}
 }
 
 // 获取一个对象里面第一层元素的数量，返回一个整数，ES5支持Object.keys获取对象属性
-function getObjectLength(obj) { // x
+function getObjectLength(obj) {
 	var count = 0;
-	for(var item in obj) {
-		count++;
+
+	if (Object.keys) {
+		count = Object.keys(obj).length;
+	} else {
+		for(var item in obj) {
+			if (obj.hasOwnProperty(item)) {
+				count++;
+			}
+		}
 	}
+	
 	return count;
 }
 

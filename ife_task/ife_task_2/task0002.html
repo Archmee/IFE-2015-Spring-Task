@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>ife task0002</title>
+	<title>ife task0002 util.js test case</title>
 	<style>
 		body {
 			margin: 0;
@@ -66,28 +66,31 @@
 		
 
 		// 测试用例：
-		// var srcObj = {
-		//     a: 1,
-		//     b: {
-		//         b1: ["hello", "hi"],
-		//         b2: "JavaScript"
-		//     },
-		//     c: new Date(),
-		//     d: function () {
-		//     	return 1;
-		//     },
-		//     e: /[a]/
+		// Array.prototype.myprotoTest = 123;
+		/*var srcObj = {
+		    a: 1,
+		    b: {
+		        b1: ["hello", "hi"],
+		        b2: "JavaScript"
+		    },
+		    c: new Date(),
+		    d: function () {
+		    	return 1;
+		    },
+		    e: /[a]/,
+		    f: true,
+		    g: ["hello", "hi"]
+		};
+		Array.prototype.myprotoTest = 123; //测试如果forin遍历数组是是否有必要验证hasOwnProperty
+		srcObj.g["ex"] = "bibibi"; //测试数组的扩展属性是否复制了
+		var abObj = srcObj;
+		var tarObj = cloneObject(srcObj);
+		srcObj.a = 2;
+		srcObj.b.b1[0] = "wwwwww";
+		srcObj.c = new Date("July 24, 2017");
 
-		// };
-		// var abObj = srcObj;
-		// var tarObj = cloneObject(srcObj);
-
-		// srcObj.a = 2;
-		// srcObj.b.b1[0] = "wwwwww";
-		// srcObj.c = new Date("July 24, 2017");
-
-		// console.log(abObj);
-		// console.log(tarObj);
+		console.log(abObj);
+		console.log(tarObj);*/
 
 		// console.log(abObj.a);
 		// console.log(abObj.b.b1[0]);
@@ -100,13 +103,14 @@
 
 
 		// // 使用示例
-		// var a = [1, 3, false, false, 5, 7, 5, 3];
+		// var a = [1, 3, 5, 7, 5, 3, "1", "2", "hello", "hello", "1"];
+		// alert(Array.prototype.indexOf);
+		// alert(a.indexOf("hello"));
 		// var b = uniqArray(a);
-
 		// console.log(a);
-		// console.log(Object.keys(b));
-		// console.log(b); // [1, 3, 5, 7]
+		// console.log(b); // [1, 3, 5, 7, "1", "2", "hello"]
 
+		// console.log(Object.keys(b));
 		// // 实现一个简单的trim函数，用于去除一个字符串，头部和尾部的空白字符
 		// // 假定空白字符只有半角空格、Tab
 		// // 练习通过循环，以及字符串的一些基本方法，分别扫描字符串str头部和尾部是否有连续的空白字符，并且删掉他们，最后返回一个完成去除的字符串
@@ -579,19 +583,19 @@
 		// onfail: 失败时的调用函数
 
 		// 使用示例：
-		ajax(
-		    'http://localhost:8080/server/ajaxtest', 
-		    {
-		        data: {
-		            name: 'simon',
-		            password: '123456'
-		        },
-		        onsuccess: function (responseText, xhr) {
-		            console.log(responseText);
-		        },
-		        type: 'post'
-		    }
-		);
+		// ajax(
+		//     'http://localhost:8080/server/ajaxtest', 
+		//     {
+		//         data: {
+		//             name: 'simon',
+		//             password: '123456'
+		//         },
+		//         onsuccess: function (responseText, xhr) {
+		//             console.log(responseText);
+		//         },
+		//         type: 'post'
+		//     }
+		// );
 
 
 	</script>
