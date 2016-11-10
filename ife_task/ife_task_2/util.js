@@ -198,116 +198,97 @@ function isSiblingNode(element, siblingNode) {
 
 // 获取element相对于浏览器窗口的位置，返回一个对象{x, y}
 function getPosition(element) { // x
-    var pos = {};
-    pos.x = element.offsetLeft - (document.body.scrollLeft || document.documentElement.scrollLeft);
-    pos.y = element.offsetTop - (document.body.scrollTop || document.documentElement.scrollTop);
+    var pos = {x:0, y:0};
+    var current = element;
+
+    while (current.nodeName.toLowerCase() != 'html') {
+    	// console.log(current);
+    	// console.log(pos);
+
+    	pos.x += current.offsetLeft;
+    	pos.y += current.offsetTop;
+
+    	current = current.parentNode; //offsetParent is also ok
+    }
+
+    pos.x -= document.body.scrollLeft || document.documentElement.scrollLeft;
+    pos.y -= document.body.scrollTop || document.documentElement.scrollTop;
+
     return pos;
 }
 
 // 为element增加一个样式名为newClassName的新样式
 // ps: HTML5 新增了classList属性，可以更加方便的添加删除class，但是这里考虑兼容性没有使用
 function addClass(element, newClassName) {
-	// 这虽然不算好的方式，但是效率高，即使添加了重复的类，也不影响效果
-	// 更合理的方法是把原字符串分割成数组，删掉和要添加的重复的class
+	// 直接追加类名虽然不算好的方式，但是效率高，即使添加了重复的类，也不影响效果
 
-	removeClass(element, newClassName); //更新：先删除已有类名，这样就不会重复了
+	//更新：先删除已有类名，这样就不会重复了
+	newClassName = removeClass(element, newClassName); //该函数会返回被删除类名
    
-    element.className += ' ' + newClassName; //没有任何类时className=""
+    element.className += (!element.className ? '' : ' ') + newClassName; //原className不为空的时候要追加一个空格
 }
 
-// 移除element中的样式oldClassName
-function removeClass(element, oldClassName) {
-	
+// 移除element.className中的oldClass
+function removeClass(element, oldClass) {
 	var tempClass = element.className;
-	var oldClassNameArr = oldClassName.split(/\s+/);
+	var oldClassArr = oldClass.split(/\s+/);
 	
-	for (var i = 0, len = oldClassNameArr.length; i < len; i++) {
+	for (var i = 0, len = oldClassArr.length; i < len; i++) {
 		//要么以字符串开头或结尾，要么字符串前后都有1或多个空格
-		// var re = new RegExp('(^'+oldClassName+')|(\\s+'+oldClassName+'\\s+)|('+oldClassName+'$)', 'g');
-		var re = new RegExp('(^|\\s+)'+oldClassNameArr[i]+'(\\s+|$)', 'g');
-		
+		var re = new RegExp('(^|\\s+)'+oldClassArr[i]+'(\\s+|$)', 'g');
 	    tempClass = tempClass.replace(re, ' ');
 	}
 
-	element.className = tempClass;//将删除后的类名一次性赋值，防止多次渲染
-	return tempClass; //并且返回删除后的className
+	tempClass = trim(tempClass); //将删除后的类名过滤掉首尾的空白字符
+	element.className = tempClass; //一次性赋值，防止多次渲染
+
+	return oldClassArr.join(' '); //返回删除后的className
 }
 
-// 遍历节点
-function traversalNodes(element, isMatchFunc) {
+// 遍历节点并调用匹配回调函数
+function traversalNodes(element, isMatch) {
 	if (!element) { return null; }
 	var nodeList = [];
 
-	//if语句执行原生的语法的方法已经放弃，原因有：1 是IE的注释节点，2 是我在遍历节点是要执行传进来的回调函数
-	/*if (typeof element.getElementsByTagName === "function") {
-		var temp = element.getElementsByTagName('*'); //返回的是一个HTMLCollection的对象，IE返回值可能包括注释节点，所以或许这不是一个好的方法（P258）
-		temp = Array.prototype.slice.call(temp, 0);   //转化为数组
-		//nodeList.concat(element, temp); //最开始想把本元素拼接起来：后来发现不需要，因为一般在一个元素上执行查询都是针对子元素，而不包括本元素
-		nodeList = temp;
-	} */
-	/* 下面是检查是否支持最新的遍历方法
-	** PS：其实如果浏览器createNodeIterator的话，也几乎都支持getElementsByTagName了，所以下面的语句几乎不会执行
-	*/
-	// ---上面的已废弃----
+	// getElementsByTagName('*')的方法已经放弃，原因有：
+	// 1 返回IE的注释节点，2 在遍历节点时要执行回调函数
 	
 	if (document.createNodeIterator) { //HTML5遍历方法，兼容IE9+
 		
 		var iterator = document.createNodeIterator(element, NodeFilter.SHOW_ELEMENT, null, false);
 		var node = iterator.nextNode(); //node现在是传入的根节点
 
-		while((node = iterator.nextNode()) != null) { //遍历下一个元素，不一定是兄弟元素
-			
-			//if(node != element) {  //不包括根节点，其实更简洁的方法是在循环外调用两次nextNode()，但是担心万一没有下一个节点会抛出异常
-				if (typeof isMatchFunc === "function") { //如果有匹配函数
-					if (isMatchFunc(node)) { //且匹配成功，则保存
-						nodeList.push(node);
-					}
-				} else { //如果没有传入匹配函数，则全部保存
-					nodeList.push(node);
-				}
-			//}
+		while((node = iterator.nextNode()) != null) { //遍历子节点(两次调用nextNode已经不包括根节点)
+			// if 如果有匹配函数
+			//	  if 且匹配成功 则保存
+			// else 如果没有传入匹配函数，则全部保存
+
+			// 如果没有函数 或者 有函数且函数返回真就保存节点
+			if (!isFunction(isMatch) || isMatch(node)) { 
+				nodeList.push(node); 
+			}
 		}
 	} else { //兼容IE8以及更低版本
-		
-		(function(node) { // 递归遍历节点（深度优先）
-			
-			if(node != element) {  //不包括根节点
-				if (typeof isMatchFunc === "function") { //如果有匹配函数
-					if (isMatchFunc(node)) { //且匹配成功，则保存
-						nodeList.push(node);
-					}
-				} else { //如果没有传入匹配函数，则全部保存
-					nodeList.push(node);
-				}
-			};
-
-
-			// 昨晚上想了一下，是否可以把上面的步奏放到循环里面，
-			//因为每次进入函数调用，都是要对子节点进行操作
-
-
-
-			node = node.children; //Element Node
+		(function(node) { // 递归遍历节点(深度优先)
+			node = node.children || node.childNodes; // children和childNodes还有一个很大的区别是IE7、8、9的document对象上都没有children对象但是有childNodes，所以这里这样做的好处是让支持children的浏览器用children，因为children只保存了元素节点，循环更少
 			for (var i = 0, len = node.length; i < len; i++) {
 				// if条件本来是想防止IE8及更低版本的注释节点（p299提到IE中的children属性包括注释节点）
 				// 但后来看到IE8及更低版本将注释节点实现为了Element类型（p258），猜想nodeType也相同了，无解
 				// 经过验证(IE7+)：nodeType===1可用来判定是否是元素节点，p249也提到过适用于所有浏览器
-				// 再次验证(IE7+)：其实不用判断nodeType也是有效的，也就是说ie中的children属性并不包括注释节点，但书上为什么这么说？？？
-				// TODO:有待确认???
-				if (node[i].nodeType === 1) { 
-					arguments.callee(node[i]); //递归调用
+				// 再次验证(IE7+)：其实不用判断nodeType也是有效的，也就是说ie中的children属性并不包括注释节点
+				// 但书上为什么这么说？？？
+				if (node[i].nodeType === 1) { //确认是元素节点
+					if (!isFunction(isMatch) || isMatch(node[i])) {
+						nodeList.push(node[i]);
+					}
+					arguments.callee(node[i]); // 递归调用
 				}
 			}
+
 		})(element);
-		// alert('myIterator');
 	}
 
 	return nodeList;
-}
-
-// 判断参数是否是一个节点
-function isNode(element) { // x 
-	return typeof element.nodeType === "number";
 }
 
 // 检查元素类名中是否包含传入的classStr
@@ -315,51 +296,39 @@ function hasClass(element, classStr) {
 	//要么以字符串开头或结尾，要么字符串前后都有1或多个空格
 	var re = new RegExp('(^|\\s+)'+classStr+'(\\s+|$)', 'g');
 
-	return re.test(element.className); //返回匹配的bool值，test方法本身也是返回布尔值
+	return re.test(element.className); //返回正则匹配结果
 }
 
-// 返回bool值，该节点的class是否包含classes字符串中的所有类
-function containClasses(element, classes) {
-	var classStr = element.className;
+// 返回bool值，该节点的class是否包含classStr字符串中的所有类
+function containClasses(element, classStr) {
 	//任何一个为空，都不会是包含关系，可直接返回假
-	if (!classStr || !classes
-		|| typeof classStr !== "string"
-		|| typeof classes !== "string") {
+	if (!element.className || !classStr || !isString(classStr)) {
 		return false;
 	}
 
-	var allMatch = true; //默认全部匹配
-	var classesArr = classes.split(/\s+/); //把多个类名拆分
-
-	for (var i = 0, len = classesArr.length; i < len; i++) {
-		if (!hasClass(element, classesArr[i])) {
-			allMatch = false;
-			break; //找到不匹配的一个，就可以退出循环了
+	var classArr = classStr.split(/\s+/); //把多个类名拆分逐个检查
+	for (var i = 0, len = classArr.length; i < len; i++) {
+		if (!hasClass(element, classArr[i])) {
+			return false; //一旦找到不匹配的类名，就直接返回
 		}
 	}
 
-	return allMatch;
+	return true; //如果循环结束就说明全部匹配，是包含关系
 }
 
-// 获取在element节点中匹配classNameStr的节点并返回
-function getByClass(element, classNameStr) {
-	var classList = [];
-	// 如果支持最新的通过类名获取元素的方法，直接取得结果（IE9+）
-	if (element.getElementsByClassName) {
-		classList = element.getElementsByClassName(classNameStr);
-	} else { //更低版本
-		classList = traversalNodes(element, function(node) {
-			return containClasses(node, classNameStr);
-		}); //遍历节点并执行回调
-	}
-
+// 获取在element节点中匹配classStr的节点并返回
+function getByClass(element, classStr) {
+	var classList = traversalNodes(element, function(node) {
+		return containClasses(node, classStr);
+	}); //遍历节点并执行回调
+	
 	return classList;
 }
 
 // 根据标签查找元素
 function getByTag(element, tagName) {
 	var tagList = traversalNodes(element, function(node) {
-		return node['nodeName'].toLowerCase() === tagName.toLowerCase(); //nodeName/tagName均可
+		return node.nodeName.toLowerCase() === tagName.toLowerCase(); //nodeName/tagName均可
 	});
 
 	return tagList;
@@ -368,7 +337,7 @@ function getByTag(element, tagName) {
 // 根据id查找元素
 function getById(element, id) {
 	var idsList = traversalNodes(element, function(node) {
-		return node['id'] === id;
+		return node.id === id;
 	});
 
 	return idsList;
@@ -377,10 +346,8 @@ function getById(element, id) {
 // 通过属性获取元素
 // value表示匹配属性的值，省略时只匹配属性名
 function getByAttr(element, attr, value) {
-	
 	var eleList = traversalNodes(element, function(node) {
-		// 这里始终传入value参数，不管函数是否传入，在函数内部检测即可
-		return hasAttribute(node, attr, value); 
+		return hasAttribute(node, attr, value); // 这里始终传入value参数，不管是否传入都在函数内部检测
 	});
 
 	return eleList;
@@ -391,24 +358,21 @@ function getByAttr(element, attr, value) {
 function hasAttribute(element, attr, value) {
 	var attrs = element.attributes;
 	for (var i = 0, len = attrs.length; i < len; i++) {
-		if (attrs[i].specified && attrs[i].nodeName === attr) { //检测specified是为了兼容IE7-
-			if (typeof value === "string" && value != "") { //如果传入了value参数，则检测，若没有传入，则其值为undefined，转到else语句
-				if (attrs[i].nodeValue === value) { //如果value值也匹配了则返回真，否则继续循环
-					return true;
-				}
-				
-			} else { //若没有第3个参数则表示只检测是否有该属性，现在已经检测到了，返回真
-				return true;
-			}
+		if (!attrs[i].specified || attrs[i].nodeName !== attr) { //检测specified是为了兼容IE7-
+			continue;
 		}
+		// else 属性名已经找到，接下来无论是否匹配 value 都直接返回而不再循环了
+		// 如果传入了value参数，就检查value参数是否匹配
+		// 如没有传入value，则直接返回true，因为attr已经找到
+		return (isString(value) ? attrs[i].nodeValue === value : true);
 	}
 
 	return false;
 }
 
 // 获取属性节点的值
-function getAttributeValue(element, attrIndex) {
-	return element.attributes[attrIndex].nodeValue;
+function getAttributeValue(element, attrName) {
+	return element.attributes[attrName].nodeValue;
 }
 
 
@@ -421,7 +385,7 @@ function getBySelector(element, selector) {
 		
 	} else if (/^#[-\w]+/.test(selector)) { //By ID
 		selector = selector.replace(/^#/, '');
-		res = getById(element, selector);
+		res = getById(element, selector);//element should always be document
 
 	} else if (/^\.[-\w]+/.test(selector)) { //By Class
 		selector = selector.replace(/^\./, '');
@@ -450,27 +414,27 @@ function $(selector) {
 	// 值得注意的是对节点的递归调用并没有回溯过程，在递归的过程中找到答案，立即终止递归过程
 	var res = (function(nodeList) {
 		
-		for (var i = 0, len = nodeList.length; i < len; i++) {
+		// for (var i = 0, len = nodeList.length; i < len; i++) {
 			
-			if (nodeList[i].children.length < 1) { //如果没有孩子节点(因为getBySelector也只算孩子节点)
-				continue; //则开始下次循环
-			}
+		// 	if (nodeList[i].children.length < 1) { //如果没有孩子节点(因为getBySelector也只算孩子节点)
+		// 		continue; //则开始下次循环
+		// 	}
 
-			var tempList = getBySelector(nodeList[i], selectorArr[currSelIndex]);
-			if (tempList == null || tempList.length < 1) { //如果没有找到匹配currSelIndex的子节点
-				continue; //则开始下次循环
-			}
+		// 	var tempList = getBySelector(nodeList[i], selectorArr[currSelIndex]);
+		// 	if (tempList == null || tempList.length < 1) { //如果没有找到匹配currSelIndex的子节点
+		// 		continue; //则开始下次循环
+		// 	}
 
-			if (currSelIndex === selectorArr.length-1) { //已经匹配到最后一个选择器
-				return tempList[0]; //且结果tempList不为null，则返回第1个匹配成功的项
-			}
+		// 	if (currSelIndex === selectorArr.length-1) { //已经匹配到最后一个选择器
+		// 		return tempList[0]; //且结果tempList不为null，则返回第1个匹配成功的项
+		// 	}
 
-			currSelIndex++; //递增选择器
-			var ret = arguments.callee(tempList); //递归调用本函数
-			if (ret != null) { //如果接到任何结果返回，就立即返回
-				return ret;
-			}
-		}
+		// 	currSelIndex++; //递增选择器
+		// 	var ret = arguments.callee(tempList); //递归调用本函数
+		// 	if (ret != null) { //如果接到任何结果返回，就立即返回
+		// 		return ret;
+		// 	}
+		// }
 
 		return null; //循环结束都没有找到，那就是null了
 	})(tempNodeList); //立即执行并传入参数

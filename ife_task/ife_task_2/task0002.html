@@ -28,14 +28,14 @@
 </head>
 <body class="wrap" id="boddd">
 	<h1>JS DOM</h1>
-	<article>
+	<article id="adom">
 		<input id="number1" data-log class="abc 123" type="text">
 		<input id="number2" class="classa" type="text">
 		<span id="result" data-log="123"><span>123</span></span>
 		<button id="addbtn" data-time=2015>计算</button>
 		<a id="link" href="">aa</a>
 		<!-- test $("#adom .classa span") -->
-		<div class="panel" id="adom">
+		<!-- <div class="panel" id="adom">
 			<span id="span1">span1</span>
 			<span id="span2">span2</span>
 			<div class="classa">
@@ -49,7 +49,7 @@
 				<span id="span7">span7</span>
 				<span id="span8">span8</span>
 			</div>
-		</div>
+		</div> -->
 		<div class="panel" id="adom" ><span class="classa">test ...</span></div>
 	</article>
 
@@ -154,7 +154,6 @@
 		//     	}
 		//     }
 		// }
-
 		// // 其中fn函数可以接受两个参数：item和index
 
 		// // 使用示例
@@ -184,96 +183,64 @@
 		// // 使用示例
 		// var obj = {
 		//     a: 1,
-		//     b: 2,
-		//     c: {
-		//         c1: 3,
-		//         c2: 4
-		//     }
+		//     b: {
+		//         b1: ["hello", "hi"],
+		//         b2: "JavaScript"
+		//     },
+		//     c: new Date(),
+		//     d: function () {
+		//     	return 1;
+		//     },
+		//     e: /[a]/,
+		//     f: true,
+		//     g: ["hello", "hi"]
 		// };
-		// console.log(getObjectLength(obj)); // 3
+		// console.log(getObjectLength(obj)); // 7
 
-		// // 判断是否为邮箱地址
-		// function isEmail(emailStr) {
-		//     var pattern = /[\w-]+@[\w-]+(\.[a-zA-Z]+){1,2}[a-zA-Z]$/;
-		//     return pattern.test(emailStr);
-		// }
-
-		// // 判断是否为手机号
-		// function isMobilePhone(phone) {
-		// 	var pattern = /^(\+?86)?1[0-9]{10}$/;
-		// 	return pattern.test(phone);
-		// }
 
 		// console.log('mail is '+isEmail("a@163.im"));
 		// console.log('phone is '+isMobilePhone("182000a333"));
-
+		var clog=console.log;
 		// // 为element增加一个样式名为newClassName的新样式
-		// function addClass(element, newClassName) {
-		// 	// 这虽然不算好的方式，但是效率高，即使添加了重复的类，也不影响效果
-		//     if (element.className) {
-		//     	element.className += ' ';
-		//     }
-		//     element.className += newClassName;
-		// }
-
 		// // 移除element中的样式oldClassName
-		// function removeClass(element, oldClassName) {
-		// 	// var re = new RegExp('(^'+oldClassName+')|(\\s+'+oldClassName+'\\s+)|('+oldClassName+'$)', 'g');
-		// 	var re = new RegExp('(^|\\s+)+'+oldClassName+'(\\s+|$)+', 'g');//要么以字符串开头/结尾，要么字符串前后都有1或多个空格
-			
-		//     element.className = element.className.replace(re, ' ');
-		// }
-
-		// // 判断siblingNode和element是否为同一个父元素下的同一级的元素，返回bool值
-		// function isSiblingNode(element, siblingNode) {
-		//     return element.parentNode === siblingNode.parentNode;
-		// }
-
-		// // 获取element相对于浏览器窗口的位置，返回一个对象{x, y}
-		// function getPosition(element) {
-		//     var pos = {};
-		//     console.log(element.offsetLeft);
-		//     console.log(element.offsetTop);
-
-		//     pos.x = element.offsetLeft - (document.body.scrollLeft || document.documentElement.scrollLeft);
-		//     pos.y = element.offsetTop - (document.body.scrollTop || document.documentElement.scrollTop);
-		//     return pos;
-		// }
-		// var clog = console.log;
-
 		// var oDiv = document.getElementsByTagName('div')[0];
 		// var oDiv2 = document.getElementsByTagName('div')[1];
 
+		// clog(oDiv.className);
 		// addClass(oDiv, "new-class    panel-  panel");
 		// removeClass(oDiv, "panel");
 		// clog(oDiv.className);
 
-
+		// // 判断siblingNode和element是否为同一个父元素下的同一级的元素，返回bool值
+		// // 获取element相对于浏览器窗口的位置，返回一个对象{x, y}
 		// console.log(isSiblingNode(oDiv, oDiv2));
 		// console.log(getPosition(oDiv));
-		var clog = console.log;
+
 		// if (document.compatMode == "CSS1Compat") {
 		// 	clog('Standard mode');
 		// } else {
 		// 	clog('Quirks mode');
 		// }
 
-		// clog(getByClass(document.documentElement, 'new-class'));
+		// clog(document.children);
+		// var dom = traversalNodes(document);
+		// clog(dom.length);
+		// clog(getByClass(document.documentElement, 'classa'));
+		// clog(getByTag(document.body, 'body'));
+		// clog(getByTag(document, 'span'));
+		// clog(getById(document, 'adom'));
+		// clog(getByAttr(document, 'id').length);
+		// clog(getByAttr(document, 'id', 'number2'));
+		// clog(getByAttr(document, 'data-log'));
+		// clog(getByAttr(document, 'data-log',''));
+
+		// var el = document.getElementsByTagName('*');
+		// console.log(el.length);
+		// each(el, function(index, value) {
+		// 	console.log(value.nodeName);
+		// })
 
 		// // 递归遍历节点（深度优先）
-		// function traversalByRecursive(element, className) {
-			
-		// 	if (containClass(element.className, className)) {
-		// 		clog(element.tagName);
-		// 	}
-
-		// 	element = element.children;
-		// 	for (var i = 0, length = element.length; i < length; i++) {
-		// 		arguments.callee(element[i], className);
-		// 	}
-
-		// }
-		// traversalByRecursive(document.documentElement, 'new-class');
 		
 		// clog(document.getElementsByTagName('*'));
 
