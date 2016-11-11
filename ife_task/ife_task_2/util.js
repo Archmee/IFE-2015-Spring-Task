@@ -407,39 +407,30 @@ function getBySelector(element, selector) {
 
 // 实现一个简单的Query
 function $(selector) {
-	var tempNodeList = [document.documentElement]; //根节点开始
 	var selectorArr = selector.split(/\s+/); //拆分组合选择器
-	var currSelIndex = 0; //从第0个选择器开始
 
-	// 值得注意的是对节点的递归调用并没有回溯过程，在递归的过程中找到答案，立即终止递归过程
-	var res = (function(nodeList) {
-		
-		// for (var i = 0, len = nodeList.length; i < len; i++) {
-			
-		// 	if (nodeList[i].children.length < 1) { //如果没有孩子节点(因为getBySelector也只算孩子节点)
-		// 		continue; //则开始下次循环
-		// 	}
+	//递归的过程中找到答案，回溯返回
+	var res = (function (node, currentIndex) {
+		var matchList = getBySelector(node, selectorArr[currentIndex]); //从node的孩子节点匹配selector
+		if (matchList == null || matchList.length < 1) { //如果没有返回值，直接返空
+			return null;
+		} // else 有返回值
 
-		// 	var tempList = getBySelector(nodeList[i], selectorArr[currSelIndex]);
-		// 	if (tempList == null || tempList.length < 1) { //如果没有找到匹配currSelIndex的子节点
-		// 		continue; //则开始下次循环
-		// 	}
+		if (currentIndex === selectorArr.length-1) { //如果已经匹配到最后一个选择器
+			return matchList[0];
+		} // else 选择器还没匹配结束，继续递增
 
-		// 	if (currSelIndex === selectorArr.length-1) { //已经匹配到最后一个选择器
-		// 		return tempList[0]; //且结果tempList不为null，则返回第1个匹配成功的项
-		// 	}
-
-		// 	currSelIndex++; //递增选择器
-		// 	var ret = arguments.callee(tempList); //递归调用本函数
-		// 	if (ret != null) { //如果接到任何结果返回，就立即返回
-		// 		return ret;
-		// 	}
-		// }
+		currentIndex++; //每一级递归都有自己的currentIndex，保证了回溯过程
+		for (var i = 0, len = matchList.length; i < len; i++) {
+			var ret = arguments.callee(matchList[i], currentIndex); 
+			if (ret != null) {
+				return ret;
+			}
+		}
 
 		return null; //循环结束都没有找到，那就是null了
-	})(tempNodeList); //立即执行并传入参数
+	})(document, 0); //起点节点从document开始，selectorIndex从0开始
 
-	// clog(res);
 	return res; //返回
 }
 

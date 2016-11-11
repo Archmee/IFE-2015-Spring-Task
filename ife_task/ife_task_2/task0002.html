@@ -35,7 +35,7 @@
 		<button id="addbtn" data-time=2015>计算</button>
 		<a id="link" href="">aa</a>
 		<!-- test $("#adom .classa span") -->
-		<!-- <div class="panel" id="adom">
+		<div class="panel" id="adom">
 			<span id="span1">span1</span>
 			<span id="span2">span2</span>
 			<div class="classa">
@@ -49,7 +49,7 @@
 				<span id="span7">span7</span>
 				<span id="span8">span8</span>
 			</div>
-		</div> -->
+		</div>
 		<div class="panel" id="adom" ><span class="classa">test ...</span></div>
 	</article>
 
@@ -200,7 +200,7 @@
 
 		// console.log('mail is '+isEmail("a@163.im"));
 		// console.log('phone is '+isMobilePhone("182000a333"));
-		var clog=console.log;
+		// var clog=console.log;
 		// // 为element增加一个样式名为newClassName的新样式
 		// // 移除element中的样式oldClassName
 		// var oDiv = document.getElementsByTagName('div')[0];
@@ -269,32 +269,34 @@
 		
 
 		// 封装选择器见util.js
-		
+		var clog=console.log;
+		var res;
 		// // 可以通过id获取DOM对象，通过#标示，例如
-		// $("#adom");   // 返回id为adom的DOM对象
-		// $("#number2");
+		// res=$("#adom");   // 返回id为adom的DOM对象
+		// res=$("#number2");
 
 		// // 可以通过tagName获取DOM对象，例如
-		// $("a");  // 返回第一个<a>对象
-		// $("h1");
+		// res=$("a");  // 返回第一个<a>对象
+		// res=$("h1");
 
 		// // 可以通过样式名称获取DOM对象，例如
-		// $(".panel"); // 返回第一个样式定义包含classa的对象
+		// res=$(".panel"); // 返回第一个样式定义包含classa的对象
 
 		// // 可以通过attribute匹配获取DOM对象，例如
-		// $("[data-log]"); // 返回第一个包含属性data-log的对象
+		// res=$("[data-log]"); // 返回第一个包含属性data-log的对象
 
-		// $("[data-time=2015]"); // 返回第一个包含属性data-time且值为2015的对象
+		// res=$("[data-time=2015]"); // 返回第一个包含属性data-time且值为2015的对象
 
 		// // 可以通过简单的组合提高查询便利性，例如
-		// $(".wrap .wrap"); // 返回id为adom的DOM所包含的所有子节点中，第一个样式定义包含classa的对象
-		// $("[data-log] span"); // 返回第一个包含属性data-log的对象	
-		// $("[data-time=2015] span");
-		// $("#adom .classa span"); //下面是内置函数，测试结果和我的一样，所以它不会只检测第一个id为adom的元素
+		// res=$(".wrap .wrap"); 
+		// res=$("[data-log] span");	
+		// res=$("[data-time=2015] span");
+		// res=$("#adom .classa span"); //下面是内置函数，测试结果和我的一样，所以它不会只检测第一个id为adom的元素
+		clog(res);
 		// clog(document.querySelector("#adom .classa span"));
 		
 		// clog(document.body.getElementsByTagName('div')[1].querySelector('#adom span'));
-
+		
 
 		// 任务四：事件
 		// // 给一个element绑定一个针对event事件的响应，响应函数为listener
