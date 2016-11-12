@@ -292,7 +292,7 @@
 		// res=$("[data-log] span");	
 		// res=$("[data-time=2015] span");
 		// res=$("#adom .classa span"); //下面是内置函数，测试结果和我的一样，所以它不会只检测第一个id为adom的元素
-		clog(res);
+		// clog(res);
 		// clog(document.querySelector("#adom .classa span"));
 		
 		// clog(document.body.getElementsByTagName('div')[1].querySelector('#adom span'));
@@ -300,63 +300,29 @@
 
 		// 任务四：事件
 		// // 给一个element绑定一个针对event事件的响应，响应函数为listener
-		// function addEvent(element, eventType, listener) {
-		//     if (element.addEventListener) {
-		//     	element.addEventListener(eventType, listener, false);
-		//     } else if (element.attachEvent) {
-		//     	element.attachEvent('on'+eventType, listener);
-		//     } else {
-		//     	element['on'+eventType] = listener;
-		//     }
-		// }
-
+		
 		// // 移除element对象对于event事件发生时执行listener的响应
-		// function removeEvent(element, eventType, listener) {
-		//     if (element.removeEventListener) {
-		//     	element.removeEventListener(eventType, listener, false);
-		//     } else if (element.detachEvent) {
-		//     	element.detachEvent('on'+eventType, listener);
-		//     } else {
-		//     	element['on'+eventType] = null;
-		//     }
-		// }
 
 		// // 实现对click事件的绑定
-		// function addClickEvent(element, listener) {
-		//     addEvent(element, 'click', listener);
-		// }
 
 		// // 实现对于按Enter键时的事件绑定
-		// function addEnterEvent(element, listener) {
-		// 	addEvent(element, 'keyup', function(event) {
-		// 		event = event || window.event;
-		// 		if (event.keyCode === 13) { //enter键
-		// 			listener.call(element, event);
-		// 		}
-		// 	});
-		// }
-		// // 例如：
-		// function clicklistener(event) {
-		//     alert(event.target.id);
-		// }
 
 		// addEvent($("#adom"), "click", clicklistener);
 		// removeEvent($("#adom"), "click", clicklistener);
 		// addEnterEvent(document, function(e) {
 		// 	console.log('done');
 		// });
-
 		
 		// $.on = addEvent;
 		// $.un = removeEvent;
 		// $.click = addClickEvent;
 		// $.enter = addEnterEvent;
 
+
 		// function clicklistener(event) {
 		//     alert(event.target.tagName);
 		//     return false;
 		// }
-
 		// 这里的问题时$对象和$函数怎么解决冲突
 		// $.on($("#adom"), "click", clicklistener);
 		// $.un($("#adom"), "click", clicklistener);
@@ -374,20 +340,15 @@
 
 		// a('str');
 		// a.on();
-
-
-		function clicklistener(event) {
-		    console.log(event.target.nodeName);
-		}
 		
 		// each($("#list").getElementsByTagName('li'), function(li) {
 		// 	 $.click(li, clickListener);
 		// });
 
 
-		function renderList() {
-		    $("#list").innerHTML += '<li>new item</li>';
-		}
+		// function renderList() {
+		//     $("#list").innerHTML += '<li>new item</li>';
+		// }
 		// function init() {
 		//     each($("#list").getElementsByTagName('li'), function(li) {
 		//         $.click(li, clicklistener);
@@ -437,42 +398,13 @@
 		// $.delegate('#list', "li", "click", clicklistener);
 
 		// // 判断是否为IE浏览器，返回-1或者版本号
-		// function isIE() {
-		// 	return !window.opera && /MSIE ([^;]+)/.test(window.navigator.userAgent);
-		// }
+		
 
 		// // 设置cookie
-		// function setCookie(cookieName, cookieValue, expiredays) {
-		//     var date = new Date(),
-		//     	expires = date.getDate()+expiredays;
-		//     date.setDate(expires);
-
-		//     document.cookie = encodeURIComponent(cookieName) + '=' +
-		//     				  encodeURIComponent(cookieValue) + 
-		//     				  (expiredays == null ? '' : '; expires=' + date.toGMTString());		  
-		// }
+		
 
 		// // 获取cookie值
-		// function getCookie(cookieName) {
-		// 	cookieName = encodeURIComponent(cookieName) + '=';
-		// 	var cookieStart = document.cookie.indexOf(cookieName),
-		// 		cookieValue = null;
 
-		// 	if (cookieStart > -1) { //Found
-		// 		var cookieEnd = document.cookie.indexOf(';', cookieStart);
-		// 		if (cookieEnd == -1) {
-		// 			cookieEnd = document.cookie.length;
-		// 		}
-
-		// 		cookieValue = decodeURIComponent(document.cookie.substring(cookieStart+cookieName.length, cookieEnd));
-		// 	}
-
-		// 	return cookieValue;
-		// }
-
-		// function unsetCookie(cookieName) {
-		// 	setCookie(cookieName, '', new Date(0));
-		// }
 
 		// if (!window.opera && /MSIE ([^;]+)/.test(window.navigator.userAgent)) {
 		// 	console.log('IE');
@@ -492,59 +424,7 @@
 		// clog(getCookie('password'));
 
 		// 学习Ajax，并尝试自己封装一个Ajax方法
-		function ajax(url, options) {
-		    var xhr = null;
-
-		    if (window.XMLHttpRequest) { //IE7+
-		    	xhr = new XMLHttpRequest();
-		    } else { //IE5,6
-		    	xhr = new ActiveXObject("Microsoft.XMLHTTP");
-		    }
-
-		    xhr.onreadystatechange = function() {
-		    	if (xhr.readyState == 4 ) {
-		    		if (((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) && options.onsuccess) {
-		    			options.onsuccess.call(null, xhr.responseText, xhr);
-		    		} else if (options.onfail) {
-		    			options.onfail.call(null, xhr);
-		    		}
-		    	}
-		    }
-
-		    var params = '';
-		    if (options.data) {
-		    	
-		    	if (typeof options.data === "string") {//split for encodeURIComponent
-		    		options.data = {};
-
-		    		params = options.data.split('&');
-		    		for (var i = 0, len = params.length; i < len; i++) {
-		    			var tmp = params[i].split('=');
-		    			options.data[tmp[0]] = tmp[1];
-		    		}
-		    	}
-
-		    	var plist = [];
-		    	for (var item in options.data) {
-		    		plist.push( encodeURIComponent(item) + '=' + 
-		    					encodeURIComponent(options.data[item]) );
-		    	}
-		    	params = plist.join('&');
-		    }
-
-		    if (!options.type) {
-		    	options.type = "GET";
-		    }
-		    options.type = options.type.toUpperCase();
-
-		    if (options.type === "GET") {
-		    	xhr.open("GET", url+'?'+params, true);
-		    	xhr.send(null);
-		    } else if (options.type === "POST") {
-		    	xhr.open("POST", url, true);
-		    	xhr.send(params);
-		    }
-		}
+		// function ajax(url, options) {}
 		// options是一个对象，里面可以包括的参数为：
 		// type: post或者get，可以有一个默认值
 		// data: 发送的数据，为一个键值对象或者为一个用&连接的赋值字符串
@@ -552,19 +432,28 @@
 		// onfail: 失败时的调用函数
 
 		// 使用示例：
-		// ajax(
-		//     'http://localhost:8080/server/ajaxtest', 
-		//     {
-		//         data: {
-		//             name: 'simon',
-		//             password: '123456'
-		//         },
-		//         onsuccess: function (responseText, xhr) {
-		//             console.log(responseText);
-		//         },
-		//         type: 'post'
-		//     }
-		// );
+		ajax(
+		    './ajaxtest.php',
+		    {
+		        data: {
+		            name: 'xsz',
+		            password: '123456'
+		        },
+		        onsuccess: function (responseText, xhr) {
+		            var res = JSON.parse(responseText);
+		            console.log(res);
+		            if (res['code'] > 0) {
+		            	setCookie('name', this.data.name, 1);
+		            } else {
+		            	alert(res['message']);
+		            }
+		        },
+		        onfail: function(xhr) {
+		        	console.log('Request failed!');
+		        },
+		        type: 'get',
+		    }
+		);
 
 
 	</script>

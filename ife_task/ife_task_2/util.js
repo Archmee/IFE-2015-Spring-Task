@@ -521,7 +521,8 @@ function setCookie(cookieName, cookieValue, expiredays) {
 
     document.cookie = encodeURIComponent(cookieName) + '=' +
     				  encodeURIComponent(cookieValue) + 
-    				  (expiredays == null ? '' : '; expires=' + expireMS.toGMTString()); //toUTCString
+    				  (!expiredays ? '' : '; expires=' + expireMS.toUTCString()); //toUTCString
+// TODO: UTC并非当地时间
 }
 
 // 获取cookie值
@@ -567,9 +568,9 @@ function ajax(url, options) {
     xhr.onreadystatechange = function() {
     	if (xhr.readyState == 4 ) {
     		if (((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) && options.onsuccess) {
-    			options.onsuccess.call(null, xhr.responseText, xhr);
+    			options.onsuccess.call(options, xhr.responseText, xhr);
     		} else if (options.onfail) {
-    			options.onfail.call(null, xhr);
+    			options.onfail.call(options, xhr);
     		}
     	}
     }
@@ -594,16 +595,13 @@ function ajax(url, options) {
     	params = plist.join('&');
     }
 
-    if (!options.type) {
-    	options.type = "GET";
-    }
-    options.type = options.type.toUpperCase();
-
+    options.type = !options.type ? "GET" : options.type.toUpperCase();
     if (options.type === "GET") {
     	xhr.open("GET", url+'?'+params, true);
     	xhr.send(null);
     } else if (options.type === "POST") {
     	xhr.open("POST", url, true);
+    	xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
     	xhr.send(params);
     }
 }
