@@ -86,6 +86,13 @@ function cloneObject(src) {
     return newValue;
 }
 
+//https://github.com/laozhang007/ife/blob/master/task/task0002/work/laozhang007/js/util.js
+function cloneObject2(obj) {
+    var s = JSON.stringify(obj);
+    var o = JSON.parse(s);
+    return o;
+}
+
 // Pollyfill: Array.indexOf
 // MDN https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
 Array.prototype.indexOf = Array.prototype.indexOf || function(searchElement, fromIndex) {
@@ -175,15 +182,54 @@ function getObjectLength(obj) {
 	return count;
 }
 
+// From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
+Object.keys = Object.keys || function(obj) {
+	'use strict';
+	var hasOwnProperty = Object.prototype.hasOwnProperty,
+    	hasDontEnumBug = !({ toString: null }).propertyIsEnumerable('toString'),
+	    dontEnums = [
+	      'toString',
+	      'toLocaleString',
+	      'valueOf',
+	      'hasOwnProperty',
+	      'isPrototypeOf',
+	      'propertyIsEnumerable',
+	      'constructor'
+	    ],
+    	dontEnumsLength = dontEnums.length;
+
+    if (typeof obj !== 'object' && (typeof obj !== 'function' || obj === null)) {
+        throw new TypeError('Object.keys called on non-object');
+    }
+
+    var result = [], prop, i;
+
+    for (prop in obj) {
+        if (hasOwnProperty.call(obj, prop)) {
+          result.push(prop);
+        }
+    }
+
+    if (hasDontEnumBug) {
+        for (i = 0; i < dontEnumsLength; i++) {
+            if (hasOwnProperty.call(obj, dontEnums[i])) {
+                result.push(dontEnums[i]);
+            }
+        }
+    }
+
+    return result;
+};
+
 // 判断是否为邮箱地址
 function isEmail(emailStr) {
-    var pattern = /[\w-]+@[\w-]+(\.[a-zA-Z]+){1,2}[a-zA-Z]$/;
+    var pattern = /^[\w-]+@[\w-]+(\.[a-zA-Z\d]+){1,2}$/i;//ignorecase
     return pattern.test(emailStr);
 }
 
 // 判断是否为手机号
 function isMobilePhone(phone) {
-	var pattern = /^(\+?86)?1[0-9]{10}$/;
+	var pattern = /^(\+?86)?1\d{10}$/;
 	return pattern.test(phone);
 }
 
@@ -217,32 +263,26 @@ function getPosition(element) { // x
     return pos;
 }
 
-// 为element增加一个样式名为newClassName的新样式
-// ps: HTML5 新增了classList属性，可以更加方便的添加删除class，但是这里考虑兼容性没有使用
-function addClass(element, newClassName) {
-	// 直接追加类名虽然不算好的方式，但是效率高，即使添加了重复的类，也不影响效果
+// 检查元素类名中是否包含传入的classStr
+function hasClass(element, classStr) {
+    //要么以字符串开头或结尾，要么字符串前后都有1或多个空格
+    var re = new RegExp('(^|\\s+)'+classStr+'(\\s+|$)', 'g');
+    return re.test(element.className); //返回正则匹配结果
+}
 
-	//更新：先删除已有类名，这样就不会重复了
-	newClassName = removeClass(element, newClassName); //该函数会返回被删除类名
-   
-    element.className += (!element.className ? '' : ' ') + newClassName; //原className不为空的时候要追加一个空格
+// 为element增加一个样式名为addClass的新样式
+// ps: HTML5 新增了classList属性，可以更加方便的添加删除class，但是这里考虑兼容性没有使用
+function addClass(element, newClass) {
+    if (!hasClass(element, newClass)) {
+        element.className += ' ' + newClass;
+    }
 }
 
 // 移除element.className中的oldClass
 function removeClass(element, oldClass) {
-	var tempClass = element.className;
-	var oldClassArr = oldClass.split(/\s+/);
-	
-	for (var i = 0, len = oldClassArr.length; i < len; i++) {
-		//要么以字符串开头或结尾，要么字符串前后都有1或多个空格
-		var re = new RegExp('(^|\\s+)'+oldClassArr[i]+'(\\s+|$)', 'g');
-	    tempClass = tempClass.replace(re, ' ');
-	}
-
-	tempClass = trim(tempClass); //将删除后的类名过滤掉首尾的空白字符
-	element.className = tempClass; //一次性赋值，防止多次渲染
-
-	return oldClassArr.join(' '); //返回删除后的className
+	//要么以字符串开头或结尾，要么字符串前后都有1或多个空格
+	var re = new RegExp('(^|\\s+)'+oldClass+'(\\s+|$)', 'g');
+    element.className = element.className.replace(re, '$1'); //$1可以决定是替换为1个空格还是0个
 }
 
 // 遍历节点并调用匹配回调函数
@@ -291,13 +331,6 @@ function traversalNodes(element, isMatch) {
 	return nodeList;
 }
 
-// 检查元素类名中是否包含传入的classStr
-function hasClass(element, classStr) {
-	//要么以字符串开头或结尾，要么字符串前后都有1或多个空格
-	var re = new RegExp('(^|\\s+)'+classStr+'(\\s+|$)', 'g');
-
-	return re.test(element.className); //返回正则匹配结果
-}
 
 // 返回bool值，该节点的class是否包含classStr字符串中的所有类
 function containClasses(element, classStr) {
@@ -469,6 +502,7 @@ function addClickEvent(element, listener) {
 function addEnterEvent(element, listener) {
 	addEvent(element, 'keyup', function(event) {
 		event = event || window.event;
+		event.keyCode = event.keyCode || event.which; //e.whice for firefox/opera
 		if (event.keyCode === 13) { //enter键
 			listener.call(element, event);
 		}
@@ -477,10 +511,10 @@ function addEnterEvent(element, listener) {
 
 function delegateEvent(element, tag, eventName, listener) { //把tag换成selector会不会更好？
    addEvent(element, eventName, function(event) {
-   		var e = event || window.event,
-   			target = e.target || e.srcElement;
-   		if (target.nodeName.toLowerCase() === tag) {
-   			listener.call(target, e);
+   		event = event || window.event;
+   		event.target = event.target || event.srcElement;
+   		if (event.target.nodeName.toLowerCase() === tag.toLowerCase()) {
+   			listener.call(event.target, event);
    		}
    });
 }
@@ -509,8 +543,8 @@ $.delegate = function(selector, tag, event, listener) {
 // 判断是否为IE浏览器，返回-1或者版本号
 function isIE() {
 	//如果不是opera且代理字符串能匹配正则表达式，则返回IE版本，否则返回-1
-	if (!window.opera && /MSIE ([^;]+)/.test(window.navigator.userAgent)) {
-		return parseFloat(RegExp["$1"]);
+	if (!window.opera && /MSIE ([^;]+)/i.test(window.navigator.userAgent)) {
+		return document.documentMode || +RegExp['$1'];
 	}
 	return -1;
 }
@@ -567,10 +601,10 @@ function ajax(url, options) {
 
     xhr.onreadystatechange = function() {
     	if (xhr.readyState == 4 ) {
-    		if (((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) && options.onsuccess) {
-    			options.onsuccess.call(options, xhr.responseText, xhr);
-    		} else if (options.onfail) {
-    			options.onfail.call(options, xhr);
+    		if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+    			options.onsuccess && options.onsuccess.call(options, xhr.responseText, xhr);
+    		} else {
+    			options.onfail && options.onfail.call(options, xhr);
     		}
     	}
     }
@@ -601,7 +635,7 @@ function ajax(url, options) {
     	xhr.send(null);
     } else if (options.type === "POST") {
     	xhr.open("POST", url, true);
-    	xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+    	xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded; charset=UTF-8");
     	xhr.send(params);
     }
 }

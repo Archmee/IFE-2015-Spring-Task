@@ -64,7 +64,7 @@
 	<!-- <script src="test.js" type="text/javascript"></script> -->
 	<script>
 		
-
+		var clog=console.log;
 		// 测试用例：
 		// Array.prototype.myprotoTest = 123;
 		/*var srcObj = {
@@ -200,16 +200,14 @@
 
 		// console.log('mail is '+isEmail("a@163.im"));
 		// console.log('phone is '+isMobilePhone("182000a333"));
-		// var clog=console.log;
 		// // 为element增加一个样式名为newClassName的新样式
 		// // 移除element中的样式oldClassName
-		// var oDiv = document.getElementsByTagName('div')[0];
+		var oDiv = document.getElementsByTagName('div')[0];
 		// var oDiv2 = document.getElementsByTagName('div')[1];
-
-		// clog(oDiv.className);
-		// addClass(oDiv, "new-class    panel-  panel");
-		// removeClass(oDiv, "panel");
-		// clog(oDiv.className);
+		clog(oDiv.className);
+		addClass(oDiv, "new-class    panel-  panel");
+		removeClass(oDiv, "panel");
+		clog(oDiv.className);
 
 		// // 判断siblingNode和element是否为同一个父元素下的同一级的元素，返回bool值
 		// // 获取element相对于浏览器窗口的位置，返回一个对象{x, y}
@@ -269,7 +267,6 @@
 		
 
 		// 封装选择器见util.js
-		var clog=console.log;
 		var res;
 		// // 可以通过id获取DOM对象，通过#标示，例如
 		// res=$("#adom");   // 返回id为adom的DOM对象
@@ -310,7 +307,7 @@
 		// addEvent($("#adom"), "click", clicklistener);
 		// removeEvent($("#adom"), "click", clicklistener);
 		// addEnterEvent(document, function(e) {
-		// 	console.log('done');
+		// 	console.log(e.keyCode);
 		// });
 		
 		// $.on = addEvent;
@@ -360,42 +357,21 @@
 
 
 		// 先简单一些
-		// function delegateEvent(element, tag, eventName, listener) {
-		//    addEvent(element, eventName, function(event) {
-		//    		var e = event || window.event,
-		//    			target = e.target || e.srcElement;
-		//    		if (target.nodeName.toLowerCase() === tag) {
-		//    			listener.call(target, e);
-		//    		}
-		//    });
-		// }
 		// $.delegate = delegateEvent;
 
 		// // 使用示例
 		// // 还是上面那段HTML，实现对list这个ul里面所有li的click事件进行响应
 		// $.click($("#btn"), renderList);
-		// $.delegate($("#list"), "li", "click", clicklistener);
+		// $.delegate($("#list"), "li", "click", function() {
+		// 	console.log(this);
+		// });
 
 		// 估计有同学已经开始吐槽了，函数里面一堆$看着晕啊，那么接下来把我们的事件函数做如下封装改变：
-		// $.on = function(selector, event, listener) {
-		//     addEvent($(selector), event, listener);
-		// }
-
-		// $.un = function(selector, event, listener) {
-		//     removeEvent($(selector), event, listener);
-		// }
-
-		// $.click = function(selector, listener) {
-		//     addClickEvent($(selector), listener);
-		// }
-
-		// $.delegate = function(selector, tag, event, listener) {
-		//     delegateEvent($(selector), tag, event, listener);
-		// }
-
 		// 使用示例：
 		// $.click("[data-log]", clicklistener);
-		// $.delegate('#list', "li", "click", clicklistener);
+		// $.delegate('#list', "li", "click", function() {
+		// 	console.log(this);
+		// });
 
 		// // 判断是否为IE浏览器，返回-1或者版本号
 		
@@ -415,6 +391,7 @@
 		// 	clog(RegExp["$+"]);
 		// 	clog(RegExp["$*"]);
 		// }
+		// clog(isIE());
 
 		// setCookie('username', 'y', 1);
 		// setCookie('password', 'mima', 1);
@@ -432,28 +409,28 @@
 		// onfail: 失败时的调用函数
 
 		// 使用示例：
-		ajax(
-		    './ajaxtest.php',
-		    {
-		        data: {
-		            name: 'xsz',
-		            password: '123456'
-		        },
-		        onsuccess: function (responseText, xhr) {
-		            var res = JSON.parse(responseText);
-		            console.log(res);
-		            if (res['code'] > 0) {
-		            	setCookie('name', this.data.name, 1);
-		            } else {
-		            	alert(res['message']);
-		            }
-		        },
-		        onfail: function(xhr) {
-		        	console.log('Request failed!');
-		        },
-		        type: 'get',
-		    }
-		);
+		// ajax(
+		//     './ajaxtest.php',
+		//     {
+		//         data: {
+		//             name: 'xsz',
+		//             password: '123456'
+		//         },
+		//         onsuccess: function (responseText, xhr) {
+		//             var res = JSON.parse(responseText);
+		//             console.log(res);
+		//             if (res['code'] > 0) {
+		//             	setCookie('name', this.data.name, 1);
+		//             } else {
+		//             	alert(res['message']);
+		//             }
+		//         },
+		//         onfail: function(xhr) {
+		//         	console.log('Request failed!');
+		//         },
+		//         type: 'get',
+		//     }
+		// );
 
 
 	</script>
