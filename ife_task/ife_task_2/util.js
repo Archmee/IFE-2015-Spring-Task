@@ -53,44 +53,31 @@ function isRegExp(arg) {
 // 使用递归来实现一个深度克隆，可以复制一个目标对象，返回一个完整拷贝
 // 被复制的对象类型会被限制为数字、字符串、布尔、日期、数组、Object对象。不会包含函数、正则对象等
 function cloneObject(src) {
-	var newValue;
+    var newValue;
 
-   	if (isFunction(src) || isRegExp(src)) { //函数或正则
-   		newValue = null;
+    if (!src || isString(src) || isNumber(src) || isBoolean(src)) { //基本值 null, string, number, bool
+        newValue = src;
+    } else if (isDate(src)) { //日期
+        newValue = new Date(src);
     } else if (isArray(src)) { //数组
     	// newValue = Array.prototype.slice.call(src, 0); //不能复制扩展属性
     	newValue = [];
     	for (var item in src) { //用forin遍历数组是为了访问扩展的属性（不是通过索引，类似对象属性）
-    		if (!src.hasOwnProperty(item)) { continue; } //防止继承属性
-    		var res = arguments.callee(src[item]);
-    		if (res != null) { // not null
-    			// newValue.push(res); //直接顺序插入（可以将不规则索引重新排列，反正值保存下来就ok了）
-    			newValue[item] = src[item] //还是用索引的方式（数组还是保持原样，有关联数组的地方还是关联的形式）
-    		}
+    		if (src.hasOwnProperty(item)) {  //防止继承属性
+                newValue[item] = arguments.callee(src[item]);//还是用key的方式保持原样(允许有关联数组）
+            }
     	}
     } else if (isObject(src)) { //非函数正则数组的对象
     	newValue = {};
     	for (var item in src) {
-    		if (!src.hasOwnProperty(item)) { continue; }
-    		var res = arguments.callee(src[item]);
-    		if (res != null) { // not null
-    			newValue[item] = res;
-    		}
+    		if (src.hasOwnProperty(item)) {
+                newValue[item] = arguments.callee(src[item]);
+            }
     	}
-    } else if (isDate(src)) { //日期
-    	newValue = new Date(src);
-    } else { //基本值
-    	newValue = src;
     }
+    // 我们没有else的其他情况，所以如Function或RegExp等都为Undefined值，但是属性名都还是存在于对象中
 
     return newValue;
-}
-
-//https://github.com/laozhang007/ife/blob/master/task/task0002/work/laozhang007/js/util.js
-function cloneObject2(obj) {
-    var s = JSON.stringify(obj);
-    var o = JSON.parse(s);
-    return o;
 }
 
 // Pollyfill: Array.indexOf
@@ -165,38 +152,22 @@ function each(arr, fn) {
 	}
 }
 
-// 获取一个对象里面第一层元素的数量，返回一个整数，ES5支持Object.keys获取对象属性
-function getObjectLength(obj) {
-	var count = 0;
-
-	if (Object.keys) {
-		count = Object.keys(obj).length;
-	} else {
-		for(var item in obj) {
-			if (obj.hasOwnProperty(item)) {
-				count++;
-			}
-		}
-	}
-	
-	return count;
-}
 
 // From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
 Object.keys = Object.keys || function(obj) {
-	'use strict';
-	var hasOwnProperty = Object.prototype.hasOwnProperty,
-    	hasDontEnumBug = !({ toString: null }).propertyIsEnumerable('toString'),
-	    dontEnums = [
-	      'toString',
-	      'toLocaleString',
-	      'valueOf',
-	      'hasOwnProperty',
-	      'isPrototypeOf',
-	      'propertyIsEnumerable',
-	      'constructor'
-	    ],
-    	dontEnumsLength = dontEnums.length;
+    'use strict';
+    var hasOwnProperty = Object.prototype.hasOwnProperty,
+        hasDontEnumBug = !({ toString: null }).propertyIsEnumerable('toString'),
+        dontEnums = [
+          'toString',
+          'toLocaleString',
+          'valueOf',
+          'hasOwnProperty',
+          'isPrototypeOf',
+          'propertyIsEnumerable',
+          'constructor'
+        ],
+        dontEnumsLength = dontEnums.length;
 
     if (typeof obj !== 'object' && (typeof obj !== 'function' || obj === null)) {
         throw new TypeError('Object.keys called on non-object');
@@ -220,6 +191,23 @@ Object.keys = Object.keys || function(obj) {
 
     return result;
 };
+
+// 获取一个对象里面第一层元素的数量，返回一个整数，ES5支持Object.keys获取对象属性
+function getObjectLength(obj) {
+	var count = 0;
+
+	if (Object.keys) {
+		count = Object.keys(obj).length;
+	} else {
+		for(var item in obj) {
+			if (obj.hasOwnProperty(item)) {
+				count++;
+			}
+		}
+	}
+	
+	return count;
+}
 
 // 判断是否为邮箱地址
 function isEmail(emailStr) {
@@ -245,26 +233,37 @@ function isSiblingNode(element, siblingNode) {
 // 获取element相对于浏览器窗口的位置，返回一个对象{x, y}
 function getPosition(element) { // x
     var pos = {x:0, y:0};
-    var current = element;
 
-    while (current.nodeName.toLowerCase() != 'html') {
-    	// console.log(current);
-    	// console.log(pos);
+    if (element.getBoundingClientRect) {
+        var tmp = element.getBoundingClientRect();
+        pos.x = tmp.left;
+        pos.y = tmp.top;
 
-    	pos.x += current.offsetLeft;
-    	pos.y += current.offsetTop;
+    } else {
+        var current = element;
 
-    	current = current.parentNode; //offsetParent is also ok
+        while (current != null) { //current != document.body.parentElement
+            // console.log(current);
+            // console.log(pos);
+
+            pos.x += current.offsetLeft;
+            pos.y += current.offsetTop;
+
+            current = current.offsetParent; //parent is also ok
+        }
+
+        pos.x -= document.body.scrollLeft || document.documentElement.scrollLeft;
+        pos.y -= document.body.scrollTop || document.documentElement.scrollTop;
     }
-
-    pos.x -= document.body.scrollLeft || document.documentElement.scrollLeft;
-    pos.y -= document.body.scrollTop || document.documentElement.scrollTop;
 
     return pos;
 }
 
 // 检查元素类名中是否包含传入的classStr
 function hasClass(element, classStr) {
+    if (!element.className || !classStr) {
+        return false;
+    }
     //要么以字符串开头或结尾，要么字符串前后都有1或多个空格
     var re = new RegExp('(^|\\s+)'+classStr+'(\\s+|$)', 'g');
     return re.test(element.className); //返回正则匹配结果
@@ -429,7 +428,7 @@ function getBySelector(element, selector) {
 		res = getByAttr(element, attr);
 		
 	} else if(/^\[[-\w]+\=[-\w]+\]/.test(selector)) { //By attribute and value
-		selector = selector.replace(/^\[([-\w]+\=[-\w]+)\]$/, "$1"); //去掉前后[]符号
+		selector = selector.replace(/^\[([-\w]+\=['"]?[-\w]*['"]?)\]$/, "$1"); //去掉前后[]符号,而且要注意属性值字符串的单引号或者双引号
 		var pair = selector.split('='); // 分割成键值对的数组
 		res = getByAttr(element, pair[0], pair[1]); //pair[0], pair[1]分别代表属性名和属性值
 
@@ -513,7 +512,7 @@ function delegateEvent(element, tag, eventName, listener) { //把tag换成select
    addEvent(element, eventName, function(event) {
    		event = event || window.event;
    		event.target = event.target || event.srcElement;
-   		if (event.target.nodeName.toLowerCase() === tag.toLowerCase()) {
+   		if (event.target.nodeName === tag.toUpperCase()) {
    			listener.call(event.target, event);
    		}
    });
@@ -612,6 +611,7 @@ function ajax(url, options) {
     var params = '';
     if (options.data) {
     	
+        // 如果传入的数据是字符串形式的，那就要转换成json形式
     	if (typeof options.data === "string") {//split for encodeURIComponent
     		params = options.data.split('&');
     		options.data = {}; //如果是字符串可以分割并保存到新对象中
@@ -621,12 +621,7 @@ function ajax(url, options) {
     		}
     	}
 
-    	var plist = [];
-    	for (var item in options.data) {
-    		plist.push( encodeURIComponent(item) + '=' + 
-    					encodeURIComponent(options.data[item]) );
-    	}
-    	params = plist.join('&');
+    	params = encodeObject(options.data);
     }
 
     options.type = !options.type ? "GET" : options.type.toUpperCase();
@@ -638,4 +633,13 @@ function ajax(url, options) {
     	xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded; charset=UTF-8");
     	xhr.send(params);
     }
+}
+
+function encodeObject(data) {
+    var plist = [];
+    for (var item in data) {
+        plist.push( encodeURIComponent(item) + '=' + 
+                    encodeURIComponent(data[item]) );
+    }
+    return plist.join('&');
 }

@@ -67,30 +67,31 @@
 		var clog=console.log;
 		// 测试用例：
 		// Array.prototype.myprotoTest = 123;
-		/*var srcObj = {
-		    a: 1,
-		    b: {
-		        b1: ["hello", "hi"],
-		        b2: "JavaScript"
-		    },
-		    c: new Date(),
-		    d: function () {
-		    	return 1;
-		    },
-		    e: /[a]/,
-		    f: true,
-		    g: ["hello", "hi"]
-		};
-		Array.prototype.myprotoTest = 123; //测试如果forin遍历数组是是否有必要验证hasOwnProperty
-		srcObj.g["ex"] = "bibibi"; //测试数组的扩展属性是否复制了
-		var abObj = srcObj;
-		var tarObj = cloneObject(srcObj);
-		srcObj.a = 2;
-		srcObj.b.b1[0] = "wwwwww";
-		srcObj.c = new Date("July 24, 2017");
+		// var srcObj = {
+		//     a: 1,
+		//     b: {
+		//         b1: ["hello", "hi", null],
+		//         b2: "JavaScript",
+		//         b3: null,
+		//     },
+		//     c: new Date(),
+		//     d: function () {
+		//     	return 1;
+		//     },
+		//     e: /[a]/,
+		//     f: true,
+		//     g: ["hello", "hi"],
+		//     n: null,
+		// };
+		// Array.prototype.myprotoTest = 123; //测试如果forin遍历数组是是否有必要验证hasOwnProperty
+		// srcObj.g["ex"] = "bibibi"; //测试数组的扩展属性是否复制了
+		// var tarObj = cloneObject(srcObj);
+		// srcObj.a = 2;
+		// srcObj.b.b1[0] = "wwwwww";
+		// srcObj.c = new Date("July 24, 2017");
 
-		console.log(abObj);
-		console.log(tarObj);*/
+		// console.log(srcObj);
+		// console.log(tarObj);
 
 		// console.log(abObj.a);
 		// console.log(abObj.b.b1[0]);
@@ -202,17 +203,18 @@
 		// console.log('phone is '+isMobilePhone("182000a333"));
 		// // 为element增加一个样式名为newClassName的新样式
 		// // 移除element中的样式oldClassName
-		var oDiv = document.getElementsByTagName('div')[0];
+		// var oDiv = document.getElementsByTagName('div')[0];
 		// var oDiv2 = document.getElementsByTagName('div')[1];
-		clog(oDiv.className);
-		addClass(oDiv, "new-class    panel-  panel");
-		removeClass(oDiv, "panel");
-		clog(oDiv.className);
+		// clog(oDiv.className);
+		// addClass(oDiv, "new-class    panel-  panel");
+		// removeClass(oDiv, "panel");
+		// clog(oDiv.className);
 
 		// // 判断siblingNode和element是否为同一个父元素下的同一级的元素，返回bool值
 		// // 获取element相对于浏览器窗口的位置，返回一个对象{x, y}
 		// console.log(isSiblingNode(oDiv, oDiv2));
-		// console.log(getPosition(oDiv));
+		// var btn = document.getElementById('btn');
+		// clog(getPosition(btn));
 
 		// if (document.compatMode == "CSS1Compat") {
 		// 	clog('Standard mode');

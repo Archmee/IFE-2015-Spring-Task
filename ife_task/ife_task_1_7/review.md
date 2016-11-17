@@ -66,7 +66,7 @@ type="button"和type="submit"效果一样， type="text" 和type="password"效�
     然后我又先后使用了`font-size:0;`到`font-size:1em;`，以及`opacity:1;`到`opacity:0;`达到隐藏显示文字的目的，但是ie仍不兼容，除了opacity能够在鼠标hover到文字上时可以达到效果，但是如果鼠标在div的非文字区域，就还是识别不到hover。
     经过google，找到和我之前不一样的设置hover的方式，`a:hover div` 选中元素，注意它是把hover添加到了a上，所以现在ie和其他浏览器都兼容了，甚至可以指定盒子不用完全和a一样大了，而指定自己想要的高度即可，这样我也可以不使用渐变背景来达到文字区域的背景了，ie也ok
 
-17. 在project.html页面的瀑布流布局那里，a元素嵌入img和一个div，a和img都是inline-block的框，但是a元素始终没有img高，始终会少1px左右，虽然网上的方案都是像问题#1一样解决的，但是这里，只有问题1的第一种方法`img{ display:block ;}` 才有效果，暂时不知道什么原因
+18. 在project.html页面的瀑布流布局那里，a元素嵌入img和一个div，a和img都是inline-block的框，但是a元素始终没有img高，始终会少1px左右，虽然网上的方案都是像问题#1一样解决的，但是这里，只有问题1的第一种方法`img{ display:block ;}` 才有效果，暂时不知道什么原因
 
 
 
