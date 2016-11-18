@@ -1,3 +1,6 @@
+
+$ = $ || {};
+
 // --------------------
 // Basic
 // --------------------
@@ -59,23 +62,18 @@ function cloneObject(src) {
         newValue = src;
     } else if (isDate(src)) { //日期
         newValue = new Date(src);
-    } else if (isArray(src)) { //数组
-    	// newValue = Array.prototype.slice.call(src, 0); //不能复制扩展属性
-    	newValue = [];
-    	for (var item in src) { //用forin遍历数组是为了访问扩展的属性（不是通过索引，类似对象属性）
-    		if (src.hasOwnProperty(item)) {  //防止继承属性
+    } else if (isArray(src) || isObject(src)){ //array and object
+        newValue = isArray(src) ? [] : {};
+        
+        for (var item in src) { //用forin遍历数组或对象是为了访问扩展的属性（不是通过索引，类似对象属性）
+            if (src.hasOwnProperty(item) 
+                && !isFunction(src[item])
+                && !isRegExp(src[item])) {  //防止继承属性和函数和正则
                 newValue[item] = arguments.callee(src[item]);//还是用key的方式保持原样(允许有关联数组）
             }
-    	}
-    } else if (isObject(src)) { //非函数正则数组的对象
-    	newValue = {};
-    	for (var item in src) {
-    		if (src.hasOwnProperty(item)) {
-                newValue[item] = arguments.callee(src[item]);
-            }
-    	}
-    }
-    // 我们没有else的其他情况，所以如Function或RegExp等都为Undefined值，但是属性名都还是存在于对象中
+        }//end for
+       
+    }//end else
 
     return newValue;
 }
@@ -390,23 +388,13 @@ function getByAttr(element, attr, value) {
 function hasAttribute(element, attr, value) {
 	var attrs = element.attributes;
 	for (var i = 0, len = attrs.length; i < len; i++) {
-		if (!attrs[i].specified || attrs[i].nodeName !== attr) { //检测specified是为了兼容IE7-
-			continue;
+		if (attrs[i].specified && attrs[i].nodeName == attr) { //检测specified是为了兼容IE7-，因为IE7-不支持hasAttribute方法检测属性是否存在
+			 return (isString(value) ? attrs[i].nodeValue === value : true);
 		}
-		// else 属性名已经找到，接下来无论是否匹配 value 都直接返回而不再循环了
-		// 如果传入了value参数，就检查value参数是否匹配
-		// 如没有传入value，则直接返回true，因为attr已经找到
-		return (isString(value) ? attrs[i].nodeValue === value : true);
 	}
 
 	return false;
 }
-
-// 获取属性节点的值
-function getAttributeValue(element, attrName) {
-	return element.attributes[attrName].nodeValue;
-}
-
 
 //根据选择器来获取元素，组合选择器只支持空格
 function getBySelector(element, selector) {
@@ -427,8 +415,8 @@ function getBySelector(element, selector) {
 		var attr = selector.replace(/^\[([-\w]+)\]$/, "$1"); //去掉前后[]符号
 		res = getByAttr(element, attr);
 		
-	} else if(/^\[[-\w]+\=[-\w]+\]/.test(selector)) { //By attribute and value
-		selector = selector.replace(/^\[([-\w]+\=['"]?[-\w]*['"]?)\]$/, "$1"); //去掉前后[]符号,而且要注意属性值字符串的单引号或者双引号
+	} else if(/^\[[-\w]+\=['"]?[-\w]+['"]?\]$/.test(selector)) { //By attribute and value
+		selector = selector.replace(/^\[([-\w]+\=['"]?[-\w]+['"]?)\]$/, "$1"); //去掉前后[]符号,而且要注意属性值字符串的单引号或者双引号
 		var pair = selector.split('='); // 分割成键值对的数组
 		res = getByAttr(element, pair[0], pair[1]); //pair[0], pair[1]分别代表属性名和属性值
 
