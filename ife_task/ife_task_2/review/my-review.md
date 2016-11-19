@@ -26,9 +26,9 @@
 自己还存在的问题：
 - 遍历对象的时候要使用hasDontEnumerBug和propertyIsEnumerable（已解决：用了MDN提供的object.keys的pollyfill）
 - 获取元素在窗口中的位置还有另外一种getBoundingClientRect的方法（已解决，直接调用就是）
-- ajax调用误差几个小时的bug，不知道不是GMT和UTC的问题，但是就是相差几个小时
-- 封装性（按照功能封装成库）
-- $的改进，比如按照属性值匹配那个没有加tag，比如是否可以采用从右向左扫描
+- setCookie调用误差几个小时的bug，好像UTC的问题，相差几个小时(解决，不用toUTCString()而用toString)
+- 封装性（按照功能封装成库）（放弃）
+- $的改进，比如按照属性值匹配那个没有加tag（已解决），比如是否可以采用从右向左扫描(放弃)
 
 另外的实现
 ```js

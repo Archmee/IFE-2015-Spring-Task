@@ -420,7 +420,7 @@ function getBySelector(element, selector) {
 
 	return res;
 }
-
+// TODO:我采用的是从左至右扫描的查询字符串，可以学习sizzle的思想从右往左扫描效率更高
 // 实现一个简单的Query
 function $(selector) {
 	var selectorArr = selector.split(/\s+/); //拆分组合选择器
@@ -533,13 +533,12 @@ function isIE() {
 }
 
 // 设置cookie
-function setCookie(cookieName, cookieValue, expiredays) {
+function setCookie(cookieName, cookieValue, expiredays=0) {
     var expireMS = new Date(Date.now() + expiredays*24*60*60*1000);
-
     document.cookie = encodeURIComponent(cookieName) + '=' +
     				  encodeURIComponent(cookieValue) + 
-    				  (!expiredays ? '' : '; expires=' + expireMS.toUTCString()); //toUTCString
-// TODO: UTC并非当地时间
+    				  (!expiredays ? '' : '; expires=' + expireMS.toString()); //toUTCString
+    // TODO: UTC并非当地时间
 }
 
 // 获取cookie值
@@ -619,7 +618,7 @@ function ajax(url, options) {
     }
 }
 
-function encodeObject(data) {
+function encodeObjectToString(data) {
     var plist = [];
     for (var item in data) {
         plist.push( encodeURIComponent(item) + '=' + 
