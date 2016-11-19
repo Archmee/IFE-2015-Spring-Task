@@ -348,39 +348,38 @@ function containClasses(element, classStr) {
 
 // 获取在element节点中匹配classStr的节点并返回
 function getByClass(element, classStr) {
-	var classList = traversalNodes(element, function(node) {
+	return traversalNodes(element, function(node) {
 		return containClasses(node, classStr);
 	}); //遍历节点并执行回调
-	
-	return classList;
-}
-
-// 根据标签查找元素
-function getByTag(element, tagName) {
-	var tagList = traversalNodes(element, function(node) {
-		return node.nodeName.toLowerCase() === tagName.toLowerCase(); //nodeName/tagName均可
-	});
-
-	return tagList;
 }
 
 // 根据id查找元素
 function getById(element, id) {
-	var idsList = traversalNodes(element, function(node) {
-		return node.id === id;
-	});
+    return traversalNodes(element, function(node) {
+        return node.id === id;
+    });
+}
 
-	return idsList;
+// 根据标签查找元素
+function getByTag(element, tagName) {
+	return traversalNodes(element, function(node) {
+		return node.nodeName.toLowerCase() === tagName.toLowerCase(); //nodeName/tagName均可
+	});
 }
 
 // 通过属性获取元素
 // value表示匹配属性的值，省略时只匹配属性名
-function getByAttr(element, attr, value) {
-	var eleList = traversalNodes(element, function(node) {
-		return hasAttribute(node, attr, value); // 这里始终传入value参数，不管是否传入都在函数内部检测
-	});
+function getByAttr(element, tag, attr, value) {
+	return traversalNodes(element, function(node) {
+        // tagName存在且相等 或者 tagName不存在 都会检测属性值是否存在，否则直接返回false
+        // return ((tagName && tagName === node.nodeName) || !tagName) ? hasAttribute(node, attr, value) : false;
 
-	return eleList;
+        // tagName存在但是不相等就已经可以返回false了，否则再检测属性值
+        // return (tagName && tagName !== node.nodeName) ? false : hasAttribute(node, attr, value);
+
+        // 如果tagName不存在 或者 tagName存在且相等（如果tagName为空或其他类型就不会相等）
+        return (!tag || tag.toUpperCase() === node.nodeName) ? hasAttribute(node, attr, value) : false;
+	});
 }
 
 // TODO：验证IE低版本中是否有很多属性节点，是否可以通过 attr in obj 的方式来判断
@@ -388,8 +387,8 @@ function getByAttr(element, attr, value) {
 function hasAttribute(element, attr, value) {
 	var attrs = element.attributes;
 	for (var i = 0, len = attrs.length; i < len; i++) {
-		if (attrs[i].specified && attrs[i].nodeName == attr) { //检测specified是为了兼容IE7-，因为IE7-不支持hasAttribute方法检测属性是否存在
-			 return (isString(value) ? attrs[i].nodeValue === value : true);
+		if (attrs[i].specified && attrs[i].nodeName === attr.toLowerCase()) { //检测specified是为了兼容IE7-，因为IE7-不支持hasAttribute方法检测属性是否存在。但是有个问题是specified会过滤掉onXXX这种事件属性
+			return value ? attrs[i].nodeValue === value : true;
 		}
 	}
 
@@ -400,26 +399,23 @@ function hasAttribute(element, attr, value) {
 function getBySelector(element, selector) {
 	var res = null;
 
-	if (/^[a-zA-Z]+[a-zA-Z\d]?$/.test(selector)) { //By TagName，\d是为了匹配h1-h6等带有数字的tag
+	if (/^[\w]+$/.test(selector)) { //By TagName (tag中可能还有数字如h2)
 		res = getByTag(element, selector);
 		
-	} else if (/^#[-\w]+/.test(selector)) { //By ID
-		selector = selector.replace(/^#/, '');
-		res = getById(element, selector);//element should always be document
+	} else if (/^#([-\w]+)$/.test(selector)) { //By ID
+		selector = RegExp.$1;
+		res = getById(element, selector);
 
-	} else if (/^\.[-\w]+/.test(selector)) { //By Class
-		selector = selector.replace(/^\./, '');
+	} else if (/^\.([-\w]+)$/.test(selector)) { //By Class
+		selector = RegExp.$1;
 		res = getByClass(element, selector);
 
-	} else if (/^\[[-\w]+\]$/.test(selector)) { //By attribute
-		var attr = selector.replace(/^\[([-\w]+)\]$/, "$1"); //去掉前后[]符号
-		res = getByAttr(element, attr);
-		
-	} else if(/^\[[-\w]+\=['"]?[-\w]+['"]?\]$/.test(selector)) { //By attribute and value
-		selector = selector.replace(/^\[([-\w]+\=['"]?[-\w]+['"]?)\]$/, "$1"); //去掉前后[]符号,而且要注意属性值字符串的单引号或者双引号
-		var pair = selector.split('='); // 分割成键值对的数组
-		res = getByAttr(element, pair[0], pair[1]); //pair[0], pair[1]分别代表属性名和属性值
-
+	} else if(/^(\w*)\[([-\w]+)(\=['"]?([-\w]+)['"]?)?\]$/.test(selector)) { //By attribute or and value
+		var tag   = RegExp.$1;
+        var attr  = RegExp.$2;
+        // 注意我跳过了RegExp.$3是因为这个是匹配了带有=号后面的一整个字符串，也可以用RegExp.$3去掉=号
+        var value = RegExp.$4; //注意属性值字符串的单引号或者双引号
+		res = getByAttr(element, tag, attr, value);
 	}
 
 	return res;
