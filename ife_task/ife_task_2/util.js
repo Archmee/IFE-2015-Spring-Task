@@ -78,6 +78,29 @@ function cloneObject(src) {
     return newValue;
 }
 
+// 别人的非严格实现
+function cloneObject1(obj, c) {
+    var c = c || {};
+
+    for(var i in obj) {
+        if(typeof obj[i] === 'object') {
+            c[i] = (obj[i].constructor === Array) ? [] : {};
+            arguments.callee(obj[i], c[i]);
+        } else {
+            c[i] = obj[i];
+        }
+    }
+
+    return c;
+}
+
+// https://github.com/laozhang007/ife/blob/master/task/task0002/work/laozhang007/js/util.js
+function cloneObject2(obj) {
+    var s = JSON.stringify(obj);
+    var o = JSON.parse(s);
+    return o;
+}
+
 // Pollyfill: Array.indexOf
 // MDN https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
 Array.prototype.indexOf = Array.prototype.indexOf || function(searchElement, fromIndex) {
@@ -135,9 +158,9 @@ function uniqArray(arr) {
 }
 
 // 对字符串头尾进行空格字符的去除、包括全角半角空格、Tab等，返回一个字符串
-// 尝试使用一行简洁的正则表达式完成该题目
 function trim(str) {
-	return str.replace(/^\s+|\s+$/g, '');
+    // chrome下\s可以匹配全角空格，但是考虑兼容的话，需要加上\uFEFF\xA0，去掉BOM头和全角空格。
+	return str.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
 }
 
 // 实现一个遍历数组的方法，针对数组中每一个元素执行fn函数，并将数组索引和元素作为参数传递
@@ -255,6 +278,16 @@ function getPosition(element) { // x
     }
 
     return pos;
+}
+
+
+// js dom编程艺术
+function toggleClass(element, className){
+    if (hasClass(element, className)) {
+        removeClass(element, className);
+    } else {
+        addClass(element, className);
+    }
 }
 
 // 检查元素类名中是否包含传入的classStr
