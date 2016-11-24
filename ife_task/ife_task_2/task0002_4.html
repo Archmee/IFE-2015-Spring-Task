@@ -4,22 +4,47 @@
 	<meta charset="UTF-8">
 	<title>task 2-4</title>
 	<style>
-		ul {
+		body {
 			margin: 0;
 			padding: 0;
+			font-family: Helvetica, sans-serif;
+			font-weight: normal;
+			font-size: 16px;
+		}
+		div.wrap {
+			width: 400px;
+			margin: 100px auto;
+		}
+		input {
+			font-size: 16px;
+			width: 378px;
+			height: 34px;
+			line-height: 34px;
+			padding: 2px 10px;
+			border: 1px solid #ddd;
+			
+			outline: none;
+			box-sizing: content-box;
+			vertical-align: bottom;
+		}
+		ul {
+			width: 400px;
+			margin: 0;
+			padding: 0;
+			
+			background-color: #eee;
 			list-style-type: none;
-			width: 172px;
-			visibility: hidden;		
+			display: none;
+			/*visibility:visible;*/
 		}
 		li {
-			padding: 5px 0 0 5px;
+			width: 95%;
+			padding: 3px 10px;
 			height: 20px;
-			background-color: #eee;
 		}
 		li.active {
-			color: #fff;
 			cursor: pointer;
-			background-color: blue;
+			background-color: lightblue;
 		}
 		b {
 			color: #ff0000;
@@ -27,109 +52,112 @@
 	</style>
 </head>
 <body>
-	<input type="text" id="search">
-	<ul id="search-result"></ul>
+	<div class="wrap">
+		<input type="search" id="search" autocomplete="off" autofocus="true" placeholder="Search Text">
+		<ul id="search-result"></ul>
+	</div>
 
-	<script>
-		var data = ['jason', 'e', 'jack', 'eric', 'ai', 'UI', 'UE',  'ae', 'UX'];
+	<script src="js/util.js"></script>
+	<script src="js/task0002_4.js"></script>
+	<script><!-- 
+		// // version 1
+		// var data = ['jason', 'e', 'jack', 'eric', 'ai', 'UI', 'UE',  'ae', 'UX'];
 
-		var searchText = document.getElementById('search');
-		var searchList = document.getElementById('search-result');
-		var index = -1;
-		var list = searchList.children;
+		// var searchText = document.getElementById('search');
+		// var searchList = document.getElementById('search-result');
+		// var index = -1;
+		// var list = searchList.children;
 
-		searchText.onkeyup = searchText.onfocus = searchText.onclick = function(e) {
-			if (searchText.value == '') { //每次按键检测是否为空或者删除完了
-				searchList.style.visibility = 'hidden';
-				return;
-			}
+		// searchText.onkeyup = searchText.onfocus = searchText.onclick = function(e) {
+		// 	if (searchText.value == '') { //每次按键检测是否为空或者删除完了
+		// 		searchList.style.visibility = 'hidden';
+		// 		return;
+		// 	}
 
-			e = e || window.event;
-			if (e.type != 'keyup') {
-				if (e.stopPropagation) {
-				    e.stopPropagation();
-				} else {
-				    e.cancelBubble = true;
-				}
-			}
+		// 	e = e || window.event;
+		// 	if (e.type != 'keyup') {
+		// 		if (e.stopPropagation) {
+		// 		    e.stopPropagation();
+		// 		} else {
+		// 		    e.cancelBubble = true;
+		// 		}
+		// 	}
 			
-			searchList.innerHTML = '';
-			// 寻找匹配项
-			for (var i = 0, len = data.length; i < len; i++) {
-				var l = data[i].toLowerCase().indexOf(searchText.value.toLowerCase());
-				if (l > -1) {
-					var res = data[i].replace(new RegExp(searchText.value, 'i'), '<b>' + "$&" + '</b>');
-					searchList.appendChild(createLi(res));
-				}
-			}
+		// 	searchList.innerHTML = '';
+		// 	var resList = '';
+		// 	var re = new RegExp('^'+searchText.value, 'i');
+
+		// 	// 寻找匹配项
+		// 	for (var i = 0, len = data.length; i < len; i++) {
+		// 		if (re.test(data[i])) {
+		// 			//将匹配到的字符串加上b标签，用于应用高亮等样式
+		// 			var res = RegExp["$`"] + '<b>' + RegExp["$&"] + '</b>' + RegExp["$'"];
+		// 			resList += '<li>' + res + '</li>'; //连接列表项
+		// 		}
+		// 	}
 			
-			searchList.style.visibility = 'visible';
+		// 	searchList.innerHTML = resList;
+		// 	searchList.style.visibility = 'visible';
 			
-			document.onkeyup = function(e) { //原是监听keyup的，但要阻止光标发生移动，所以改为keydown
-				e = e || window.event;
-				if (e.keyCode != 13 && e.keyCode != 38 && e.keyCode != 40) {
-					return ;
-				}
+		// 	document.onkeyup = function(e) {
+		// 		e = e || window.event;
+		// 		var code = e.keyCode || e.which;
+		// 		if (code != 13 && code != 38 && code != 40) { //不是回车和上下方向键就返回
+		// 			return ;
+		// 		}
 				
-				if (list.length <= 0) {
-					return ;
-				}
+		// 		if (list.length <= 0) {
+		// 			return ;
+		// 		}
 
-				if (e.keyCode == 13) {
-					if (index >= 0) {
-						searchText.value = list[index].innerText;
-						searchList.style.visibility = 'hidden';
-						index = -1;
-					}
-					return false;
-				}
+		// 		if (code == 13) {
+		// 			if (index >= 0) {
+		// 				searchText.value = list[index].innerText;
+		// 				searchList.style.visibility = 'hidden';
+		// 				index = -1;
+		// 			}
+		// 			return false;
+		// 		}
 
-				if (e.keyCode == 38) index--; //up
-				if (e.keyCode == 40) index++; //down
-				if (index < 0) index = list.length-1;
-				if (index > list.length-1) index = 0;
+		// 		if (code == 38) index--; //up
+		// 		if (code == 40) index++; //down
+		// 		if (index < 0) index = list.length-1;
+		// 		if (index > list.length-1) index = 0;
 
-				clearClass();
+		// 		clearClass();
 
-				list[index].className = 'active';
-				document.onkeyup = null;
+		// 		list[index].className = 'active';
+		// 		document.onkeyup = null;
 				
-				return false;
-			};
+		// 		return false;
+		// 	};
 
-		}
+		// }
 
-		function createLi(text) {
-			var li = document.createElement('li');
-			li.innerHTML = text;
-			return li;
-		}
+		// function clearClass() {
+		// 	for (var i = 0, len = list.length; i < len; i++) {
+		// 		list[i].className = '';
+		// 	}
+		// }
 
+		// searchList.onclick = function(e) {
+		// 	e = e || window.event;
+		// 	var target = e.target || e.srcElement;
+		// 	searchText.value = target.innerText;
+		// 	index = -1;
+		// 	// 最后隐藏列表，但是通过冒泡实现了
+		// }
+		// searchList.onmouseover = function(e) {
+		// 	e = e || window.event;
+		// 	var target = e.target || e.srcElement;
+		// 	clearClass();
+		// 	e.target.className = 'active';
+		// 	index = -1;
+		// }
 
-		function clearClass() {
-			for (var i = 0, len = list.length; i < len; i++) {
-				list[i].className = '';
-			}
-		}
-
-		searchList.onclick = function(e) {
-			e = e || window.event;
-			var target = e.target || e.srcElement;
-			searchText.value = target.innerText;
-			index = -1;
-			// 最后隐藏列表，但是通过冒泡实现了
-		}
-		searchList.onmouseover = function(e) {
-			e = e || window.event;
-			var target = e.target || e.srcElement;
-			clearClass();
-			e.target.className = 'active';
-			index = -1;
-		}
-
-		document.onclick = function() {
-			searchList.style.visibility = 'hidden';
-		}
-	</script>
+		// document.onclick = function() {
+		// 	searchList.style.visibility = 'hidden';
+		// }
+	 --></script>
 </body>
 </html>

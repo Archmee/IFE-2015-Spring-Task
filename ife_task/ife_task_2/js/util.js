@@ -566,7 +566,8 @@ function isIE() {
 }
 
 // 设置cookie
-function setCookie(cookieName, cookieValue, expiredays=0) {
+function setCookie(cookieName, cookieValue, expiredays) {
+	expiredays = expiredays || 0;
     var expireMS = new Date(Date.now() + expiredays*24*60*60*1000);
     document.cookie = encodeURIComponent(cookieName) + '=' +
     				  encodeURIComponent(cookieValue) + 
