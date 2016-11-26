@@ -4,6 +4,14 @@
 	<meta charset="UTF-8">
 	<title>拖拉机</title>
 	<style>
+		body:after {
+			content: " ";
+			visibility: hidden;
+			display: block;
+			font-size: 0;
+			height: 0;
+			clear: both;
+		}
 		ul {
 			color: #000;
 			height: 400px;
@@ -20,14 +28,13 @@
 			height: 40px;
 			width: 200px;
 			border: 1px solid #000;
-			border-top: none;
-			background-color: rgba(0,0,255, 1);
+			background-color: blue;
 		}
-		li.move {
+		#dragging {
 			cursor: move;
 			position: absolute;
-			border: 1px solid #fff;
-			background-color: rgba(0,0,255, 0.6);
+			border: 1px dotted #fff;
+			background-color: lightblue;
 		}
 
 	</style>
@@ -46,91 +53,94 @@
 		<li>8</li>
 	</ul>
 
+	<script src="js/util.js"></script>
+	<script src="js/task0002_5.js"></script><!-- verson 2 -->
 	<script>
-		var oUl = document.getElementsByTagName('ul');
-		for (var i = 0; i < oUl.length; i++) {
+		// version 1
+		// var oUl = document.getElementsByTagName('ul');
+		// for (var i = 0; i < oUl.length; i++) {
 
-		 	oUl[i].onmousedown = function(event) {
-		 		var that = this;
-				var e = event || window.event,
-					target = e.target || e.srcElement,
-					diffX  = e.clientX - target.offsetLeft,
-					diffY  = e.clientY - target.offsetTop,
-					location = {x:0, y:0};
+		//  	oUl[i].onmousedown = function(event) { //用代理方式监听
+		//  		var that = this;
+		// 		var e = event || window.event,
+		// 			target = e.target || e.srcElement,
+		// 			diffX  = e.clientX - target.offsetLeft,
+		// 			diffY  = e.clientY - target.offsetTop,
+		// 			location = {x:0, y:0};
 
-				if (target.nodeName.toLowerCase() != 'li') {
-					return ;
-				}
+		// 		if (target.nodeName.toLowerCase() != 'li') { //判断发生拖拽的目标是不是li元素
+		// 			return ;
+		// 		}
 				
-				// 元素被拾起时设置样式
-				target.className = 'move';
-				target.style.left = e.clientX - diffX + 'px';
-				target.style.top  = e.clientY - diffY + 'px';
+		// 		// 元素被拾起时设置样式
+		// 		target.id = 'dragging';
+		// 		target.style.left = e.clientX - diffX + 'px';
+		// 		target.style.top  = e.clientY - diffY + 'px';
 				
 
-				document.onmousemove = function(event) {
-					var e = event || window.event,
-						left = e.clientX - diffX,
-						top  = e.clientY - diffY;
+		// 		document.onmousemove = function(event) {
+		// 			var e = event || window.event,
+		// 				left = e.clientX - diffX,
+		// 				top  = e.clientY - diffY;
 					
-					location.x = e.clientX;
-					location.y = e.clientY;
+		// 			location.x = e.clientX;
+		// 			location.y = e.clientY;
 
-					if (left < 0) {
-						left = 0;
-					} else if (left > document.documentElement.clientWidth - target.offsetWidth) {
-						left = document.documentElement.clientWidth - target.offsetWidth;
-					}
+		// 			if (left < 0) {
+		// 				left = 0;
+		// 			} else if (left > document.documentElement.clientWidth - target.offsetWidth) {
+		// 				left = document.documentElement.clientWidth - target.offsetWidth;
+		// 			}
 
-					if (top < 0) {
-						top = 0;
-					} else if (top > document.documentElement.clientHeight - target.offsetHeight) {
-						top = document.documentElement.clientHeight - target.offsetHeight;
-					}
+		// 			if (top < 0) {
+		// 				top = 0;
+		// 			} else if (top > document.documentElement.clientHeight - target.offsetHeight) {
+		// 				top = document.documentElement.clientHeight - target.offsetHeight;
+		// 			}
 
-					target.style.left = left + 'px';
-					target.style.top  = top  + 'px';
+		// 			target.style.left = left + 'px';
+		// 			target.style.top  = top  + 'px';
 
-					// checkLocation(location);
-				};//onmousemove
+		// 			// checkLocation(location);
+		// 		};//onmousemove
 
-				document.onmouseup = function(e) {
-					e = event || window.event;
-					whereIam(location, target);
+		// 		document.onmouseup = function(e) {
+		// 			e = event || window.event;
+		// 			whereIam(location, target);
 
-					// 释放鼠标后
-					// 清除目标被拾起时设置的样式
-					target.className = '';
+		// 			// 释放鼠标后
+		// 			// 清除目标被拾起时设置的样式
+		// 			target.id = '';
 					
-					// 清除事件
-					document.onmousemove = null;
-					document.onmouseup = null;
-				}; //onmouseup
+		// 			// 清除事件
+		// 			document.onmousemove = null;
+		// 			document.onmouseup = null;
+		// 		}; //onmouseup
 
-				return false;
-			}; //onmousedown
+		// 		return false;
+		// 	}; //onmousedown
 
-		} //for
+		// } //for
 
-		function whereIam(loc, target) {
-			for (var i = 0; i < oUl.length; i++) {
+		// function whereIam(loc, target) {
+		// 	for (var i = 0; i < oUl.length; i++) {
 				
-				if ((loc.x > oUl[i].offsetLeft && loc.x < oUl[i].offsetLeft+oUl[i].offsetWidth) && (loc.y > oUl[i].offsetTop  && loc.y < oUl[i].offsetTop+oUl[i].offsetHeight)) {
-				 	// console.log(loc.x, oUl[i].offsetLeft, oUl[i].offsetLeft+oUl[i].offsetWidth);
-					// console.log(loc.y, oUl[i].offsetTop, oUl[i].offsetTop+oUl[i].offsetHeight);
-					var child = oUl[i].children;
-					for (var j = 0; j < child.length; j++) {
-						if (loc.y < child[j].offsetTop) { //找到可以放置的li，插入并退出
-							oUl[i].insertBefore(target, child[j]); 
-							return ;
-						}
-					}
+		// 		if ((loc.x > oUl[i].offsetLeft && loc.x < oUl[i].offsetLeft+oUl[i].offsetWidth) && (loc.y > oUl[i].offsetTop  && loc.y < oUl[i].offsetTop+oUl[i].offsetHeight)) {
+		// 		 	// console.log(loc.x, oUl[i].offsetLeft, oUl[i].offsetLeft+oUl[i].offsetWidth);
+		// 			// console.log(loc.y, oUl[i].offsetTop, oUl[i].offsetTop+oUl[i].offsetHeight);
+		// 			var child = oUl[i].children;
+		// 			for (var j = 0; j < child.length; j++) {
+		// 				if (loc.y < child[j].offsetTop) { //找到可以放置的li，插入并退出
+		// 					oUl[i].insertBefore(target, child[j]); 
+		// 					return ;
+		// 				}
+		// 			}
 
-					// if(loc.y > child[j-1].offsetTop+child[j-1].offsetHeight  && loc.y < oUl[i].offsetTop+oUl[i].offsetHeight)
-					oUl[i].appendChild(target); //没有放到li之间的位置，直接添加到列表末尾
-				}
-			}
-		}
+		// 			// if(loc.y > child[j-1].offsetTop+child[j-1].offsetHeight  && loc.y < oUl[i].offsetTop+oUl[i].offsetHeight)
+		// 			oUl[i].appendChild(target); //没有放到li之间的位置，直接添加到列表末尾
+		// 		}
+		// 	}
+		// }
 
 	</script>
 </body>

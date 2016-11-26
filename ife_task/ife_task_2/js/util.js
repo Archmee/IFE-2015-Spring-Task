@@ -509,6 +509,24 @@ function removeEvent(element, eventType, listener) {
     }
 }
 
+// 阻止默认事件
+function preventDefault(e) {
+	if (e.preventDefault) {
+		e.preventDefault();
+	} else {
+		e.returnValue = false;
+	}
+}
+
+// 取消冒泡
+function cancelBubble(e) {
+	if (e.stopPropagation) {
+		e.stopPropagation();
+	} else {
+		e.cancelBubble = true;
+	}
+}
+
 // 实现对click事件的绑定
 function addClickEvent(element, listener) {
     addEvent(element, 'click', listener);
@@ -525,7 +543,7 @@ function addEnterEvent(element, listener) {
 	});
 }
 
-function delegateEvent(element, tag, eventName, listener) { //把tag换成selector会不会更好？
+function delegateEvent(element, tag, eventName, listener) { //把tag换成选择器或逻布尔函数会不会更好？
    addEvent(element, eventName, function(event) {
    		event = event || window.event;
    		event.target = event.target || event.srcElement;
