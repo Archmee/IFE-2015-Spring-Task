@@ -47,7 +47,7 @@ function init() {
 	// 2. 文本框不为空，说明曾经失去过焦点
 	//    2.1 如果列表不为空，就可以直接显示出来（这一条有个问题，已废弃处理。原因是如果输入了ja，但是我用鼠标点击选中了匹配ja的所有项中的jac项然后隐藏了列表，那么下次focus的时候会将之前匹配ja的列表全部显示出来，而不是现在文本框中的jac，并且匹配了ja的项还带有样式，这样就和当前文本框中的并不算匹配项）
 	// 	  2.2 如果列表为空，有可能就是像IE等浏览器刷新后文本框的值还在，但是ul已初始化为空
-	addEvent($.searchText, 'focus', function(e) {
+	addEvent($.searchText, 'focus', function(e) { //通过点击触发的focus也会触发click，在document上处理了
 		if ($.searchText.value != '') {
 			handleSearchInput(e);
 		}
@@ -167,24 +167,6 @@ function hiddenSearchList() {
 function toggleLiClass(lastIndex, currentIndex) {
 	$.searchList.children[lastIndex].className = '';
 	$.searchList.children[currentIndex].className = 'active';
-}
-
-// 阻止默认事件
-function preventDefault(e) {
-	if (e.preventDefault) {
-		e.preventDefault();
-	} else {
-		e.returnValue = false;
-	}
-}
-
-// 取消冒泡
-function cancelBubble(e) {
-	if (e.stopPropagation) {
-		e.stopPropagation();
-	} else {
-		e.cancelBubble = true;
-	}
 }
 
 // http://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript
