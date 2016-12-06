@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>轮播效果</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			background-color: #eee;
+		}
+		ul {
+			padding: 0;
+			margin: 0;
+			list-style-type: none;
+		}
+
+		.slider {
+			position: relative;
+			overflow: hidden;
+			text-align: center;
+		}
+
+		/*上一张下一张切换按钮*/
+		.switch {
+			position: absolute;
+			/*让a元素垂直居中，自身高度确定的情况*/
+			top: 50%;
+			margin-top: -60px; /*self height120/2*/
+			
+			/*另外一种垂直居中，自身高度不确定，ie67不支持
+			top:0;
+			bottom: 0;
+			margin: auto 0;*/
+
+			width: 70px;
+			height: 120px;
+
+			/*a元素中的内容水平垂直居中*/
+			line-height: 120px;
+			text-align: center;
+
+			color: #fff;
+			font-size: 5em;
+			font-weight: bold;
+			text-decoration: none;
+			
+			z-index: 100;
+			visibility: hidden;
+		}
+		.switch.prev {
+			left: 0;
+		}
+		.switch.next {
+			right: 0;
+		}
+		/*鼠标在图标上*/
+		.switch:hover {
+			color:  #FE3;
+		}
+		/*鼠标移入轮播区*/
+		.slider:hover .switch {
+			visibility: visible;
+			background-color: rgba(0,0,0, 0.3); /*另见下ie678的兼容方式*/
+		}
+
+		/*图片列表的样式*/
+		.slider .slider-list {
+			font-size: 0; /*由于子元素li绝对定位脱离文档流，没有内容导致的空白间隙*/
+		}
+		.slider .slider-list li {
+			height: 100%;
+			width: 100%; /*如果不设置宽度，会和leftToRight综合出另外的效果*/
+
+			position: absolute;
+			top: 0;
+			left: 0;
+
+			visibility: hidden; /*display和负z-index也可以实现隐藏*/
+		}
+		.slider .slider-list li:first-child {
+			visibility: visible;
+		}
+
+		.slider .slider-list li a {
+			/*这个可以决定图片比父元素小时是填充还是原样显示，不设置就是默认inline填充显示*/
+			display: inline-block;
+		}
+		.slider .slider-list li img {
+			width: 100%; /*宽度自动随父元素宽度伸缩，高度不设置会和宽度保持比例缩放*/
+			border: none;
+			
+			/*解决图片和父元素对不齐的问题*/
+			/*display: block; /*触发图片变成块元素，撑开父元素a的高度*/
+			vertical-align: middle; /*使图片的默认vertical-align=baseline失效*/
+		}
+
+		/*轮播的小点指示器*/
+		/*最终还是选择了增加一层嵌套标签来实现指示器的居中对齐，
+		  因为在元素绝对定位的情况下，如果不使用js而且还要兼容性的居中不好实现
+		  所以我选择添加标签，相比其他方式来说成本更小*/
+		.slider .slider-indicator {
+			position: absolute;
+			bottom: 10px;
+			left: 50%;
+			z-index: 100;
+		}
+		.slider .slider-indicator ul {
+			overflow: hidden;/*清理浮动*/
+
+			/*向左偏移-50实现居中*/ /*transform: translateX(-50%);也可以实现，但兼容性不好*/
+			position: relative;
+			left: -50%;
+
+			padding: 4px 10px;
+			border-radius: 20px;
+			background-color: rgba(0,0,0, 0.3); /*另见下ie678的兼容方式*/
+		}
+		.slider .slider-indicator li {
+			float: left;
+
+			cursor: pointer;
+			width: 12px;
+			height: 12px;
+			margin: 0 4px;
+			border-radius: 50%;
+			background-color: #eee;
+		}
+		.slider .slider-indicator li.active {
+			background-color: #FE3;
+		}
+
+		/*针对a链接点击出现的虚线框，也可以是focus、active伪类上*/
+		.slider a {
+			outline: none;
+		}
+
+		/*针对ie6 7 8的样式表*/
+		@media \0screen\,screen\9 { 
+			/*兼容ie678的透明度，由于ie9既支持rgba又支持filter，所以只好单独用规则*/
+			.slider:hover .switch,
+			.slider .slider-indicator ul {
+				filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#4C000000',endColorstr='#4C000000');
+			}
+			.slider a {
+				blr:expression(this.onFocus=this.blur()); /*ie67不支持outline属性*/
+			}
+		}
+
+
+		/*自定义轮播器样式*/
+		#slider1 {
+			margin: 20px auto;
+			/*是否有必要设置和line-height一样的行高*/
+			/*每次更改轮播组件的高度就要改为相等行高*/
+			width: 960px; /*若不设置高度，即全屏*/
+			height: 360px;
+			line-height: 360px;
+		}
+		#slider2 {
+			display: inline-block;
+			margin-left: 20px;
+			width: 500px;
+			height: 300px;
+			line-height: 300px;
+		}
+		
+		#slider3 {
+			display: inline-block;
+			margin-left: 20px;
+			width: 500px;
+			height: 300px;
+			line-height: 300px;	
+		}
+		#slider2, #slider3 {
+			*display: inline;
+		}
+
+	</style>
+</head>
+<body>
+	<div class="slider" id="slider1">
+		<ul class="slider-list">
+			<li><a href="#"><img src="img/jd1.jpg" alt=""></a></li>
+			<li><a href="#"><img src="img/jd2.jpg" alt=""></a></li>
+			<li><a href="#"><img src="img/jd3.jpg" alt=""></a></li>
+			<li><a href="#"><img src="img/jd4.jpg" alt=""></a></li>
+		</ul>
+		<!-- <a class="switch prev" title="上一张" alt="上一张" href="javascript:">&lt;</a>
+		<a class="switch next" title="下一张" alt="下一张" href="javascript:">&gt;</a> -->
+		<!-- 嵌套标签实现slideer-indicator的居中 -->
+		<!-- <div class="slider-indicator">
+			<ul>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+			</ul>
+		</div> -->
+	</div>
+
+	<div class="slider" id="slider2">
+		<ul class="slider-list">
+			<li><a href="#"><img src="img/jd2.jpg" alt=""></a></li>
+			<li><a href="#"><img src="img/jd1.jpg" alt=""></a></li>
+			<li><a href="#"><img src="img/jd4.jpg" alt=""></a></li>
+			<li><a href="#"><img src="img/jd3.jpg" alt=""></a></li>
+		</ul>
+	</div>
+	<div class="slider" id="slider3">
+		<ul class="slider-list">
+			<li><a href="#"><img src="img/jd2.jpg" alt=""></a></li>
+			<li><a href="#"><img src="img/jd1.jpg" alt=""></a></li>
+			<li><a href="#"><img src="img/jd4.jpg" alt=""></a></li>
+			<li><a href="#"><img src="img/jd3.jpg" alt=""></a></li>
+		</ul>
+	</div>
+
+	
+	<script src="js/util.js"></script>
+	<script src="js/zhinengshe.js"></script><!--学习智能社视频写的运动函数-->
+	<script src="js/task0002_3.js"></script>
+	<script>
+		window.onload = function() {
+		    var slider = new Slider('slider1', false, true, 2000);
+		    slider.start('fadeIn'); // 'fadeIn', 'leftToRight', 'topToBottom'
+
+		    (new Slider('slider2', false, true, 2000)).start('topToBottom');
+		    (new Slider('slider3', true, true, 2000)).start('leftToRight');
+		}
+	</script>
+</body>
+</html>
