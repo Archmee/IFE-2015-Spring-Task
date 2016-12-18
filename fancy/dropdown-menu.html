@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>下拉菜单</title>
+<style>
+/*******************
+    1. 基础样式
+    2. 特定样式
+        2.1 水平导航菜单 
+        2.2 垂直导航菜单 
+        2.3 垂直导航菜单 
+    3. 主题样式
+        3.1 默认灰
+        3.2 粉色
+        3.3 蓝色
+********************/
+
+/* 1. 基础样式 */
+* {
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-size: 16px;
+    font-family: Helvetica, Verdana, Arial, 'Microsoft Yahei', sans-serif;
+}
+a {
+    text-decoration: none;
+}
+ul {
+    list-style-type: none;
+}
+body {
+    background-color: #eee;
+}
+.wrap {
+    width: 80%;
+    margin: 0 auto;
+}
+
+nav ul {
+    display: inline-block;
+    /*background-color: #eee;*/
+}
+nav li {
+    position: relative;
+    min-width: 200px;
+    height: 50px;
+    line-height: 50px;
+    letter-spacing: 2px;
+    border-bottom: 1px solid #ddd; /*下边线*/
+}
+nav a {
+    height: 100%;
+    display: block;
+    padding: 0 30px 0 35px;
+    
+    border-right: 1px solid #ddd; /*右边线本来可写在li上，但是由于li中嵌套了ul，ul中的li的a的左边线会和其父li的右边线重叠，因为它们是父子而非兄弟的关系产生了像素级的误差*/
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+nav a:after {
+    content: '+';
+    float: right;
+}
+nav li ul {
+    position: absolute;
+    display: none;
+}
+nav li:hover > ul {
+    display: block;
+}
+nav li:hover > a {
+}
+nav li:hover > a:after {
+    content: '=';
+}
+nav li li li a:after,
+nav li li li:hover a:after {
+    content: none;
+}
+nav a:link,
+nav a:hover,
+nav a:visited,
+nav a:active {
+    color: #000;
+}
+
+
+/* 2. 特定样式 */
+/* 为了展示菜单de放置位置 */
+nav {
+    margin-top: 50px;
+    margin-bottom: 200px;
+}
+#nav-1, #nav-2, #nav-3 {
+    float: left;
+}
+ #nav-3 {
+    margin-left: 300px;
+ }
+
+/* 2.1 水平导航菜单 */
+#nav-1 > ul > li {
+    float: left;
+}
+#nav-1 > ul:after {
+    content: '';
+    height: 0;
+    clear: both;
+    display: block;
+    overflow: hidden;
+}
+#nav-1 > ul > li > ul { /*由于li中嵌套了ul，li的下边线和子ul的li的顶部重叠，为使其产生视觉上的隔离，用了margin*/
+    margin-top: 1px;
+}
+#nav-1 li li ul {
+    top: 0;
+    left: 200px;
+}
+#nav-1 a {
+    /*text-align: center;*/
+}
+
+
+/* 2.2 垂直导航菜单——级联 */
+#nav-2 li ul {
+    /*left: 200px;
+    top: 0;*/
+}
+
+
+/* 2.3 垂直导航菜单——手风琴 */
+#nav-3 li ul {
+    left: 200px;
+    top: 0;
+}
+
+
+/* 3. 主题相关 */
+/* 灰色 */
+.theme-gray {}
+.theme-gray ul {
+    box-shadow: 8px 26px 70px #ccc;
+    
+    /*border-left: 5px dashed #333;*/
+    /*border-left: 5px solid #333;*/
+}
+
+.theme-gray li {}
+.theme-gray a:after {
+    color: #333;
+}
+
+.theme-gray li:hover > a {
+    text-indent: -5px;
+    border-left: 5px solid #333;
+    text-shadow: 2px 2px 12px #333;
+
+    /*text-indent: -3px;
+    border-left: 3px dashed #333;*/
+}
+.theme-gray li:hover > a:after {}
+
+.theme-gray a:link,
+.theme-gray a:hover,
+.theme-gray a:visited,
+.theme-gray a:active {
+    color: #333;
+}
+
+/* 粉色 */
+.theme-pink {
+}
+.theme-pink ul {
+    box-shadow: 8px 26px 70px rgba(238, 73, 119, 0.6);
+    /*border-left: 5px dashed #EE4977;*/
+    /*border-left: 5px solid #EE4977;*/
+}
+.theme-pink li {
+}
+.theme-pink a:after {
+    color: #EE4977;
+}
+.theme-pink li:hover > a {
+    text-indent: -5px;
+    border-left: 5px solid #EE4977;
+    text-shadow: 2px 2px 12px #EE4977;
+
+    /*text-indent: -3px;
+    border-left: 3px dashed #EE4977;*/
+}
+.theme-pink li:hover > a:after {
+}
+.theme-pink a:link,
+.theme-pink a:hover,
+.theme-pink a:visited,
+.theme-pink a:active {
+    color: #EE4977;
+}
+
+/* 蓝色 */
+.theme-blue {}
+.theme-blue ul {
+    box-shadow: 8px 26px 70px rgba(68, 139, 238, 0.6);
+    /*border-left: 5px dashed #4477ee;*/
+    /*border-left: 5px solid #4477ee;*/
+}
+.theme-blue li {
+}
+.theme-blue a:after {
+    color: #4477ee;
+}
+.theme-blue li:hover > a {
+    text-indent: -5px;
+    border-left: 5px solid #4477ee;
+    text-shadow: 2px 2px 12px #4477ee;
+
+    /*text-indent: -3px;
+    border-left: 3px dashed #4477ee;*/
+}
+.theme-blue li:hover > a:after {}
+
+.theme-blue a:link,
+.theme-blue a:hover,
+.theme-blue a:visited,
+.theme-blue a:active {
+    color: #4477ee;
+}
+
+</style>
+</head>
+<body>
+    <div class="wrap">
+        <nav id="nav-1" class="theme-gray">
+            <ul>
+                <li><a href="#">男装</a>
+                    <ul>
+                        <li><a href="#">主题系列</a>
+                            <ul>
+                                <li><a href="#">新品</a></li>
+                                <li><a href="#">基础百搭</a></li>
+                                <li><a href="#">飞行员夹克</a></li>
+                                <li><a href="#">棉服/羽绒服</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#">上装</a>
+                            <ul>
+                                <li><a href="#">夹克/风衣/外套/西装</a></li>
+                                <li><a href="#">针织衫</a></li>
+                                <li><a href="#">衬衫</a></li>
+                                <li><a href="#">卫衣</a></li>
+                                <li><a href="#">T恤/Polo衫</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#">下装</a>
+                           <ul>
+                               <li><a href="#">休闲裤/长裤</a></li>
+                               <li><a href="#">牛仔裤</a></li>
+                               <li><a href="#">短裤</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li><a href="#">女装</a>
+                    <ul>
+                        <li><a href="#">主题系列</a>
+                            <ul>
+                                <li><a href="#">新品</a></li>
+                                <li><a href="#">基础百搭</a></li>
+                                <li><a href="#">棉服/羽绒服</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#">上装</a>
+                            <ul>
+                                <li><a href="#">夹克/风衣/外套/西装</a></li>
+                                <li><a href="#">针织衫</a></li>
+                                <li><a href="#">衬衫</a></li>
+                                <li><a href="#">T恤/Polo衫</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#">下装</a>
+                           <ul>
+                               <li><a href="#">休闲裤/长裤</a></li>
+                               <li><a href="#">牛仔裤</a></li>
+                               <li><a href="#">短裤</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li><a href="#">童装</a></li>
+                <li><a href="#">最新单品</a></li>
+                <li><a href="#">季末折扣</a></li>
+            </ul>
+        </nav>
+        <nav id="nav-2" class="theme-pink">
+            <ul>
+                <li><a href="#">男装</a>
+                    <ul>
+                        <li><a href="#">主题系列</a>
+                            <ul>
+                                <li><a href="#">新品</a></li>
+                                <li><a href="#">基础百搭</a></li>
+                                <li><a href="#">飞行员夹克</a></li>
+                                <li><a href="#">棉服/羽绒服</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#">上装</a>
+                            <ul>
+                                <li><a href="#">夹克/风衣/外套/西装</a></li>
+                                <li><a href="#">针织衫</a></li>
+                                <li><a href="#">衬衫</a></li>
+                                <li><a href="#">卫衣</a></li>
+                                <li><a href="#">T恤/Polo衫</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#">下装</a>
+                           <ul>
+                               <li><a href="#">休闲裤/长裤</a></li>
+                               <li><a href="#">牛仔裤</a></li>
+                               <li><a href="#">短裤</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li><a href="#">女装</a>
+                    <ul>
+                        <li><a href="#">主题系列</a>
+                            <ul>
+                                <li><a href="#">新品</a></li>
+                                <li><a href="#">基础百搭</a></li>
+                                <li><a href="#">棉服/羽绒服</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#">上装</a>
+                            <ul>
+                                <li><a href="#">夹克/风衣/外套/西装</a></li>
+                                <li><a href="#">针织衫</a></li>
+                                <li><a href="#">衬衫</a></li>
+                                <li><a href="#">T恤/Polo衫</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#">下装</a>
+                           <ul>
+                               <li><a href="#">休闲裤/长裤</a></li>
+                               <li><a href="#">牛仔裤</a></li>
+                               <li><a href="#">短裤</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li><a href="#">童装</a></li>
+                <li><a href="#">最新单品</a></li>
+                <li><a href="#">季末折扣</a></li>
+            </ul>
+        </nav>
+        <nav id="nav-3" class="theme-blue">
+            <ul>
+                <li><a href="#">男装</a>
+                    <ul>
+                        <li><a href="#">主题系列</a>
+                            <ul>
+                                <li><a href="#">新品</a></li>
+                                <li><a href="#">基础百搭</a></li>
+                                <li><a href="#">飞行员夹克</a></li>
+                                <li><a href="#">棉服/羽绒服</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#">上装</a>
+                            <ul>
+                                <li><a href="#">夹克/风衣/外套/西装</a></li>
+                                <li><a href="#">针织衫</a></li>
+                                <li><a href="#">衬衫</a></li>
+                                <li><a href="#">卫衣</a></li>
+                                <li><a href="#">T恤/Polo衫</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#">下装</a>
+                           <ul>
+                               <li><a href="#">休闲裤/长裤</a></li>
+                               <li><a href="#">牛仔裤</a></li>
+                               <li><a href="#">短裤</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li><a href="#">女装</a>
+                    <ul>
+                        <li><a href="#">主题系列</a>
+                            <ul>
+                                <li><a href="#">新品</a></li>
+                                <li><a href="#">基础百搭</a></li>
+                                <li><a href="#">棉服/羽绒服</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#">上装</a>
+                            <ul>
+                                <li><a href="#">夹克/风衣/外套/西装</a></li>
+                                <li><a href="#">针织衫</a></li>
+                                <li><a href="#">衬衫</a></li>
+                                <li><a href="#">T恤/Polo衫</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#">下装</a>
+                           <ul>
+                               <li><a href="#">休闲裤/长裤</a></li>
+                               <li><a href="#">牛仔裤</a></li>
+                               <li><a href="#">短裤</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li><a href="#">童装</a></li>
+                <li><a href="#">最新单品</a></li>
+                <li><a href="#">季末折扣</a></li>
+            </ul>
+        </nav>
+    </div>
+<script src="js/move.js"></script>
+<script>
+window.onload = function () {
+    var lastMenu = null,
+        lastMenus = [];
+
+    var nav3 = document.getElementById('nav-3');
+    if (!nav3) { return; }
+    nav3.onmouseover = function (e) {
+        var e = e || window.event,
+            target = e.target || e.srcElement;
+        if (target.nodeName === 'A' && target.parentNode.nodeName === 'LI') {
+            target = target.parentNode;
+        }
+        if (target.nodeName !== 'LI') {
+            return;
+        }
+
+        lastLi = target;
+        
+        // 获取子菜单，没有则退出
+        var menu = target.children[1];
+        if (!menu) {
+             return;
+        }
+        
+        menu._height = parseFloat(menu._height ? menu._height : getStyle(menu, 'height'));
+        menu.style.height = 0;
+        menu.style.display = 'block';
+        menu.style.overflow = 'hidden';
+        startMove(menu, {height: menu._height});
+
+
+        //鼠标离开菜单项
+        target.onmouseout = function(e) {
+
+            target.onmouseout = null;
+            menu.style.height = menu._height+'px';
+            menu.style.overflow = 'visible';
+
+            // 下面过程可以总结为，如果移到的目标是target的子元素，则不操作，子菜单仍显示，否则隐藏
+            e = e || window.event;
+            var toEle = e.relatedTarget;
+            if (!toEle) {
+                return;
+            }
+            if (toEle.nodeName === 'A') {
+                toEle = toEle.parentNode;
+            }
+            if (toEle.nodeName === 'LI') {
+                toEle = toEle.parentNode;
+            }
+            if (toEle.nodeName === 'UL') {
+                if (toEle === menu) { //如果鼠标离开去了子菜单，则不需要隐藏
+                    return;
+                }
+            }
+
+            menu.style.display = 'none';
+        };
+
+        menu.onmouseenter = function (e) {
+            // console.log('enter');
+            lastMenu = menu;
+            lastMenus.push(menu);
+        }
+
+        // 如果鼠标进入了子菜单又离开，就得考虑隐藏菜单
+        menu.onmouseleave = function (e) {
+            //menu === this === e.target
+            // console.log('leave');
+
+            // 先隐藏自己
+            menu.style.display = 'none';
+            menu.style.overflow = 'visible';
+            menu.style.height = menu._height+'px';
+
+            // 再隐藏不是它父亲菜单的所有其他菜单，包括子菜单
+            // TODO：但是这就有个bug，他的爷爷菜单会被隐藏，
+            // 所以可以考虑用链表的方式而非列表的方式来实现
+            lastMenus.forEach(function (menuItem) {
+                if (menuItem !== menu.parentNode.parentNode) { //
+                    menuItem.style.display = 'none';
+                    menuItem.style.overflow = 'visible';
+                    menuItem.style.height = menuItem._height+'px';
+                }
+            });
+            // lastMenus[0] = lastMenus[lastMenus.length-1];
+            // lastMenus.length = 1;
+            lastMenus.length = 0;
+        };
+    };
+}
+</script>
+</body>
+</html>
