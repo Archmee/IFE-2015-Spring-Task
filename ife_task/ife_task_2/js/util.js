@@ -509,21 +509,30 @@ function removeEvent(element, eventType, listener) {
     }
 }
 
+// 获取兼容事件
+function getEvent(event) {
+	return event || window.event;
+}
+// 获取事件目标
+function getEventTarget(event) {
+	return event.target || event.srcElement;
+}
+
 // 阻止默认事件
-function preventDefault(e) {
-	if (e.preventDefault) {
-		e.preventDefault();
+function preventDefault(event) {
+	if (event.preventDefault) {
+		event.preventDefault();
 	} else {
-		e.returnValue = false;
+		event.returnValue = false;
 	}
 }
 
 // 取消冒泡
-function cancelBubble(e) {
-	if (e.stopPropagation) {
-		e.stopPropagation();
+function cancelBubble(event) {
+	if (event.stopPropagation) {
+		event.stopPropagation();
 	} else {
-		e.cancelBubble = true;
+		event.cancelBubble = true;
 	}
 }
 
@@ -535,7 +544,7 @@ function addClickEvent(element, listener) {
 // 实现对于按Enter键时的事件绑定
 function addEnterEvent(element, listener) {
 	addEvent(element, 'keyup', function(event) {
-		event = event || window.event;
+		event = getEvent(event);
 		event.keyCode = event.keyCode || event.which; //e.whice for firefox/opera
 		if (event.keyCode === 13) { //enter键
 			listener.call(element, event);
@@ -545,8 +554,8 @@ function addEnterEvent(element, listener) {
 
 function delegateEvent(element, tag, eventName, listener) { //把tag换成选择器或逻布尔函数会不会更好？
    addEvent(element, eventName, function(event) {
-   		event = event || window.event;
-   		event.target = event.target || event.srcElement;
+   		event = getEvent(event);
+   		event.target = getEventTarget(event);
    		if (event.target.nodeName === tag.toUpperCase()) {
    			listener.call(event.target, event);
    		}
