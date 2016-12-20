@@ -45,7 +45,7 @@ nav ul {
 }
 nav li {
     position: relative;
-    min-width: 200px;
+    width: 200px;
     height: 50px;
     line-height: 50px;
     letter-spacing: 2px;
@@ -58,9 +58,11 @@ nav a {
     
     border-right: 1px solid #ddd; /*右边线本来可写在li上，但是由于li中嵌套了ul，ul中的li的a的左边线会和其父li的右边线重叠，因为它们是父子而非兄弟的关系产生了像素级的误差*/
 
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    /*如果父元素li的width属性固定了，这3个属性决定了超出a宽度的元素是显示省略号还是截断
+      如果父元素li有min-width，下面只需要white-space=nowrap，元素宽度就会自动扩展*/
+    overflow: hidden; /*隐藏超出元素宽度的元素*/
+    white-space: nowrap; /*如何处理元素内的空白，nowrap是除非强制否则不换行*/
+    text-overflow: ellipsis; /*溢出宽度的文本如何处理，ellipsis是省略号*/
 }
 nav a:after {
     content: '+';
@@ -78,10 +80,19 @@ nav li:hover > a {
 nav li:hover > a:after {
     content: '=';
 }
+
+/*由于+号是用于展开子菜单用的，但这里只是把第3级的菜单的展开形式取消了，因为没有子菜单了
+但是这样就有个问题，就是1、2级菜单如果没有子菜单仍然会显示可展开状态 */
 nav li li li a:after,
 nav li li li:hover a:after {
     content: none;
 }
+/*选中a不是最后一个子元素时的after内容，因为a是最后一个子元素说明没有下级菜单，不需要展开状态*/
+/*a:last-child:after,
+nav li:hover > a:last-child:after {
+    content: none;
+}*/
+
 nav a:link,
 nav a:hover,
 nav a:visited,
@@ -114,8 +125,8 @@ nav {
     display: block;
     overflow: hidden;
 }
-#nav-1 > ul > li > ul { /*由于li中嵌套了ul，li的下边线和子ul的li的顶部重叠，为使其产生视觉上的隔离，用了margin*/
-    margin-top: 1px;
+#nav-1 > ul > li > ul {
+    margin-top: 1px; /*由于li中嵌套了ul，li的下边线和嵌套ul的li的顶部重叠，为使其产生视觉上的隔离，用了margin*/
 }
 #nav-1 li li ul {
     top: 0;
@@ -127,9 +138,30 @@ nav {
 
 
 /* 2.2 垂直导航菜单——级联 */
+#nav-2 ul {
+    overflow: hidden;
+
+}
+#nav-2 > ul ul li {
+    border-color: #eee;
+}
+#nav-2 > ul ul {
+    background-color: #ddd;
+    
+    border-left: 5px solid #bbb;
+}
+#nav-2 > ul ul ul {
+    background-color: #ccc;
+    
+    border-left: 5px solid #aaa;
+}
+#nav-2 > ul ul {
+    box-shadow: none;
+}
 #nav-2 li ul {
-    /*left: 200px;
-    top: 0;*/
+    left: 200px;
+    top: 100%;
+    display: block;
 }
 
 
@@ -422,6 +454,74 @@ nav {
 <script src="js/move.js"></script>
 <script>
 window.onload = function () {
+
+    // 菜单2
+    var nav2 = document.getElementById('nav-2');
+    nav2._active = [];
+    nav2.onclick = function (e) {
+        var e = e || window.event,
+            target = e.target || e.srcElement;
+        if (target.nodeName === 'A') {
+            target = target.parentNode;
+        } //ensure target is li element
+
+        // 清理已展开菜单
+        var i, 
+            last = null;
+        for (i = this._active.length-1; i >= 0; i--) {
+            last = this._active[i];
+
+            // 对比当前激活菜单项和上一次激活的菜单项之间的关系
+            // 是自己或父子就退出循环
+            if (last === target || last === target.parentNode.parentNode) {
+                break;
+            }
+            //兄弟关系 和 子祖关系或者其他关系按照如下处理
+            last._statu = null; //收起状态 隐藏 缩小间隔
+            startMove(last.children[1], {opacity: 0, left: last.children[1]._width});
+            startMove(last, {marginBottom: 0});
+        }
+        this._active.length = i+1; //always
+
+        var menu = target.children[1];
+        if (!menu) { return; }
+        menu._height = menu._height ? menu._height : parseFloat(getStyle(menu, 'height'));
+        menu._width  = menu._width ? menu._width : parseFloat(getStyle(menu, 'width'));
+
+        var i, curr,
+            sum = 0;
+
+        if (!target._statu) { //还没有展开则展开使其激活
+            this._active.push(target);
+            target._statu = 'active'; //只要不为空就行
+            setNumStyle(menu, 'opacity', 0);
+            startMove(menu, {left: 0, opacity: 100});
+
+            for (i = this._active.length-1; i >= 0; i--) {
+                curr = this._active[i];
+                sum += curr.children[1]._height;
+
+                startMove(curr, {marginBottom: sum});
+            }
+           
+        } else { //已经展开了，现在需要隐藏
+            target._statu = null;
+            startMove(menu, {left: menu._width, opacity: 0});
+            
+            for (i = this._active.length-1; i >= 0; i--) {
+                // 这里关键思路在于，在不知道总高度的情况下设置marginBottom，不能用层层减法的思路来做
+                // 每一个菜单项的marginBottom都 = 已经展开的子菜单项的高度 + 子菜单项的marginBottom
+                
+                curr = this._active[i];
+                startMove(curr, {marginBottom: sum});
+                // 顺序！！！
+                sum += curr.parentNode._height ? curr.parentNode._height : 0; 
+            }
+            this._active.length--;
+        }        
+    }
+
+    // 菜单3的效果
     var lastMenu = null,
         lastMenus = [];
 
@@ -436,8 +536,6 @@ window.onload = function () {
         if (target.nodeName !== 'LI') {
             return;
         }
-
-        lastLi = target;
         
         // 获取子菜单，没有则退出
         var menu = target.children[1];
@@ -445,7 +543,7 @@ window.onload = function () {
              return;
         }
         
-        menu._height = parseFloat(menu._height ? menu._height : getStyle(menu, 'height'));
+        menu._height = menu._height ? menu._height : parseFloat(getStyle(menu, 'height'));
         menu.style.height = 0;
         menu.style.display = 'block';
         menu.style.overflow = 'hidden';

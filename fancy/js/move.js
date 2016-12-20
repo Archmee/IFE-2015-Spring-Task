@@ -8,13 +8,11 @@ function startMove(obj, attrJson, fn) {
             isEnd = true; //标记json属性数据是否到达目标值
 
         for (var attrName in attrJson) {
-        
-            // 获取属性值
-            if (attrName === 'opacity') {//获取opacity的值的处理方式稍有不同
-                attrValue = Math.round(parseFloat(getStyle(obj, attrName))*100); 
-            } else {
-                attrValue = parseInt(getStyle(obj, attrName));
-            }
+            // 将参数转换一下，以防是字符串，或者带有px后缀
+            attrJson[attrName] = parseInt(attrJson[attrName]);
+
+            // 获取当前属性值
+            attrValue = parseInt(getStyle(obj, attrName));
 
             //检测该属性值是否到达目标值，到达了就跳过，没有到达则继续处理且 定时器不能结束
             if (attrValue != attrJson[attrName]) {
@@ -27,12 +25,7 @@ function startMove(obj, attrJson, fn) {
                 speed += attrValue; // 前进的速度+物体原来的位置=物体新的目标位置
 
                 // 设置元素属性值
-                if (attrName === 'opacity') {
-                    obj.style[attrName] = speed/100; //opacity设置值是0~1
-                    obj.style['filter'] = 'alpha(opacity='+speed+')'; // 兼容IE <= 8的时候数值是0~100
-                } else {
-                    obj.style[attrName] = speed+'px';
-                }
+                setNumStyle(obj, attrName, speed);
             } //end if
 
         } //end for
@@ -48,10 +41,31 @@ function startMove(obj, attrJson, fn) {
 } //end function
 
 // 获取样式
-function getStyle(element, attr) {
+function getStyle(element, attrName) {
+    var value;
     if (element.currentStyle) {
-        return element.currentStyle[attr];
+        value = element.currentStyle[attrName];
     } else {
-        return getComputedStyle(element, false)[attr];
+        value = getComputedStyle(element, false)[attrName];
     }
+    // opacity特殊处理
+    if (attrName === 'opacity') { //将opacity转换成0~100
+        value = parseFloat(value) * 100;
+    }
+    return value;
+}
+
+// attrValue 只能为数字类型的值
+function setNumStyle(element, attrName, attrValue) {
+    // opacity特殊处理
+    if (attrName === 'opacity') {
+        setOpacity(element, attrValue);
+    } else {
+        element.style[attrName] = attrValue + 'px';
+    }
+}
+// 设置兼容的透明度
+function setOpacity(element, value) {
+    element.style['opacity'] = value / 100; //opacity设置值是0~1
+    element.style['filter'] = 'alpha(opacity=' + value + ')'; // 兼容IE <= 8的时候数值是0~100
 }
