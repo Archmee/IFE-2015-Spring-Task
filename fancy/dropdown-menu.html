@@ -452,6 +452,7 @@ nav {
         </nav>
     </div>
 <script src="js/move.js"></script>
+<!-- <script src="../useJS/move.v5.js"></script> -->
 <script>
 window.onload = function () {
 
@@ -494,7 +495,7 @@ window.onload = function () {
         if (!target._statu) { //还没有展开则展开使其激活
             this._active.push(target);
             target._statu = 'active'; //只要不为空就行
-            setNumStyle(menu, 'opacity', 0);
+            setOpacity(menu, 'opacity', 0);
             startMove(menu, {left: 0, opacity: 100});
 
             for (i = this._active.length-1; i >= 0; i--) {

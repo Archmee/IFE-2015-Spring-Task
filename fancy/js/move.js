@@ -3,7 +3,7 @@ function startMove(obj, attrJson, fn) {
     clearInterval(obj.timer);
 
     obj.timer = setInterval(function() {
-        var attrValue,  //操作obj的相应属性的当前值
+        var currValue,  //操作obj的相应属性的当前值
             speed,      //经过计算此次应该移动的速度
             isEnd = true; //标记json属性数据是否到达目标值
 
@@ -12,20 +12,20 @@ function startMove(obj, attrJson, fn) {
             attrJson[attrName] = parseInt(attrJson[attrName]);
 
             // 获取当前属性值
-            attrValue = parseInt(getStyle(obj, attrName));
+            currValue = parseInt(getStyle(obj, attrName));
 
             //检测该属性值是否到达目标值，到达了就跳过，没有到达则继续处理且 定时器不能结束
-            if (attrValue != attrJson[attrName]) {
+            if (currValue != attrJson[attrName]) {
                 isEnd = false;
 
                 // 计算此次前进的速度
-                speed = (attrJson[attrName]-attrValue)/6; //除数越大，速度越慢
+                speed = (attrJson[attrName]-currValue)/6; //除数越大，速度越慢
                 speed = speed > 0 ? Math.ceil(speed) : Math.floor(speed);
 
-                speed += attrValue; // 前进的速度+物体原来的位置=物体新的目标位置
+                currValue += speed; // 前进的速度+物体原来的位置=物体新的目标位置
 
                 // 设置元素属性值
-                setNumStyle(obj, attrName, speed);
+                setNumStyle(obj, attrName, currValue);
             } //end if
 
         } //end for
@@ -37,7 +37,7 @@ function startMove(obj, attrJson, fn) {
             if (typeof fn === "function") fn(); //执行链式操作
         } //end if
         
-    }, 30);//end interval   
+    }, 16);//end interval   
 } //end function
 
 // 获取样式
