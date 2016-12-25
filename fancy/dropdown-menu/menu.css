@@ -99,13 +99,13 @@ nav a:active {
 /* 为了展示菜单de放置位置 */
 nav {
     margin-top: 50px;
-    margin-bottom: 200px;
+    margin-bottom: 100px;
 }
 #nav-1, #nav-2, #nav-3 {
     float: left;
 }
  #nav-3 {
-    margin-left: 300px;
+    margin-left: 100px;
  }
 
 /* 2.1 水平导航菜单 */
@@ -140,6 +140,7 @@ nav {
     border-color: #eee;
 }
 #nav-2 > ul ul {
+    box-shadow: none;
     background-color: #ddd;
     
     border-left: 5px solid #bbb;
@@ -149,9 +150,7 @@ nav {
     
     border-left: 5px solid #aaa;
 }
-#nav-2 > ul ul {
-    box-shadow: none;
-}
+
 #nav-2 li ul {
     left: 200px;
     top: 100%;

@@ -37,7 +37,7 @@ function startMove(obj, attrJson, fn) {
             if (typeof fn === "function") fn(); //执行链式操作
         } //end if
         
-    }, 16);//end interval   
+    }, 16.7);//end interval   
 } //end function
 
 // 获取样式
@@ -64,6 +64,24 @@ function setNumStyle(element, attrName, attrValue) {
         element.style[attrName] = attrValue + 'px';
     }
 }
+
+// 如果会设置很多样式属性的话，这个方法就比较实用
+function setJsonStyle(element, json) {
+    if (Object.prototype.toString.call(json) === '[object Object]') {
+        var item, 
+            eStyle = element.style;
+        for (item in json) {
+            if (json.hasOwnProperty(item)) {
+                if (item === 'opacity') {
+                    setOpacity(element, json[item]);
+                } else {
+                    eStyle[item] = json[item];
+                }
+            }
+        }
+    }
+}
+
 // 设置兼容的透明度
 function setOpacity(element, value) {
     element.style['opacity'] = value / 100; //opacity设置值是0~1
