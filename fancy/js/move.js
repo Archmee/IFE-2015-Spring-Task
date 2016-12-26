@@ -37,7 +37,7 @@ function startMove(obj, attrJson, fn) {
             if (typeof fn === "function") fn(); //执行链式操作
         } //end if
         
-    }, 16.7);//end interval   
+    }, 30);//end interval   
 } //end function
 
 // 获取样式

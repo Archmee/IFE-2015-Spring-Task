@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>手风琴效果</title>
+	<style>
+		body {
+			margin: 0;
+			overflow: hidden;
+		}
+		#box {
+			width: 3000px;
+			height: 676px;
+		}
+		a {
+			height: 100%;
+			width: 100px;
+			overflow: hidden;
+			float: left;
+		}
+		a:last-child {
+			width: 79%;
+		}
+		img {
+			width: 1066px;
+			height: 100%;
+			vertical-align: middle;
+		}
+	</style>
+</head>
+<body>
+	<div id="box">
+		<a href="#"><img src="http://www.canda.cn/media/dm/lp_img/2016/1117/men/lookbook-men_10.jpg" alt="fantasy"></a>
+		<a href="#"><img src="http://www.canda.cn/media/dm/lp_img/2016/1117/women/women_06.jpg" alt="fantasy"></a>
+		<a href="#"><img src="http://www.canda.cn/media/dm/lp_img/2016/1117/men/lookbook-men_11.jpg" alt="fantasy"></a>
+		<a href="#"><img src="http://www.canda.cn/media/dm/lp_img/2016/1117/women/lookbook-women_04.jpg" alt="fantasy"></a>
+	</div>
+	<script src="js/move.js"></script>
+	<script>
+		window.onload = function () {
+			var imgs = document.images;
+			var box = document.getElementById('box');
+			var last = box.children[box.children.length - 1];
+
+			document.onmouseover = function(event) {
+				var e = event || window.event,
+					target = e.target || e.srcElement;
+				if (target.nodeName !== 'IMG') { // not img
+					return;
+				}
+				if (target.parentNode === last) { //is self
+					return;
+				}
+
+				var imgW = getStyle(target, 'width');
+				startMove(last, {width: 100});
+				startMove(target.parentNode, {width: imgW});
+				
+				last = target.parentNode;
+			}
+		}
+	</script>
+</body>
+</html>
