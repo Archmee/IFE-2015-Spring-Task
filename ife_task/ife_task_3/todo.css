@@ -1,0 +1,371 @@
+@charset "utf-8";
+/*
+同一 rule set 下的属性在书写时，应按功能进行分组，并以 Formatting Model（布局方式、位置） > Box Model（尺寸） > Typographic（文本相关） > Visual（视觉效果） 的顺序书写，以提高代码的可读性。
+
+解释：
+- Formatting Model 相关属性包括：position / top / right / bottom / left / float / display / overflow 等
+- Box Model 相关属性包括：border / margin / padding / width / height 等
+- Typographic 相关属性包括：font / line-height / text-align / word-wrap 等
+- Visual 相关属性包括：background / color / transition / list-style 等
+另外，如果包含 content 属性，应放在最前面。
+*/
+
+body,
+h1, h2, h3,
+ul {
+    margin: 0;
+}
+body {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    color: #555;
+    word-spacing: 1px;
+    font: 16px Helvetica,  'Microsoft Yahei',  Sans-serif;
+}
+ul {
+    padding-left: 0;
+    list-style-type: none;
+}
+button {
+    outline: none;
+    cursor: pointer;
+    color: inherit;
+    font-family: inherit;
+}
+a {
+    color: inherit;
+    text-decoration: none;
+}
+li,
+button {
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
+
+/*基本布局*/
+#header {
+    position: relative;
+    z-index: 10;
+    height: 60px;
+    line-height: 60px;
+    padding: 0 20px;
+    color: #EEE;
+    box-shadow: 0px 2px 5px #999;
+    background-color: #5d6684; /*#DDD #5d6684 rgba(132, 93, 93, 0.89)*/
+}
+#menu,
+#list,
+#detail {
+    position: absolute;
+    top: 60px;
+    bottom: 0;
+    border-right: 1px solid #CCC;
+    box-shadow: 2px 0 5px #CCC;
+    background-color: #E9EAEB; /*#F2F4D8 #F2F2F2*/
+}
+#menu {
+    width: 250px;
+    left: 0;
+    z-index: 3;
+    padding-top: 20px;
+}
+#list {
+    width: 250px;
+    left: 250px;
+    z-index: 2;
+}
+#detail {
+    left: 500px;
+    right: 0;
+    z-index: 1;
+    /*background: #E9EAEB url(img/noise.png) repeat;*/
+}
+
+/*各区域细节*/
+/*窗口resize或者高度超出视窗，显示滚动条*/
+#category-list {
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 50px;
+    bottom: 50px;
+    overflow-y: scroll;
+}
+#todo-list {
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 51px;
+    bottom: 50px;
+    overflow-y: scroll;
+}
+#detail .td-desc {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 102px;
+    bottom: 0;
+    overflow-y: scroll;
+}
+
+/*两个底部按钮图标*/
+footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 50px;
+    width: 100%;
+    background-color: #F2F2F2;
+}
+/* 底部按钮图标 */
+footer button {
+    height: 100%;
+    width: 100%;
+    font-size: .9em;
+    border: 1px solid #CCC;
+    background: linear-gradient(to bottom, #fff, #ddd);
+}
+footer button:active {
+    background: linear-gradient(to top, #fff, #ddd);
+}
+/*按钮的+号标记*/
+footer .icon-add:before {
+    content: '+';
+    float: left;
+    display: block;
+    width: 16px;
+    height: 16px;
+    text-indent: 30%;
+    line-height: 20px;
+    font-size: 1.8em;
+    font-weight: 700;
+}
+
+/*按钮组*/
+.btns {
+    overflow: hidden;
+}
+.btns button {
+    float: left;
+    height: 30px;
+    width: 60px;
+    margin-left: 15px;
+    border-radius: 4px;
+    border: 1px outset #A8AAC5;
+    background-color: #A8AAC5;
+}
+.btns button:active {
+    border: 1px inset #CCC;
+}
+
+/* 列表行 */
+.item {
+    position: relative;
+    display: block;
+    height: 30px;
+    line-height: 30px;
+    padding: 0 20px;
+    cursor: pointer;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+/* 列表行经过，选中背景*/
+.item:hover,
+.item.selected {
+    background-color: #CCC;
+}
+
+/* 列表行folder图标*/
+.icon-file:before, 
+.icon-folder:before {
+    content: '';
+    display: block;
+    float: left;
+    width:  24px;
+    height: 24px;
+    margin: 2px 5px 0 0;
+}
+/*目录*/
+.icon-folder:before {
+    background: url(img/close_folder_24.png) 50% 50% no-repeat;
+}
+/*目录展开*/
+.icon-folder.folder-opened:before {
+    background-image: url(img/open_folder_24.png);
+}
+/*子目录*/
+.icon-file:before {
+    background: url(img/file.png) 50% 50% no-repeat;
+}
+/* todo 条目数量*/
+.td-count {
+    color: #999;
+    margin-left: 5px;
+    font-size: .9em;
+}
+/*隐藏子分类*/
+.hidden {
+    display: none;
+}
+
+/* 完成或删除的标记 */
+.act-del, 
+.act-done {
+    position: absolute;
+}
+/*删除*/
+.act-del {
+    right: 8px;
+}
+.act-del:after {
+    content: "×";
+    display: none;
+    font-size: 2em;
+}
+.item:hover .act-del:after {
+    display: block;
+}
+#menu .act-del {
+    color: #666;
+}
+#list .act-del {
+    color: #F22;
+}
+
+/*完成标记的文字后移*/
+#list .item {
+    padding-left: 50px;
+}
+/* 完成标记 */
+.act-done {
+    left: 24px;
+    top: 7px;
+    width: 14px;
+    height: 14px;
+    line-height: 15px;
+    border: 1px solid #999;
+    border-radius: 2px;
+    color: #0DC70D;
+    font-weight: 700;
+    font-size: 1.6em;
+    text-indent: -1.2px; /*align mark √*/
+}
+.act-done:after {
+    content: "√";
+    display: none;
+}
+.done-item .act-done {
+    border: 1px solid #0DC70D;
+}
+.done-item .act-done:after {
+    display: block;
+}
+
+/*中间任务列表*/
+#list .header {
+    overflow: hidden;
+    width: 100%;
+    height: 50px;
+    border-bottom: 1px solid #CCC;
+    /*background-color: #EEE;*//*EEE, 5d6684*/
+}
+#list .btns {
+    float: left;
+    margin-top: 10px; /* (50-30)/2 */
+}
+#list .btns .selected {
+    border: 1px inset #CCC;
+    background-color: #CCC; /*#FAFAEE;*/
+}
+
+time,
+#list ul {
+    font-size: .95em;
+}
+#list time {
+    display: block;
+    height: 30px;
+    line-height: 30px;
+    padding-left: 20px;
+    font-style: italic;
+    border-top: 1px solid #DDD;
+    border-bottom: 1px solid #DDD;
+    background-color: #FAFAEE;/*#FAFAEE #A8AAC5*/
+}
+#list li:first-child time {
+    border-top: none;
+}
+ 
+/*任务详情*/
+#detail label {
+    color: #AAA;
+}
+/*todo详情 */
+#detail .td-head,
+#detail .td-date,
+#detail .td-desc {
+    padding: 0 20px;
+}
+#detail .td-head,
+#detail .td-date {
+    height: 50px;
+    line-height: 50px;
+    
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    border-bottom: 1px solid #DDD;
+    /*box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 2px;*/
+}
+#detail .td-head {
+    overflow: hidden;
+    /*background-color: #EEE;*/
+}
+#detail .title {
+    font-size: .96em;
+    font-weight: 700;
+}
+/*按钮*/
+#detail .btns {
+    float: right;
+    margin-top: 10px;
+}
+#detail .cancel {
+    background-color: #BBB;
+}
+#detail .td-date {
+    background-color: #FAFAEE;
+}
+#detail .td-desc {
+    padding: 10px 20px;
+    white-space: pre-wrap;
+}
+#detail input,
+#detail textarea {
+    padding: 3px 5px;
+    color: #222;
+    font: inherit;
+    font-size: 14px;
+    border: 1px solid #CCC;
+}
+#detail input {
+    width: 200px;
+    height: 20px;
+}
+#detail textarea {
+    width: 90%;
+    line-height: 1.4em;
+    vertical-align: top;
+}
+
+#detail .warning {
+    padding: 0 10px;
+    font-size: 12px;
+    color: #999;
+}
