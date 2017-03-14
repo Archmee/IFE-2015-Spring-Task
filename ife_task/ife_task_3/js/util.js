@@ -703,3 +703,12 @@ function encodeObjectToString(data) {
     }
     return plist.join('&');
 }
+
+// 获取样式
+function getStyle(element, attr) {
+	if (element.currentStyle) {
+		return element.currentStyle[attr];
+	} else {
+		return getComputedStyle(element, false)[attr];
+	}
+}

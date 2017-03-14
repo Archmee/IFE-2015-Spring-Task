@@ -9,22 +9,6 @@ window.onload = function() {
     
     // 要用单例延迟加载
     todoModule.init('category-list', 'todo-list', 'detail');
-    initWindow();
-    window.onresize = initWindow;
-}
-
-function initWindow() {
-    // var cl = $('#'+'category-list');
-    // cl.style.height = (window.innerHeight-160) + 'px';
-    // cl.style.overflowY = 'scroll';
-
-    // var tl = $('#'+'todo-list');
-    // tl.style.height = (window.innerHeight-160) + 'px';
-    // tl.style.overflowY = 'scroll';
-
-    // var td = $('.td-desc');
-    // td.style.height = (window.innerHeight-185) + 'px';
-    // td.style.overflowY = 'scroll';
 }
 
 var store = (function(db) {
@@ -956,33 +940,3 @@ var todoModule = (function(_CL, _TL, _TD) {
 
 // Module/单例
 // 观察者/发布订阅 模式
-
-/*
-{
-  "total": 227,//总记录数
-  "result": [//返回结果集
-    {
-      "famous_name": "车尔尼雪夫斯基",//名人
-      "famous_saying": "非凡的单纯，非凡的明确——这是天才的智慧的最可惊人的品质。"//语录
-    },
-    {
-      "famous_name": "约·德莱顿",
-      "famous_saying": "天才在社会生活中往往显得迟钝而"
-    },
-    {
-      "famous_name": "雨果",
-      "famous_saying": "敢于冲撞命运才是天才"
-    },
-    {
-      "famous_name": "卡莱尔",
-      "famous_saying": "所谓天才，就是比任何人都先抵挡痛苦的经验本领。"
-    },
-    {
-      "famous_name": "林肯",
-      "famous_saying": "卓越的天才不屑走一条人家走过的路。他寻找迄今没有开拓过的地区。"
-    }
-  ],
-  "error_code": 0,//返回状态码
-  "reason": "Succes"//返回状态说明
-}
-*/
