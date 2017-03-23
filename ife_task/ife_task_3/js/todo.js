@@ -66,9 +66,10 @@ function getFormatDate(timestamp, spliter) {
 var CategoryListModule = (function() {
     var _topCatId = 'cid_0000000000001'; // 顶级分类id
     // var _defCatId = 'cid_0000000000002'; // default默认分类id，不能删除，不能增加子分类，我没做是觉得这个需求不合理
-    var _wrapperId = 'category-list';    // 包含分类列表的容器
     var _storeKey = 'category_list';     // 本地存储的key
-    var _sourceList = null;       // 获取数据源
+
+    var _wrapperId = null;    // 包含分类列表的容器
+    var _sourceList = null;   // 获取数据源
     
     var _startPadding = 20; // 层级对齐距离
     var _incrPadding = 20;
@@ -124,10 +125,8 @@ var CategoryListModule = (function() {
     var getCategoryItemTemplate = function(catItem, startPadding) {
         return  ''
                 + '<a id="' + catItem.cid + '"'
-                +   ' data-id="' + catItem.cid + '"'
-                +   ' class="item item-cat ' +
-                            ((catItem.childCatList.length > 0 || catItem.pid === _topCatId) 
-                            ? 'icon-folder' : 'icon-file') + '"'
+                // +   ' data-id="' + catItem.cid + '"'
+                +   ' class="item item-cat icon-folder"'
                 +   ' style="padding-left:' + startPadding + 'px">'
                 +     '<span>' + catItem.title + '</span>'
                 +     '<span class="td-count">(' + catItem.childTodoList.length + ')</span>'
@@ -145,7 +144,9 @@ var CategoryListModule = (function() {
     }
 
     var appendItemTemplate = function(parent, category) {
-        var itemTemplate = '<li>' + getCategoryItemTemplate(category, calcStartPadding(category.pid)) + '</li>';
+        var itemTemplate =    '<li>' 
+                            + getCategoryItemTemplate(category, calcStartPadding(category.pid)) 
+                            + '</li>';
         var child = $('ul', parent);
         if (child) {
             child.innerHTML += itemTemplate;
@@ -171,42 +172,66 @@ var CategoryListModule = (function() {
         parent.childCatList.push(category.cid);
         resetSource();
     };
+
+    // 删除分类条目
     var deleteItem = function(category) {
         delete _sourceList[category.cid];
-        var brothers = _sourceList[category.pid].childCatList;
-        brothers[brothers.indexOf(category.cid)] = null; //不能用splice删除，因为递归是操作的是同一个数组，会导致递归时上级循环
-        // brothers.splice(brothers.indexOf(category.cid), 1);
+    };
+    // 删除该分类以及所有子孙分类
+    var removeCategory = function(cid) {
+        // 从父分类移出该分类
+        var parent = _sourceList[_sourceList[cid].pid];
+        var brothers = parent.childCatList;
+        brothers.splice(brothers.indexOf(cid), 1);
+        
+        // 删除该分类和子孙分类
+        var childIds = getChildIds(cid);
+        for (var i = 0, len = childIds.length; i < len; i++) {
+            deleteItem(_sourceList[childIds[i]]);
+        }
 
+        // 更新
         resetSource();
     };
-    var removeCategory = function(cid) {
-        var item = _sourceList[cid];
-        if (!item) {
-            return;
-        }
-        
-        var childIds = item.childCatList;
-        for (var i = 0, len = childIds.length; i < len; i++) {
-            arguments.callee(childIds[i]); //还有子分类的的todo
-        }
-
-        deleteItem(item);
-    };
-    var getTodoListInCat = function(cid) {
-        var item = _sourceList[cid];
-        if (!item) {
-            return;
-        }
-        var childIds = item.childCatList;
-        var todo = [].concat(item.childTodoList); //把分类下的todo列表保存起来
-        for (var i = 0, len = childIds.length; i < len; i++) {
-            if (childIds[i]) {
-                todo = todo.concat(arguments.callee(childIds[i])); //还有子分类的的todo
+    // 获取所有子孙分类id
+    var getChildIds = function(cid) {
+        var ids = [];
+        (function(cidIn) {
+            var item = _sourceList[cidIn];
+            if (!item) {
+                return;
             }
-        }
+            ids.push(cidIn);
 
-        return todo; //返回todo列表
+            // 遍历子分类列表
+            var childIds = item.childCatList;
+            for (var i = 0, len = childIds.length; i < len; i++) {
+                arguments.callee(childIds[i]);
+            }
+        })(cid);
+
+        return ids;
+    };
+    // 遍历分类获取子todo
+    var getTodoListInCat = function(cid) {
+        var ids = [];
+        (function(cidIn) {
+            var item = _sourceList[cidIn];
+            if (!item) {
+                return;
+            }
+            ids = ids.concat(item.childTodoList);
+
+            // 递归遍历子分类
+            var childIds = item.childCatList;
+            for (var i = 0, len = childIds.length; i < len; i++) {
+                arguments.callee(childIds[i]); //还有子分类的的todo
+            }
+        })(cid);
+
+        return ids;
     }
+
     var getAllTodoList = function() {
         return getTodoListInCat(_topCatId);
     }
@@ -250,7 +275,7 @@ var CategoryListModule = (function() {
             _wrapperId = wrapperId || _wrapperId;
             var wrapper = $('#' + _wrapperId);
             if (wrapper) {
-                wrapper.innerHTML += getCategoryTemplate();
+                wrapper.innerHTML = getCategoryTemplate();
             }
             updateAllTodoCount();
         },
@@ -290,7 +315,7 @@ var CategoryListModule = (function() {
             removeCategory(cid);
             updateAllTodoCount();
         },
-        appendItemTemplate: appendItemTemplate,
+        addItemTemplate: appendItemTemplate,
         addChildTodo: function(cid, tid) {
             if (!_sourceList[cid].childTodoList) {
                 _sourceList[cid].childTodoList = [];
@@ -325,7 +350,7 @@ var CategoryListModule = (function() {
 
 var TodoListModule = (function() {
 
-    var _wrapperId = 'todo-list';
+    var _wrapperId = null;
     // var _sourceList = null;
 
     // 从localStorage加载todo列表
@@ -466,12 +491,12 @@ var TodoListModule = (function() {
 })();
 
 var todoDetail = (function() {
-    var _wrapperId = 'todo-detail';
+    var _wrapperId = null;
 
-    var showItem = function(todo) {
+    var getShowTemplate = function(todo) {
         todo = todo || { title: '', expireTime: '', content: ''};
 
-        $('#' + _wrapperId).innerHTML = ''
+        return ''
                 + '<header class="td-head">'
                 +    '<label>标题：</label>'
                 +    '<span class="title">' + todo.title + '</span>'
@@ -489,10 +514,10 @@ var todoDetail = (function() {
                 + '</div>';
     }
 
-    var editItem = function(todo) {
+    var getEditTemplate = function(todo) {
         todo = todo || { title: '未命名任务', expireTime: Date.now(), content: '?'};
 
-        $('#' + _wrapperId).innerHTML = ''
+        return ''
                 + '<header class="td-head">'
                 +    '<label>标题：</label>'
                 +    '<input type="text" id="todo-title" maxlength="30" value="'+ todo.title +'" autofocus>'
@@ -517,8 +542,12 @@ var todoDetail = (function() {
         init: function(wrapperId) {
             _wrapperId = wrapperId || _wrapperId;
         },
-        showItem: showItem,
-        editItem: editItem,
+        showItem: function(todo) {
+            $('#' + _wrapperId).innerHTML = getShowTemplate(todo);
+        },
+        editItem: function(todo) {
+            $('#' + _wrapperId).innerHTML = getEditTemplate(todo);
+        }
     }
 })();
 
@@ -604,7 +633,8 @@ var todoModule = (function(_CL, _TL, _TD) {
                     _UI.alert('请选中一个父分类！');
                     return;
                 }
-                if (pid.indexOf('cid_') < 0) {
+                
+                if (pid.indexOf('cid_') < 0) { //!/^cid_\d+/.test(pid)
                     pid = _topCatId;
                 }
 
@@ -644,7 +674,7 @@ var todoModule = (function(_CL, _TL, _TD) {
                 if (isValid) {
                     var category = new Category(name, pid);
                     _CL.addItem(category);
-                    _CL.appendItemTemplate(_currentCatEle.parentNode, category);
+                    _CL.addItemTemplate(_currentCatEle.parentNode, category);
 
                     // 新的子分类创建后，无论父分类是否是展开状态，都要展开
                     openParentCategory(_currentCatEle);
@@ -874,8 +904,6 @@ var todoModule = (function(_CL, _TL, _TD) {
         var child = $('ul', target.parentNode); //展开子节点
         if (child) {
             removeClass(child, 'hidden');
-            removeClass(target, 'icon-file');
-            addClass(target, 'icon-folder');
             addClass(target, 'folder-opened');
         }
     }
@@ -883,11 +911,14 @@ var todoModule = (function(_CL, _TL, _TD) {
     function selectCategory(target) {
         var child = $('ul', target.parentNode); //展开子节点
         if (child) {
-            toggleClass(child, 'hidden');
+            if (hasClass(child, 'hidden')) {
+                toggleClass(child, 'hidden');
+            }
             if (hasClass(target, 'icon-folder')) {
                 toggleClass(target, 'folder-opened');
             }
         }
+
         switchSelectLastCat(target);
     }
     // 选中分类列表中的第一项
