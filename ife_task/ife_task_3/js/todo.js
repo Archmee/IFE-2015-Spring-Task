@@ -63,6 +63,14 @@ function getFormatDate(timestamp, spliter) {
             ].join(spliter);
 }
 
+function hiddenEle(ele) {
+    addClass(ele, 'hidden');
+}
+
+function showEle(ele) {
+    removeClass(ele, 'hidden');
+}
+
 var CategoryListModule = (function() {
     var _topCatId = 'cid_0000000000001'; // 顶级分类id
     // var _defCatId = 'cid_0000000000002'; // default默认分类id，不能删除，不能增加子分类，我没做是觉得这个需求不合理
@@ -540,18 +548,18 @@ var todoDetail = (function() {
             wrapper.innerHTML = getShowTemplate(todo);
 
             var parent = wrapper.parentNode;
-            addClass($('.' + 'save', parent), 'hidden'); //隐藏保存
-            addClass($('.' + 'cancel', parent), 'hidden'); //隐藏取消
-            removeClass($('.' + 'edit', parent), 'hidden'); //显示编辑
+            hiddenEle($('.' + 'save', parent));
+            hiddenEle($('.' + 'cancel', parent));
+            showEle($('.' + 'edit', parent));
         },
         editItem: function(todo) {
             var wrapper = $('#' + _wrapperId);
             wrapper.innerHTML = getEditTemplate(todo);
 
             var parent = wrapper.parentNode;
-            addClass($('.' + 'edit', parent), 'hidden'); //隐藏编辑
-            removeClass($('.' + 'save', parent), 'hidden'); //显示添加
-            removeClass($('.' + 'cancel', parent), 'hidden'); //显示添加
+            hiddenEle($('.' + 'edit', parent));
+            showEle($('.' + 'save', parent));
+            showEle($('.' + 'cancel', parent));
         }
     }
 })();
