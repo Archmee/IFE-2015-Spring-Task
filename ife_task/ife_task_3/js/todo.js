@@ -8,7 +8,7 @@ window.onload = function() {
     }
     
     // 要用单例延迟加载
-    todoModule.init('category-list', 'todo-list', 'detail');
+    todoModule.init('category-list', 'todo-list', 'detail-wrap');
 }
 
 var store = (function(db) {
@@ -500,9 +500,6 @@ var todoDetail = (function() {
                 + '<header class="td-head">'
                 +    '<label>标题：</label>'
                 +    '<span class="title">' + todo.title + '</span>'
-                +    '<div class="btns">'
-                +      '<button class="edit" data-action="edit-todo">编辑</button>'
-                +    '</div>'
                 + '</header>'
                 + '<div class="td-date">'
                 +    '<label>日期：</label>'
@@ -522,10 +519,6 @@ var todoDetail = (function() {
                 +    '<label>标题：</label>'
                 +    '<input type="text" id="todo-title" maxlength="30" value="'+ todo.title +'" autofocus>'
                 +    '<span class="warning">不超过30字</span>'
-                +    '<div class="btns">'
-                +       '<button class="save" data-action="save-edit">保存</button>'
-                +       '<button class="cancel" data-action="cancel-edit">取消</button>'
-                +    '</div>'
                 + '</header>'
                 + '<div class="td-date">'
                 +    '<label>日期：</label>'
@@ -543,10 +536,22 @@ var todoDetail = (function() {
             _wrapperId = wrapperId || _wrapperId;
         },
         showItem: function(todo) {
-            $('#' + _wrapperId).innerHTML = getShowTemplate(todo);
+            var wrapper = $('#' + _wrapperId);
+            wrapper.innerHTML = getShowTemplate(todo);
+
+            var parent = wrapper.parentNode;
+            addClass($('.' + 'save', parent), 'hidden'); //隐藏保存
+            addClass($('.' + 'cancel', parent), 'hidden'); //隐藏取消
+            removeClass($('.' + 'edit', parent), 'hidden'); //显示编辑
         },
         editItem: function(todo) {
-            $('#' + _wrapperId).innerHTML = getEditTemplate(todo);
+            var wrapper = $('#' + _wrapperId);
+            wrapper.innerHTML = getEditTemplate(todo);
+
+            var parent = wrapper.parentNode;
+            addClass($('.' + 'edit', parent), 'hidden'); //隐藏编辑
+            removeClass($('.' + 'save', parent), 'hidden'); //显示添加
+            removeClass($('.' + 'cancel', parent), 'hidden'); //显示添加
         }
     }
 })();
@@ -733,6 +738,9 @@ var todoModule = (function(_CL, _TL, _TD) {
 
                 break;
             case 'save-edit':
+                if (!_saveAction) {
+                    return;
+                }
                 
                 var title   = $('#' + 'todo-title').value;
                 var expire  = $('#' + 'todo-expire').value;

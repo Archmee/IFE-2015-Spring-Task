@@ -45,6 +45,11 @@ button {
             user-select: none;
 }
 
+/*隐藏*/
+.hidden {
+    display: none;
+}
+
 /*基本布局*/
 #header {
     z-index: 10;
@@ -208,10 +213,6 @@ footer .icon-add:before {
     margin-left: 5px;
     font-size: .9em;
 }
-/*隐藏子分类*/
-.hidden {
-    display: none;
-}
 
 /* 完成或删除的标记 */
 .act-del, 
@@ -282,7 +283,7 @@ time,
     padding-left: 20px;
     background-color: #FAFAEE;/*#FAFAEE #A8AAC5*/
 }
- 
+
 /*任务详情*/
 #detail label {
     color: #AAA;
@@ -310,8 +311,10 @@ time,
 }
 /*按钮*/
 #detail .btns {
-    float: right;
-    margin-top: 10px;
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    z-index: 10;
 }
 #detail .cancel {
     background-color: #BBB;
