@@ -11,20 +11,6 @@ window.onload = function() {
     todoModule.init('category-list', 'todo-list', 'detail-wrap');
 }
 
-var store = (function(db) {
-    return {
-        get: function(key) {
-            return JSON.parse(db.getItem(key));
-        },
-        set: function(key, value) {
-            db.setItem(key, JSON.stringify(value));
-        },
-        remove: function(key) {
-            db.removeItem(key);
-        }
-    };
-})(window.localStorage);
-
 var STATU_FINISH = 1;
 var STATU_NOT_FINISH = -1;
 
@@ -49,6 +35,20 @@ function Todo(cid, title, content, expire) {
     this.status = STATU_NOT_FINISH;
     this.expireTime = expire;
 }
+
+var store = (function(db) {
+    return {
+        get: function(key) {
+            return JSON.parse(db.getItem(key));
+        },
+        set: function(key, value) {
+            db.setItem(key, JSON.stringify(value));
+        },
+        remove: function(key) {
+            db.removeItem(key);
+        }
+    };
+})(window.localStorage);
 
 function getFormatDate(timestamp, spliter) {
     if (!timestamp) {
@@ -927,9 +927,7 @@ var todoModule = (function(_CL, _TL, _TD) {
     function selectCategory(target) {
         var child = $('ul', target.parentNode); //展开子节点
         if (child) {
-            if (hasClass(child, 'hidden')) {
-                toggleClass(child, 'hidden');
-            }
+            toggleClass(child, 'hidden');
             if (hasClass(target, 'icon-folder')) {
                 toggleClass(target, 'folder-opened');
             }
