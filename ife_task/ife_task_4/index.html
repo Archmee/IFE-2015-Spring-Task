@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="width=device-width, height=device-height, inital-scale=1.0, maximum-scale=1.0, user-scalable=no;"/>
+    <title>GTD</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/todo-mobile.css" media="screen and (max-width:480px)">
+    <link rel="stylesheet" href="css/todo-pc.css" media="screen and (min-width:481px)">
+</head>
+<body>
+    <header id="header">
+        <h1>GTD ToooL</h1>
+    </header>
+    <main>
+        <div id="menu">
+            <ul>
+                <li>
+                    <a class="item" id="show-all-todo">
+                        <span>所有任务</span><span class="td-count"></span>
+                    </a>
+                </li>
+                <li>
+                    <a class="item" id="show-all-cat"><span>分类列表</span></a>
+                    <div id="category-list"></div>
+                </li>
+            </ul>
+            <footer>
+                <button class="icon-add" data-action="add-category">新增分类</button>
+            </footer>
+        </div>
+        <div id="list">
+            <div class="header">
+                <div class="btns">
+                    <button data-action="switch-status" id="statu-all">所有</button>
+                    <button data-action="switch-status" id="statu-not">未完成</button>
+                    <button data-action="switch-status" id="statu-done">已完成</button>
+                </div>
+            </div>
+            <div id="todo-list"></div>
+            <footer>
+                <button class="icon-add" data-action="add-todo">新增任务</button>
+            </footer>
+        </div>
+        <div id="detail">
+            <div id="detail-wrap"></div>
+            <div class="btns">
+                <button class="edit" data-action="edit-todo">编辑</button>
+                <button class="save add" data-action="save-edit">保存</button>
+                <button class="cancel add" data-action="cancel-edit">取消</button>
+            </div>
+        </div>
+    </main>
+<script src="js/util.js"></script>
+<script src="js/todo.js"></script>
+</body>
+</html>

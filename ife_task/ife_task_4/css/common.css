@@ -1,0 +1,63 @@
+@charset "utf-8";
+/*
+同一 rule set 下的属性在书写时，应按功能进行分组，并以 Formatting Model（布局方式、位置） > Box Model（尺寸） > Typographic（文本相关） > Visual（视觉效果） 的顺序书写，以提高代码的可读性。
+
+解释：
+- Formatting Model 相关属性包括：position / top / right / bottom / left / float / display / overflow 等
+- Box Model 相关属性包括：border / margin / padding / width / height 等
+- Typographic 相关属性包括：font / line-height / text-align / word-wrap 等
+- Visual 相关属性包括：background / color / transition / list-style 等
+另外，如果包含 content 属性，应放在最前面。
+*/
+html {
+    font-size: 16px;
+    font: 16px Helvetica,  'Microsoft Yahei',  Sans-serif;
+}
+
+body,
+ul,
+h1, h2, h3 {
+    margin: 0;
+}
+body {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    color: #555;
+    word-spacing: 1px;
+}
+ul {
+    padding-left: 0;
+    list-style-type: none;
+}
+button {
+    outline: none;
+    cursor: pointer;
+    color: inherit;
+    font-family: inherit;
+}
+a {
+    color: inherit;
+    text-decoration: none;
+}
+li,
+button {
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
+
+/*隐藏*/
+.hidden {
+    display: none;
+}
+
+/*基本布局*/
+#header {
+    z-index: 10;
+    /*position: relative;*/
+    /*box-shadow: 0px 2px 5px #999;*/
+    color: #EEE;
+    background-color: #5d6684;
+}
