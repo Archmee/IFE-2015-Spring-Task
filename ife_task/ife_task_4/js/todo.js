@@ -523,22 +523,22 @@ var todoDetail = (function() {
     }
 
     var getEditTemplate = function(todo) {
-        todo = todo || { title: '未命名任务', expireTime: Date.now(), content: '?'};
+        todo = todo || { title: '未命名任务', expireTime: Date.now(), content: ''};
 
         return ''
                 + '<header class="td-head">'
                 +    '<label>标题：</label>'
-                +    '<input type="text" id="todo-title" maxlength="30" value="'+ todo.title +'">'
-                +    '<span class="warning">30字内</span>'
+                +    '<input type="text" id="todo-title" maxlength="30" value="'+ todo.title +'" placeholder="请输入标题">'
+                +    '<span class="warning">&lt; 30</span>'
                 + '</header>'
                 + '<div class="td-date">'
                 +    '<label>日期：</label>'
-                +    '<input type="date" id="todo-expire" value="'+ getFormatDate(todo.expireTime) +'">'
+                +    '<input type="date" id="todo-expire" value="'+ getFormatDate(todo.expireTime) +'" placeholder="请输入日期">'
                 +    '<span class="warning">2000-01-02</span>'
                 + '</div>'
                 + '<div class="td-desc">'
                 +    '<label>描述：</label>'
-                +    '<textarea id="todo-content" cols="80" rows="10">'+ todo.content +'</textarea>'
+                +    '<textarea id="todo-content" cols="80" rows="8" placeholder="请输入任务内容">'+ todo.content +'</textarea>'
                 + '</div>';
     }
 
@@ -644,6 +644,7 @@ var todoModule = (function(_CL, _TL, _TD) {
                 // 添加分类到分类列表
                 // 添加到分类列表容器
                 // 选中新添加的分类并更新数据
+
                 var pid = _currentCatEle.id;
 
                 if (pid === 'show-all-todo') { // 如果当前选中的是所有任务项，那就不能创建分类
@@ -741,7 +742,7 @@ var todoModule = (function(_CL, _TL, _TD) {
                 _saveAction = action;
                 _TD.editItem();
 
-                slidePageNext(); // 翻到编辑页
+                slidePageNext(); //Mobile:翻到编辑页
                 
                 break;
             case 'edit-todo':
@@ -793,6 +794,12 @@ var todoModule = (function(_CL, _TL, _TD) {
 
                 break;
             case 'cancel-edit':
+
+                //Mobile:如果正在添加任务时取消，则返回上一页
+                if (_saveAction === 'add-todo') {
+                    slidePagePrev();
+                }
+
                 showCurrItem();
                 _saveAction = null;
 
@@ -821,7 +828,8 @@ var todoModule = (function(_CL, _TL, _TD) {
             case 'switch-statu':
                 selectStatu(target);
                 break;
-            case 'act-back': // 客户端翻页的返回行为
+            case 'act-back': 
+                //Mobile:客户端翻页的返回行为
                 slidePagePrev(); 
                 break;
             default:
@@ -832,15 +840,15 @@ var todoModule = (function(_CL, _TL, _TD) {
                 // 有item class 再判断类型
                 if (hasClass(target, 'item-cat')) { // 分类条目
                     selectCategory(target);
-                    slidePageNext(); // 翻页
+                    slidePageNext(); //Mobile:翻页
                 } else if (hasClass(target, 'item-todo')) { //todo条目
                     selectTodo(target);
-                    slidePageNext(); // 翻页
+                    slidePageNext(); //Mobile:翻页
                 } else if (target.id === 'show-all-cat') {
                     showAllCat(target);
                 } else if (target.id === 'show-all-todo') {
                     showAllTodo(target);
-                    slidePageNext(); // 翻页
+                    slidePageNext(); //Mobile:翻页
                 }
 
                 break;
@@ -869,14 +877,14 @@ var todoModule = (function(_CL, _TL, _TD) {
 
         //上一页回来
         // addClass($(_pages[_pageIndex]), 'page-active');
-        // removeClass($(_pages[_pageIndex]), 'page-prev');
+        removeClass($(_pages[_pageIndex]), 'page-prev');
 
         showBack();
     }
 
     // 翻到下一页
     function slidePageNext() {
-        // addClass($(_pages[_pageIndex]), 'page-prev');
+        addClass($(_pages[_pageIndex]), 'page-prev');
         // removeClass($(_pages[_pageIndex]), 'page-active');
 
         _pageIndex = ++_pageIndex >= _pages.length ? 0 : _pageIndex;
