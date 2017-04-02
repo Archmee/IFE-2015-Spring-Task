@@ -55,9 +55,11 @@ button {
 
 /*基本布局*/
 #header {
-    z-index: 10;
-    /*position: relative;*/
-    /*box-shadow: 0px 2px 5px #999;*/
+    position: relative;
+    /*z-index: 10;*/
+    height: 60px;
+    line-height: 60px;
     color: #EEE;
     background-color: #5d6684;
+    /*box-shadow: 0px 2px 5px #999;*/
 }
