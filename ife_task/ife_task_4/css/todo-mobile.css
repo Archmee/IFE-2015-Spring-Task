@@ -10,9 +10,7 @@ button {
 #header {
     text-align: center;
 }
-#header h1 {
-	font-weight: normal;
-}
+
 
 /*移动设备返回按钮*/
 .icon-back {
@@ -52,308 +50,44 @@ button {
             transform: translate3d(100%, 0, 0);
 }
 
+/*针对设备布局*/
+
 #menu,
 #list,
 #detail {
-	position: absolute;
-    /*z-index: 8;*/
     left: 0;
     right: 0;
-    top: 0;
-    bottom: 0;
     width: 100%;
     height: auto;
-    overflow: hidden;
-
-    /*-webkit-box-sizing: border-box;
-       -moz-box-sizing: border-box;
-            box-sizing: border-box;*/
-
     border-left: 1px solid #BBB;
-    border-right: 1px solid #BBB;
-    background: #EEE url(../img/noise.png) repeat;
-}
-#menu {
-    padding-top: 20px;
 }
 
-/*各区域细节*/
-/*窗口resize或者高度超出视窗，显示滚动条*/
-#todo-list,
-#category-list,
-#detail .td-desc {
-    position: absolute;
-    /*z-index: 7;*/
-    left: 0;
-    right: 0;
-    bottom: 50px;
-    /*width: 100%;*/
-    overflow-y: auto;
-    overflow-x: hidden;
-}
 
-#category-list {
-    width: 100%;
-    top: 88px; /* 34+34+20+? */
-}
-#todo-list {
-    width: 100%;
-    top: 50px;
-}
-#detail .td-desc {
-    top: 102px; /*51+51*/
-}
-
-/*两个底部按钮图标*/
-footer {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    /*right: 0;*/
+/*底部*/
+.footer {
     height: 70px;
-    width: 100%;
 }
-/* 底部按钮图标 */
-footer button {
-	display: block;
+/*底部按钮图标*/
+.footer button {
+    margin: 0 auto; /*靠顶边且居中*/
     height: 60px;
     width: 60px;
-    margin: 0 auto; /*靠顶边且居中*/
-    border: 1px solid #CCC;
 	border-radius: 50%;
-    text-indent: -9999px; /*隐藏文字*/
-    background: linear-gradient(to bottom, #FFF, #DDD);
+    font-size: 0;/*隐藏文字*/
 }
-footer button:active {
-    background: linear-gradient(to top, #FFF, #DDD);
-}
+
 /*按钮的+号标记*/
-footer .icon-add:before {
-	/*todo: 还没找到合适的方法水平居中*/
+.footer .icon-add:before {
     content: '+';
-    float: left;
-    width: 20px;
-    height: 20px;
-    line-height: 20px;
-    text-indent: 14px; /*手动调整的居中值*/
-    font-size: 2em;
+    display: inline;
+    font-size: 2rem;
     font-weight: 700;
-}
-
-/*按钮组*/
-.btns {
-    display: table;
-    width: 100%;
+    /*width: 100%;
     height: 100%;
-    overflow: hidden;
-    white-space: nowrap;
-}
-.btns .btns-inner {
-    display: table-cell;
     text-align: center;
-    vertical-align: middle;
-}
-.btns button {
-    min-height: 30px;
-    min-width: 60px;
-    padding: 5px 10px;
-    margin-left: 15px;
-    border: 1px outset #A8AAC5;
-    border-radius: 5px;
-    background-color: #A8AAC5;
-}
-.btns button:active {
-    border: 1px inset #CCC;
+    vertical-align: middle;*/
 }
 
-/* 列表行 */
-.item {
-    position: relative;
-    display: block;
-    height: 34px;
-    line-height: 34px;
-    padding: 0 20px;
-    cursor: pointer;
-
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-/* 列表行经过，选中背景*/
-.item:hover,
-.item.selected {
-    background-color: #CCC;
-}
-
-/* 列表行folder图标*/
-.icon-file:before, 
-.icon-folder:before {
-    content: '';
-    display: block;
-    float: left;
-    width:  24px;
-    height: 100%;
-    margin-right: 5px;
-}
-/*目录*/
-.icon-folder:before {
-    background: url(../img/close_folder_24.png) -2px 50% no-repeat;
-}
-/*目录展开*/
-.icon-folder.folder-opened:before {
-    background-image: url(../img/open_folder_24.png);
-}
-/*子目录*/
-.icon-file:before {
-    background: url(../img/file.png) 50% 50% no-repeat;
-}
-/* todo 条目数量*/
-.td-count {
-    color: #999;
-    margin-left: 5px;
-    font-size: .9em;
-}
-
-/* 完成或删除的标记 */
-.act-del, 
-.act-done {
-    position: absolute;
-}
-/*删除*/
-.act-del {
-    right: 8px;
-}
-.act-del:after {
-    content: "×";
-    display: none;
-    font-size: 2em;
-}
-.item:hover .act-del:after {
-    display: block;
-}
-#menu .act-del {
-    color: #666;
-}
-#list .act-del {
-    color: #F22;
-}
-
-/*完成标记的文字后移*/
-#list .item {
-    padding-left: 50px;
-}
-/* 完成标记 */
-.act-done {
-    left: 20px;
-    top: 0;
-    bottom: 0;
-    margin: auto 0;
-    width: 14px;
-    height: 14px;
-    border: 1px solid #fff;
-    border-radius: 50%;
-    background-color: rgba(255, 0, 0, .8);
-}
-.done-item .act-done {
-    background-color: rgba(13, 199, 13, .9);
-}
-
-/*中间任务列表*/
-#list .header {
-    
-    width: 100%;
-    height: 50px;
-    border-bottom: 1px solid #CCC;
-}
-#list .btns {
-}
-#list .btns .selected {
-    border: 1px inset #CCC;
-    background-color: #CCC; /*#FAFAEE;*/
-}
-
-time {
-    font-size: .96em;
-}
-
-#list time {
-    display: block;
-    height: 30px;
-    line-height: 30px;
-    padding-left: 20px;
-    background-color: #FAFAEE;/*#FAFAEE #A8AAC5*/
-}
-
-/*任务详情*/
-#detail label {
-    color: #AAA;
-}
-/*todo详情 */
-#detail .td-head,
-#detail .td-date,
-#detail .td-desc {
-    padding-left: 10px;
-    white-space: nowrap;
-}
-#detail .td-head,
-#detail .td-date {
-    height: 50px;
-    line-height: 50px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    border-bottom: 1px solid #DDD;
-}
-
-#detail .title {
-    font-weight: 700;
-}
-
-#detail .td-date {
-    background-color: #FAFAEE;
-}
 #detail .td-date .warning {
     display: none;
-}
-
-#detail .td-desc {
-    width: auto;
-    line-height: 1.5;
-    padding-top: 10px;
-    white-space: pre-wrap;
-    word-wrap: break-word; /*按照单字分割*/
-    /*word-break: break-all;*/ /*任意分割*/
-}
-#detail .warning {
-    padding-left: 5px;
-    font-size: .9em;
-    color: #999;
-}
-
-#detail input,
-#detail textarea {
-    padding: 5px;
-    color: #222;
-    font: inherit;
-    border: 1px solid #CCC;
-}
-#detail input {
-    width: 70%;
-    height: 20px;
-    line-height: 20px;
-}
-#detail textarea {
-    width: 70%;
-    vertical-align: top;
-}
-
-/*按钮*/
-#detail .btns {
-    position: absolute;
-    bottom: 20px;
-    width: 100%;
-    height: 30px;
-    /*z-index: 10;*/
-}
-#detail .cancel {
-    background-color: #BBB;
 }

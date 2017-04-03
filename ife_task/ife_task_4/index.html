@@ -41,8 +41,9 @@
 
     <title>GTD</title>
     <link rel="stylesheet" href="css/common.css">
-    <link rel="stylesheet" href="css/todo-mobile.css" media="screen and (max-width:480px)">
-    <link rel="stylesheet" href="css/todo-pc.css" media="screen and (min-width:481px)">
+    <link rel="stylesheet" href="css/todo-mobile.css" media="screen and (max-width:720px)">
+    <link rel="stylesheet" href="css/todo-pc.css" media="screen and (min-width:721px)">
+    <!-- <link rel="stylesheet" href="css/todo-pc-max.css" media="screen and (min-width: 1024px)"> -->
 </head>
 <body>
     <header id="header">
@@ -62,7 +63,7 @@
                     <div id="category-list"></div>
                 </li>
             </ul>
-            <footer>
+            <footer class="footer">
                 <button class="icon-add" data-action="add-category">新增分类</button>
             </footer>
         </div>
@@ -77,19 +78,25 @@
                 </div>
             </div>
             <div id="todo-list"></div>
-            <footer>
+            <footer class="footer">
                 <button class="icon-add" data-action="add-todo">新增任务</button>
             </footer>
         </div>
         <div id="detail" class="page page-next">
             <div id="detail-wrap"></div>
-            <div class="btns">
-                <div class="btns-inner">
-                    <button class="edit" data-action="edit-todo">编辑</button>
-                    <button class="cancel add" data-action="cancel-edit">取消</button>
-                    <button class="save add" data-action="save-edit">保存</button>
+            <footer class="footer">
+                <div class="btns" id="edit-grp">
+                    <div class="btns-inner">
+                        <button class="edit" data-action="edit-todo">编辑</button>
+                    </div>
                 </div>
-            </div>
+                <div class="btns" id="add-grp">
+                    <div class="btns-inner">
+                        <button class="cancel" data-action="cancel-edit">取消</button>
+                        <button class="save" data-action="save-edit">保存</button>
+                    </div>
+                </div>
+            </footer>
         </div>
     </main>
     <script src="js/util.js"></script>

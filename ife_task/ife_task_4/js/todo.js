@@ -8,7 +8,7 @@ window.onload = function() {
     }
     
     // 要用单例延迟加载
-    todoModule.init('category-list', 'todo-list', 'detail-wrap');
+    todoModule.init();
 }
 
 var STATU_FINISH = 1;
@@ -533,12 +533,13 @@ var todoDetail = (function() {
                 + '</header>'
                 + '<div class="td-date">'
                 +    '<label>日期：</label>'
-                +    '<input type="date" id="todo-expire" value="'+ getFormatDate(todo.expireTime) +'" placeholder="请输入日期">'
+                +    '<input type="date" id="todo-expire" value="'+ getFormatDate(todo.expireTime) +'" placeholder="请输入日期如 2017-01-02"> <input type="time" value="23:59">'
+
                 +    '<span class="warning">2000-01-02</span>'
                 + '</div>'
                 + '<div class="td-desc">'
                 +    '<label>描述：</label>'
-                +    '<textarea id="todo-content" cols="80" rows="8" placeholder="请输入任务内容">'+ todo.content +'</textarea>'
+                +    '<textarea id="todo-content" placeholder="请输入任务内容">'+ todo.content +'</textarea>'
                 + '</div>';
     }
 
@@ -551,18 +552,17 @@ var todoDetail = (function() {
             wrapper.innerHTML = getShowTemplate(todo);
 
             var parent = wrapper.parentNode;
-            hiddenEle($('.' + 'save', parent));
-            hiddenEle($('.' + 'cancel', parent));
-            showEle($('.' + 'edit', parent));
+
+            hiddenEle($('#' + 'add-grp'), parent);
+            showEle($('#' + 'edit-grp', parent));
         },
         editItem: function(todo) {
             var wrapper = $('#' + _wrapperId);
             wrapper.innerHTML = getEditTemplate(todo);
 
             var parent = wrapper.parentNode;
-            hiddenEle($('.' + 'edit', parent));
-            showEle($('.' + 'save', parent));
-            showEle($('.' + 'cancel', parent));
+            showEle($('#' + 'add-grp'), parent);
+            hiddenEle($('#' + 'edit-grp', parent));
         }
     }
 })();
@@ -764,9 +764,9 @@ var todoModule = (function(_CL, _TL, _TD) {
                 if (!title.length || title.length > 30 || !expire.length || !content.length) {
                     return;
                 }
-                // alert(content);
+                title = stripTag(title);
                 content = stripTag(content);
-                // alert(content);
+                
                 expire = (new Date(expire)).getTime();
                 var todo;
 
@@ -1036,11 +1036,11 @@ var todoModule = (function(_CL, _TL, _TD) {
 
     return {
         init: function(catListId, todoListId, todoDetailId) {
-            _CL.init(catListId);
-            _TL.init(todoListId);
-            _TD.init(todoDetailId);
+            _CL.init('category-list');
+            _TL.init('todo-list');
+            _TD.init('detail-wrap');
             selectStatu($('#statu-all'));
-            selectFirstCatItem($('#' + catListId));
+            selectFirstCatItem($('#' + 'category-list'));
             
             initEvents();
         }
