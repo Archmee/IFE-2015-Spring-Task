@@ -518,7 +518,7 @@ var todoDetail = (function() {
                 + '</div>'
                 + '<div class="td-desc">'
                 +    '<label>描述：</label>'
-                +    '<span>'+ todo.content +'</span>'
+                +    '<div class="content">'+ todo.content +'</div>'
                 + '</div>';
     }
 
@@ -527,18 +527,18 @@ var todoDetail = (function() {
 
         return ''
                 + '<header class="td-head">'
-                +    '<label>标题：</label>'
+                +    '<label for="todo-title">标题：</label>'
                 +    '<input type="text" id="todo-title" maxlength="30" value="'+ todo.title +'" placeholder="请输入标题">'
                 +    '<span class="warning">&lt; 30</span>'
                 + '</header>'
                 + '<div class="td-date">'
-                +    '<label>日期：</label>'
-                +    '<input type="date" id="todo-expire" value="'+ getFormatDate(todo.expireTime) +'" placeholder="请输入日期如 2017-01-02"> <input type="time" value="23:59">'
+                +    '<label for="todo-expire">日期：</label>'
+                +    '<input type="date" id="todo-expire" value="'+ getFormatDate(todo.expireTime) +'" placeholder="请输入日期如 2017-01-02">'
 
                 +    '<span class="warning">2000-01-02</span>'
                 + '</div>'
                 + '<div class="td-desc">'
-                +    '<label>描述：</label>'
+                +    '<label for="todo-content">描述：</label>'
                 +    '<textarea id="todo-content" placeholder="请输入任务内容">'+ todo.content +'</textarea>'
                 + '</div>';
     }
@@ -553,16 +553,16 @@ var todoDetail = (function() {
 
             var parent = wrapper.parentNode;
 
-            hiddenEle($('#' + 'add-grp'), parent);
-            showEle($('#' + 'edit-grp', parent));
+            hiddenEle($('#' + 'save-btns'), parent);
+            showEle($('#' + 'edit-btns', parent));
         },
         editItem: function(todo) {
             var wrapper = $('#' + _wrapperId);
             wrapper.innerHTML = getEditTemplate(todo);
 
             var parent = wrapper.parentNode;
-            showEle($('#' + 'add-grp'), parent);
-            hiddenEle($('#' + 'edit-grp', parent));
+            showEle($('#' + 'save-btns'), parent);
+            hiddenEle($('#' + 'edit-btns', parent));
         }
     }
 })();
@@ -746,6 +746,10 @@ var todoModule = (function(_CL, _TL, _TD) {
                 
                 break;
             case 'edit-todo':
+                // 如果正在编辑，则不操作
+                /*if (_saveAction == 'edit-todo') {
+                    return;
+                }*/
                 if (_currentTodoEle) {
                     _saveAction = action;
                     _TD.editItem(_TL.getItem(_currentTodoEle.id));
@@ -860,8 +864,17 @@ var todoModule = (function(_CL, _TL, _TD) {
     function initEvents() {
         addEvent(document.body, 'click', eventHandler);
         addEvent(document.body, 'contextmenu', function(event) {
-           event = getEvent(event);
-           preventDefault(event);
+            event = getEvent(event);
+            var target = getEventTarget(event);
+            preventDefault(event);
+        });
+        addEvent(document.body, 'touchstart', function(event) {
+            // alert(event.target);
+        });
+        addEvent(document.body, 'touchend', function(event) {
+            // alert(event);
+            // event = getEvent(event);
+            // cancelBubble(event);
         });
     };
 
@@ -879,11 +892,12 @@ var todoModule = (function(_CL, _TL, _TD) {
         // addClass($(_pages[_pageIndex]), 'page-active');
         removeClass($(_pages[_pageIndex]), 'page-prev');
 
-        showBack();
+        showBack(_pageIndex);
     }
 
     // 翻到下一页
     function slidePageNext() {
+
         addClass($(_pages[_pageIndex]), 'page-prev');
         // removeClass($(_pages[_pageIndex]), 'page-active');
 
@@ -891,13 +905,14 @@ var todoModule = (function(_CL, _TL, _TD) {
 
         // addClass($(_pages[_pageIndex]), 'page-active');
         removeClass($(_pages[_pageIndex]), 'page-next');
+        
 
-        showBack();
+        showBack(_pageIndex);
     }
 
     // 根据当前页判断是否显示back按钮
     function showBack(index) {
-        if (_pageIndex > 0) {
+        if (index > 0) {
             showEle($('#page-back'));
         } else {
             hiddenEle($('#page-back'));

@@ -24,6 +24,12 @@ body {
     height: 100%;
     color: #555;
     word-spacing: 1px;
+    
+    /*兼容*/
+    /*使用click会出现绑定点击区域闪一下的情况*/
+    -webkit-tap-highlight-color: transparent;
+    /*用iphone或ipad浏览很长的网页滚动时的滑动效果*/
+    -webkit-overflow-scrolling: touch;
 }
 ul {
     padding-left: 0;
@@ -32,8 +38,9 @@ ul {
 button {
     outline: none;
     cursor: pointer;
-    font-family: inherit;
     color: inherit;
+    font-family: inherit;
+    text-align: center;
 }
 a {
     color: inherit;
@@ -74,6 +81,9 @@ textarea {
     background-color: #5d6684;
     box-shadow: 0px 2px 5px #999;
 }
+#header h1 {
+    font-weight: 400;
+}
 
 
 /*页面主体内容*/
@@ -88,6 +98,7 @@ textarea {
     overflow: hidden;
 }
 
+/*三个展示区样式*/
 #menu,
 #list,
 #detail {
@@ -103,6 +114,9 @@ textarea {
        -moz-box-sizing: border-box;
             box-sizing: border-box;
 }
+#menu {
+    padding-top: 20px;
+}
 
 /*内嵌区域细节*/
 /*窗口resize或者高度超出视窗，显示滚动条*/
@@ -113,7 +127,6 @@ textarea {
     bottom: 50px;
     left: 0;
     right: 0;
-    /*width: 100%;*/
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -121,19 +134,12 @@ textarea {
     top: 88px; /* 34+34+20+? */
 }
 #todo-list {
-    top: 50px;
+    top: 51px;
 }
 #detail .td-desc {
     top: 102px; /*51+51*/
 }
 
-.footer {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-}
 
 /*按钮组*/
 .btns {
@@ -145,53 +151,61 @@ textarea {
 }
 .btns .btns-inner {
     display: table-cell;
+    width: 100%;
+    height: 100%;
     text-align: center;
     vertical-align: middle;
     font-size: 0;
     word-spacing: 0;
 }
 
+/*miui风格按钮样式*/
 .btns button {
-    display: inline;
-    min-height: 30px;
-    min-width: 70px;
-    padding: 5px 10px;
-    margin-left: 10px;
-    border: 1px outset #A8AAC5;
-    background-color: #A8AAC5;
+    min-height: 36px;
+    min-width: 72px;
+    margin-right: 5px;
+    padding: 0 5%;
+    
+    /*border: 1px outset #AAA;
+    background-color: #A8AAC5;*/
+
+    border: 1px solid #CCC;
+    transition: all .1s ease;
+    background: linear-gradient(to bottom, #FFF, #CCC);
 }
 .btns button:first-child {
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
+    border-top-left-radius: 100px;
+    border-bottom-left-radius: 100px;
 }
 .btns button:last-child {
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
-}
-.btns button:active {
-    border: 1px inset #CCC;
+    margin-right: 0;
+    border-top-right-radius: 100px;
+    border-bottom-right-radius: 100px;
 }
 
+/*.btns button:active,*/
 .btns .selected {
-    border: 1px inset #CCC;
-    background-color: #CCC;
+    color: #888;
+    box-shadow: 5px 5px 16px rgb(128, 128, 128) inset;
+    /*border: 1px inset #AAA;
+    background-color: #CCC;*/
 }
 
-#header h1 {
-    font-weight: normal;
-}
-
-#menu {
-    padding-top: 20px;
+/*页脚*/
+.footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
 }
 
 .footer button {
-    display: block;
     border: 1px solid #CCC;
-    background: linear-gradient(to bottom, #FFF, #DDD);
+    background: linear-gradient(to bottom, #FFF, #CCC);
 }
 .footer button:active {
-    background: linear-gradient(to top, #FFF, #DDD);
+    background: linear-gradient(to top, #FFF, #CCC);
 }
 
 /* 列表行 */
@@ -213,6 +227,10 @@ textarea {
     background-color: #CCC;
 }
 
+/*完成标记的文字后移*/
+#list .item {
+    padding-left: 50px;
+}
 
 /* 列表行folder图标*/
 .icon-folder:before {
@@ -222,21 +240,11 @@ textarea {
     width:  24px;
     height: 100%;
     margin-right: 5px;
-}
-/*目录*/
-.icon-folder:before {
     background: url(../img/close_folder_24.png) -2px 50% no-repeat;
 }
 /*目录展开*/
 .icon-folder.folder-opened:before {
     background-image: url(../img/open_folder_24.png);
-}
-
-/* todo 条目数量*/
-.item .td-count {
-    color: #999;
-    margin-left: 5px;
-    font-size: .9em;
 }
 
 /* 完成和删除标记 */
@@ -251,7 +259,7 @@ textarea {
 .act-del:after {
     content: "×";
     display: none;
-    font-size: 2em;
+    font-size: 2rem;
 }
 .item:hover .act-del:after {
     display: block;
@@ -261,12 +269,6 @@ textarea {
 }
 #list .act-del {
     color: #F22;
-}
-
-
-/*完成标记的文字后移*/
-#list .item {
-    padding-left: 50px;
 }
 
 /* 完成标记 */
@@ -293,30 +295,24 @@ textarea {
     border-bottom: 1px solid #CCC;
 }
 
-time,
-#list ul {
-    font-size: .95rem;
-}
-
 #list time {
     display: block;
     height: 30px;
     line-height: 30px;
     padding-left: 20px;
-    background-color: #FAFAEE;/*#FAFAEE #A8AAC5*/
+    background-color: #FAFAEE;
 }
 
-
 /*任务详情*/
+
 #detail label {
     color: #AAA;
 }
-
 /*todo详情 */
 #detail .td-head,
 #detail .td-date,
 #detail .td-desc {
-    padding-left: 10px;
+    padding-left: 20px;
     white-space: nowrap;
 }
 #detail .td-head,
@@ -328,35 +324,29 @@ time,
     border-bottom: 1px solid #DDD;
 }
 #detail .title {
-    font-size: .95em;
     font-weight: 700;
 }
 #detail .td-date {
     background-color: #FAFAEE;
 }
 #detail .td-desc {
-    width: auto;
     line-height: 1.5;
     padding-top: 10px;
     white-space: pre-wrap;
     word-wrap: break-word; /*按照单字分割*/
     /*word-break: break-all;*/ /*任意分割*/
 }
-#detail .warning {
-    padding-left: 5px;
-    font-size: .9rem;
-    color: #999;
+#detail .td-desc .content {
+    display: inline-block;
+    vertical-align: top;
 }
-
 #detail input,
 #detail textarea {
     padding: 5px;
     color: #222;
     font: inherit;
-    font-size: .95em;
     border: 1px solid #CCC;
 }
-
 #detail input {
     width: 70%;
     height: 20px;
@@ -368,13 +358,18 @@ time,
     vertical-align: top;
 }
 
-/*按钮*/
-#detail .btns {
-    /*position: absolute;
-    bottom: 20px;
-    width: 100%;
-    height: 30px;*/
+#detail .save {
+    color: #008000;
 }
 #detail .cancel {
-    background-color: #BBB;
+    /*color: #F00;*/
 }
+
+/* 显示在分类上的todo数量 任务详情编辑提示*/
+.item .td-count,
+#detail .warning {
+    padding-left: 5px;
+    font-size: .9rem;
+    color: #999;
+}
+

@@ -1,18 +1,20 @@
 @charset "utf-8";
 
-body {
-    /*处理点击元素高亮闪烁*/
-    -webkit-tap-highlight-color: transparent;
-}
-button {
-    font-size: 1rem;
-}
 #header {
     text-align: center;
 }
 
+/*中等字体*/
+time,
+.item,
+button,
+#detail .title,
+#detail input,
+#detail textarea {
+    font-size: 1rem;
+}
 
-/*移动设备返回按钮*/
+/*翻页时的返回按钮*/
 .icon-back {
     position: absolute;
     left: 0;
@@ -68,7 +70,8 @@ button {
     height: 70px;
 }
 /*底部按钮图标*/
-.footer button {
+.footer .btn-add {
+    display: block;
     margin: 0 auto; /*靠顶边且居中*/
     height: 60px;
     width: 60px;
@@ -77,7 +80,7 @@ button {
 }
 
 /*按钮的+号标记*/
-.footer .icon-add:before {
+.footer .btn-add:before {
     content: '+';
     display: inline;
     font-size: 2rem;
@@ -87,7 +90,7 @@ button {
     text-align: center;
     vertical-align: middle;*/
 }
-
+/*
 #detail .td-date .warning {
     display: none;
-}
+}*/

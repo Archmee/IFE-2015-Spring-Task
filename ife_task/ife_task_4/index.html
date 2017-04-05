@@ -41,13 +41,13 @@
 
     <title>GTD</title>
     <link rel="stylesheet" href="css/common.css">
-    <link rel="stylesheet" href="css/todo-mobile.css" media="screen and (max-width:720px)">
-    <link rel="stylesheet" href="css/todo-pc.css" media="screen and (min-width:721px)">
+    <link rel="stylesheet" href="css/todo-mobile.css" media="screen and (max-width:768px)">
+    <link rel="stylesheet" href="css/todo-pc.css" media="screen and (min-width:769px)">
     <!-- <link rel="stylesheet" href="css/todo-pc-max.css" media="screen and (min-width: 1024px)"> -->
 </head>
 <body>
     <header id="header">
-        <h1>GTD ToooL</h1>
+        <h1>GTD T<span>◎◎</span>L</h1>
         <a href="#" id="page-back" class="icon-back hidden" data-action="act-back">&lt;</a>
     </header>
     <main class="main">
@@ -64,14 +64,14 @@
                 </li>
             </ul>
             <footer class="footer">
-                <button class="icon-add" data-action="add-category">新增分类</button>
+                <button class="btn-add" data-action="add-category">新增分类</button>
             </footer>
         </div>
         <div id="list" class="page page-next">
             <div class="header">
                 <div class="btns">
                     <div class="btns-inner">
-                        <button data-action="switch-statu" id="statu-all">所有</button>
+                        <button data-action="switch-statu" id="statu-all">&nbsp;所有&nbsp;</button>
                         <button data-action="switch-statu" id="statu-not">未完成</button>
                         <button data-action="switch-statu" id="statu-done">已完成</button>
                     </div>
@@ -79,24 +79,25 @@
             </div>
             <div id="todo-list"></div>
             <footer class="footer">
-                <button class="icon-add" data-action="add-todo">新增任务</button>
+                <button class="btn-add" data-action="add-todo">新增任务</button>
             </footer>
         </div>
         <div id="detail" class="page page-next">
             <div id="detail-wrap"></div>
             <footer class="footer">
-                <div class="btns" id="edit-grp">
+                <div class="btns" id="edit-btns">
                     <div class="btns-inner">
                         <button class="edit" data-action="edit-todo">编辑</button>
                     </div>
                 </div>
-                <div class="btns" id="add-grp">
+                <div class="btns" id="save-btns">
                     <div class="btns-inner">
                         <button class="cancel" data-action="cancel-edit">取消</button>
                         <button class="save" data-action="save-edit">保存</button>
                     </div>
                 </div>
             </footer>
+            
         </div>
     </main>
     <script src="js/util.js"></script>
