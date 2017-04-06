@@ -24,7 +24,7 @@ function isString(arg) {
 	return protoToString.call(arg) === DataType.STRING;
 }
 // 是否是布尔值
-function isBoolean(arg) {
+function isBool(arg) {
 	return protoToString.call(arg) === DataType.BOOL;
 }
 // 是否是数组
@@ -64,7 +64,7 @@ function RegExpEscape(s) {
 function cloneObject(src) {
     var newValue;
 
-    if (!src || isString(src) || isNumber(src) || isBoolean(src)) { //基本值 null, string, number, bool
+    if (!src || isString(src) || isNumber(src) || isBool(src)) { //基本值 null, string, number, bool
         newValue = src;
     } else if (isDate(src)) { //日期
         newValue = new Date(src);
