@@ -61,6 +61,9 @@ button,
 }
 
 /*详情页面的编辑按钮组，这里虽然使用了左边两个区域底部的按钮样式，但是由于适配移动端不一样的样式所以采用了.btns包装类，但是会影响表现，所以这里重点是从btns包装容器相关类上移出移出已有样式从而采用footer类下的样式，这样做有点坑*/
+.footer .btns {
+    display: block;
+}
 .footer .btns .btns-inner {
     display: block;
 }
@@ -80,3 +83,8 @@ button,
 #save-btns .save {
     float: left;
 }*/
+
+#show-info {
+    width: 40%;
+    margin: 0 30%;
+}

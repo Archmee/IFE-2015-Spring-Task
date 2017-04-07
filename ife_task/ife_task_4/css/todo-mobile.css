@@ -90,7 +90,18 @@ button,
     text-align: center;
     vertical-align: middle;*/
 }
-/*
+
+#detail .td-head,
+#detail .td-date,
+#detail .td-desc {
+    padding-left: 15px;
+}
+
+/*手机上看不到干脆隐藏了*/
 #detail .td-date .warning {
     display: none;
-}*/
+}
+
+#show-info {
+    border-radius: 0;
+}

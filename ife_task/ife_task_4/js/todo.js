@@ -1,4 +1,4 @@
-// 'use strict';
+'use strict';
 var clog = console.log;
 
 window.onload = function() {
@@ -6,10 +6,9 @@ window.onload = function() {
         alert('你的浏览器不支持本地存储技术');
         return;
     }
-    
-    // 要用单例延迟加载
+
     todoModule.init();
-}
+};
 
 var store = (function() {
     var db = window.localStorage;
@@ -108,25 +107,25 @@ var CategoryListModule = (function() {
 
         // 首先新建顶级分类
         var topCat = new Category('顶级分类');
+        //将时间戳-1是为了防止程序运行太快导致默认分类和顶级分类id重复了(都是时间戳取的)
+        topCat.addTime = topCat.addTime-1;
+        topCat.cid = 'cid_' + topCat.addTime;
+        
         _topCatId = topCat.cid;
         store.data(_topKey, _topCatId);
         
         // 再新建一个默认分类并保存
-        // 为了防止运行太快导致时间戳相同的情况（会导致默认分类id会覆盖顶级分类id）
-        setTimeout(function() {
-            
-            var firstCat = new Category('默认分类', topCat.cid);
-            store.data(firstCat.cid, firstCat);
+        var firstCat = new Category('默认分类', _topCatId);
+        store.data(firstCat.cid, firstCat);
 
-            // 将默认分类添加到顶级分类中
-            topCat.childCatList.push(firstCat.cid);
-            store.data(_topCatId, topCat);
-            
-            topCat = null;
-            firstCat = null;
-        }, 3);
+        // 将默认分类添加到顶级分类中
+        topCat.childCatList.push(firstCat.cid);
+        store.data(_topCatId, topCat);
+        
+        topCat = null;
+        firstCat = null;
+        
     }
-
 
     // 模板：单条分类
     var getCategoryItemTemplate = function(cate, startPadding) {
@@ -139,7 +138,6 @@ var CategoryListModule = (function() {
                 +     '<span class="act-del" data-action="delete-category"></span>'
                 + '</a>';
     };
-
 
     // 模板：分类列表
     var getCategoryTemplate = function(catItem, startPadding) {
@@ -225,6 +223,7 @@ var CategoryListModule = (function() {
         var parent = store.data(cate.pid);
         var brothers = parent.childCatList;
         brothers.splice(brothers.indexOf(cid), 1);
+        store.data(parent.cid, parent);
 
         // 删除该分类和子孙分类
         var childIds = getCateListIds(cid);
@@ -623,6 +622,21 @@ var _UI = {
     confirm: function(msg) {
         return window.confirm(msg);
     },
+    showInfo: (function() {
+        var timer = null;
+        var panel = $('#show-info');
+
+        return function(msg) {
+            clearTimeout(timer);
+            panel.innerHTML = msg;
+            addClass(panel, 'anim');
+            console.log(Date.now() +': '+ msg);
+            
+            timer = setTimeout(function () {
+                removeClass(panel, 'anim');
+            }, 3000);
+        }
+    })(),
 
     need: function(name, msg, placeholder) {
         switch(name) {
@@ -667,7 +681,7 @@ var todoModule = (function(_CL, _TL, _TD) {
         cancelBubble(event);
 
         var target = getEventTarget(event);
-        var action = target.dataset.action || target.getAttribute('data-action');
+        var action = (target.dataset && target.dataset.action) || target.getAttribute('data-action');
 
         // 纠正目标 并 判断是否为item
         var isItem = true;
@@ -690,7 +704,7 @@ var todoModule = (function(_CL, _TL, _TD) {
                 var pid = _currentCatEle.id;
 
                 if (pid === 'show-all-todo') { // 如果当前选中的是所有任务项，那就不能创建分类
-                    _UI.alert('请选中一个父分类！');
+                    _UI.showInfo('请先选中一个父分类！');
                     return;
                 }
 
@@ -712,21 +726,19 @@ var todoModule = (function(_CL, _TL, _TD) {
 
                     } else if (name === '') { //空白字符串
                         isValid = false;
-                        if (!_UI.confirm('名称不能为空！\n\n是否返回继续？\n')) {
-                            break;
-                        };
+                        msg = '注意：名称不能为空！'
+
+                        // _UI.showInfo('分类名称不能为空！');
                         
-                    } else if (/[\/|:*?"<>.()、,]+/g.test(name)) {
+                    } else if (/[^\w\u4E00-\u9FA5]+/g.test(name)) { //不允许非数字字母下环线汉字
                         isValid = false;
-                        if (!_UI.confirm('名称只能包含字母、数字、下划线！\n\n是否返回继续？\n')) {
-                            break;
-                        };
+                        msg = '注意：名称只能包含汉字、字母、数字、下划线！';
+                        // _UI.showInfo('名称只能包含字母、数字、下划线');
 
                     } else if (_CL.hasSameName(pid, name)) {
                         isValid = false;
-                        if (!_UI.confirm('该分类下已经使用过该名称! \n\n是否返回继续？\n')) {
-                            break;
-                        }
+                        msg = '注意：该分类下已使用过相同名称！';
+                        // _UI.showInfo('同分类下已经使用过相同名称！');
                     }
 
                 } while (!isValid); // 反复尝试直到用户输入有效数据 或者取消
@@ -776,7 +788,7 @@ var todoModule = (function(_CL, _TL, _TD) {
 
                 var cid = _currentCatEle.id;
                 if (cid.indexOf('cid_') < 0) {
-                    _UI.alert('请选中一个具体分类再添加任务！');
+                    _UI.showInfo('请选中分类列表中的一个分类！');
                     return;
                 }
                 _saveAction = action;
@@ -791,6 +803,8 @@ var todoModule = (function(_CL, _TL, _TD) {
                 if (_currentTodoEle) {
                     _saveAction = action;
                     _TD.editItem(_TL.getItem(_currentTodoEle.id));
+                } else {
+                    _UI.showInfo('请先选择任务列表中的一个任务！');
                 }
 
                 break;
@@ -803,7 +817,16 @@ var todoModule = (function(_CL, _TL, _TD) {
                 var expire  = $('#' + 'todo-expire').value;
                 var content = $('#' + 'todo-content').value;
 
-                if (!title.length || title.length > 30 || !expire.length || !content.length) {
+                if (!title.length || title.length > 30 ) {
+                    _UI.showInfo('任务名称不能为空，也不能超过30字！');
+                    return;
+                }
+                if (!expire.length) {
+                    _UI.showInfo('过期时间不能为空！');
+                    return;
+                }
+                if (!content.length) {
+                    _UI.showInfo('任务内容不能为空！');
                     return;
                 }
                 title = stripTag(title);
@@ -815,6 +838,10 @@ var todoModule = (function(_CL, _TL, _TD) {
                 if (_saveAction === 'add-todo') {
 
                     todo = new Todo(_currentCatEle.id, title, content, expire);
+                    // 如果是在已完成列表添加的任务将任务标记为已完成
+                    if (_currentStatuEle.id === 'statu-done') {
+                        todo.isFinish = true;
+                    }
                     _TL.addItem(todo);
                     _CL.addChildTodo(todo.cid, todo.tid);
 
@@ -1045,7 +1072,7 @@ var todoModule = (function(_CL, _TL, _TD) {
     }
 
 
-    // 状态相关
+    // 切换状态相关
 
     // 和新状态交换
     function switchSelectLastStatu(newEle) {
@@ -1098,12 +1125,8 @@ var todoModule = (function(_CL, _TL, _TD) {
             _TD.init('detail-wrap');
             selectStatu($('#statu-all'));
             selectFirstCatItem($('#' + 'category-list'));
-            
+
             initEvents();
         }
     };
-})(CategoryListModule, TodoListModule, todoDetail); // 引入模块
-
-
-// Module/单例
-// 观察者/发布订阅 模式
+})(CategoryListModule, TodoListModule, todoDetail);// 引入模块

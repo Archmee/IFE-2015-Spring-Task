@@ -366,10 +366,82 @@ textarea {
 }
 
 /* 显示在分类上的todo数量 任务详情编辑提示*/
-.item .td-count,
-#detail .warning {
+.warning,
+.item .td-count {
     padding-left: 5px;
     font-size: .9rem;
     color: #999;
+}
+
+/*用户提示*/
+#show-info {
+    position: absolute;
+    z-index: 100;
+    top: -100%;
+    left: 0;
+    right: 0;
+    height: 20px;
+    line-height: 20px;
+    overflow: hidden;
+    
+    padding: 12px;
+    border-radius: 5px;
+    box-shadow: 0 0 30px  #FFFF9D;
+
+    color: #444;
+    text-align: center;
+    background: #FFFF9D;
+}
+
+.anim {
+    -webkit-animation: easeInOut 2.5s ease-in-out 2 alternate;
+       -moz-animation: easeInOut 2.5s ease-in-out 2 alternate;
+         -o-animation: easeInOut 2.5s ease-in-out 2 alternate;
+            animation: easeInOut 2.5s ease-in-out 2 alternate;
+}
+
+@-webkit-keyframes easeInOut {
+    0% {
+        top: -100%;
+    }
+    15% {
+        top: 0%;
+    }
+    100% {
+        top: 0;
+    }
+}
+@-moz-keyframes easeInOut {
+    0% {
+        top: -100%;
+    }
+    15% {
+        top: 0%;
+    }
+    100% {
+        top: 0;
+    }
+}
+@-o-keyframes easeInOut {
+    0% {
+        top: -100%;
+    }
+    15% {
+        top: 0%;
+    }
+    100% {
+        top: 0;
+    }
+}
+@keyframes easeInOut {
+    0% {
+        top: -100%;
+    }
+    15% {
+        top: 0%;
+    }
+    100% {
+        top: 0;
+    }
 }
 
