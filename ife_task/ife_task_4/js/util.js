@@ -712,3 +712,12 @@ function getStyle(element, attr) {
 		return getComputedStyle(element, false)[attr];
 	}
 }
+
+// 来自js设计模式一书
+// 用于将模块立即表达式绑定到事件
+function library(module) {
+    if (module.init) {
+        window.onload = module.init();
+    }
+    return module;
+}
