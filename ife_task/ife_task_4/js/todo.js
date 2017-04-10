@@ -1,598 +1,576 @@
-'use strict';
-var clog = console.log;
+var todo = (function () {
+    'use strict';
+    var clog = console.log;
 
-window.onload = function() {
-    if (!window.localStorage) {
-        alert('你的浏览器不支持本地存储技术');
-        return;
+    var appName = 'GTD Tool';
+    var appVersion = '0.2';
+
+    // Category 类
+    function Category(pid, level, title) {
+        this.addTime = Date.now();
+        this.cid = 'cid_' + this.addTime;
+        this.pid =  pid || null;
+        this.level = level || 0; // 记录目录层级
+        this.title = title || '';
+        this.childCatList = [];
+        this.childTodoList = [];
     }
 
-    todoModule.init();
-};
+    // Todo 类
+    function Todo(cid, title, content, expire) {
+        this.addTime = Date.now();
+        this.tid = 'tid_' + this.addTime;
+        this.cid = cid;
+        this.level = 0; // 紧急程度
+        this.title = title;
+        this.content = content;
+        this.isFinish = false;
+        this.expireTime = expire;
+    }
 
-var store = (function() {
-    var db = window.localStorage;
+    // 存储
+    var store = (function() {
+        var db = window.localStorage;
 
-    var get = function(key) {
-        return JSON.parse(db.getItem(key));
-    };
+        var get = function(key) {
+            return JSON.parse(db.getItem(key));
+        };
 
-    var set = function(key, value) {
-        db.setItem(key, JSON.stringify(value));
-    };
+        var set = function(key, value) {
+            db.setItem(key, JSON.stringify(value));
+        };
 
-    var data = function(key, value) {
-        if (value === null || value === undefined) {
-            return get(key);
-        } else {
-            return set(key, value);
+        var data = function(key, value) {
+            if (value === null || value === undefined) {
+                return get(key);
+            } else {
+                return set(key, value);
+            }
+        };
+
+        var remove = function(key) {
+            db.removeItem(key);
+        };
+
+        var clear = function() {
+            db.clear();
+        };
+        
+        return {
+            get: get,
+            set: set,
+            data: data,
+            remove: remove
+        };
+    })();
+
+    // 分类模块
+    var CategoryModule = (function() {
+        
+        // 层级对齐距离
+        var _startPadding = 0;
+        var _incrPadding = 20;
+        var _wrapperId = null;    // 包含分类列表的容器
+
+        var _topKey = 'topCatId'; // 顶级分类id
+        var _topCatId = store.data(_topKey); //获取顶级分类id
+        
+        if (!_topCatId) { 
+            // 如果还没有分类
+
+            // 首先新建顶级分类
+            var topCat = new Category(null, 0, '顶级分类');
+            //将时间戳-1是为了防止程序运行太快导致默认分类和顶级分类id重复了(都是时间戳取的)
+            topCat.addTime = topCat.addTime-1;
+            topCat.cid = 'cid_' + topCat.addTime;
+            
+            _topCatId = topCat.cid;
+            store.data(_topKey, _topCatId);
+            
+            // 再新建一个默认分类并保存
+            var firstCat = new Category(_topCatId, topCat.level+1, '默认分类');
+            store.data(firstCat.cid, firstCat);
+
+            // 将默认分类添加到顶级分类中
+            topCat.childCatList.push(firstCat.cid);
+            store.data(_topCatId, topCat);
+            
+            topCat = null;
+            firstCat = null;
+            
         }
-    };
 
-    var remove = function(key) {
-        db.removeItem(key);
-    };
+        // 模板：单条分类
+        var getCategoryItemTemplate = function(cate) {
 
-    var clear = function() {
-        
-    };
-    
-    return {
-        get: get,
-        set: set,
-        data: data,
-        remove: remove
-    };
-})();
+            var paddingLeft = _startPadding + _incrPadding*cate.level;
+            
+            // jshint ignore:start
+            return  ''
+                    + '<a id="' + cate.cid + '"'
+                    + 'class="item item-cat icon-folder"'
+                    + 'style="padding-left:' + paddingLeft + 'px">' 
+                    +   '<span>' + cate.title + '</span>' 
+                    +   '<span class="td-count">(' + cate.childTodoList.length + ')</span>' 
+                    +   '<span class="act-del" data-action="delete-category"></span>' 
+                    + '</a>';
+            // jshint ignore:end
+        };
 
-// Category 类
-function Category(title, pid) {
-    this.addTime = Date.now();
-    this.cid = 'cid_' + this.addTime;
-    this.pid =  pid || null;
-    this.title = title;
-    this.childCatList = [];
-    this.childTodoList = [];
-};
-
-// Todo 类
-function Todo(cid, title, content, expire) {
-    this.addTime = Date.now();
-    this.tid = 'tid_' + this.addTime;
-    this.cid = cid;
-    this.level = 0; // 紧急程度
-    this.title = title;
-    this.content = content;
-    this.isFinish = false;
-    this.expireTime = expire;
-}
-
-function getFormatDate(timestamp, spliter) {
-    if (!timestamp) {
-        return '';
-    }
-    spliter = spliter || '-';
-    var date = new Date(timestamp);
-    var y = date.getFullYear(), m = date.getMonth()+1, d = date.getDate();
-    return [ y, 
-             m < 10 ? '0'+m : m,
-             d < 10 ? '0'+d : d
-            ].join(spliter);
-}
-
-function hiddenEle(ele) {
-    // ele.style.display = "none";
-    addClass(ele, 'hidden');
-}
-
-function showEle(ele) {
-    // ele.style.display = "";
-    removeClass(ele, 'hidden');
-}
-
-// 分类
-
-var CategoryListModule = (function() {
-    
-    // 层级对齐距离
-    var _startPadding = 20;
-    var _incrPadding = 20;
-    var _wrapperId = null;    // 包含分类列表的容器
-
-    var _topKey = 'topCatId'; // 顶级分类id
-    var _topCatId = store.data(_topKey); //获取顶级分类id
-    
-    if (!_topCatId) { 
-        // 如果还没有分类
-
-        // 首先新建顶级分类
-        var topCat = new Category('顶级分类');
-        //将时间戳-1是为了防止程序运行太快导致默认分类和顶级分类id重复了(都是时间戳取的)
-        topCat.addTime = topCat.addTime-1;
-        topCat.cid = 'cid_' + topCat.addTime;
-        
-        _topCatId = topCat.cid;
-        store.data(_topKey, _topCatId);
-        
-        // 再新建一个默认分类并保存
-        var firstCat = new Category('默认分类', _topCatId);
-        store.data(firstCat.cid, firstCat);
-
-        // 将默认分类添加到顶级分类中
-        topCat.childCatList.push(firstCat.cid);
-        store.data(_topCatId, topCat);
-        
-        topCat = null;
-        firstCat = null;
-        
-    }
-
-    // 模板：单条分类
-    var getCategoryItemTemplate = function(cate, startPadding) {
-        return  ''
-                + '<a id="' + cate.cid + '"'
-                +   ' class="item item-cat icon-folder"'
-                +   ' style="padding-left:' + startPadding + 'px">'
-                +     '<span>' + cate.title + '</span>'
-                +     '<span class="td-count">(' + cate.childTodoList.length + ')</span>'
-                +     '<span class="act-del" data-action="delete-category"></span>'
-                + '</a>';
-    };
-
-    // 模板：分类列表
-    var getCategoryTemplate = function(catItem, startPadding) {
-        startPadding = startPadding || _startPadding;
-        if (!catItem) {
-            return '';
-        }
-        
-        var childIds = catItem.childCatList;
-        
-        // 顶级分类列表默认显示，而下级隐藏
-        var template = (!catItem.pid) ? '<ul>' : '<ul class="hidden">';
-
-        for (var i = 0, len = childIds.length; i < len; i++) {
-
-            var currItem = store.data(childIds[i]);
-            if (!currItem) {
-                continue;
+        // 模板：分类列表
+        var getCategoryTemplate = function(catItem) {
+            if (!catItem) {
+                return '';
             }
             
-            // 加载模板
-            template += '<li>';
-            template += getCategoryItemTemplate(currItem, startPadding);
+            var childIds = catItem.childCatList;
+            
+            // 顶级分类列表默认显示，而下级隐藏
+            var template = (!catItem.pid) ? '<ul>' : '<ul class="hidden">';
 
-            if (currItem.childCatList.length > 0) { // 如果有子分类
-                template += getCategoryTemplate(currItem, startPadding + _incrPadding); // 获取子分类列表
+            for (var i = 0, len = childIds.length; i < len; i += 1) {
+
+                var currItem = store.data(childIds[i]);
+                if (!currItem) {
+                    continue;
+                }
+                
+                // 加载模板
+                template += '<li>';
+                template += getCategoryItemTemplate(currItem);
+
+                if (currItem.childCatList.length > 0) { // 如果有子分类
+                    template += getCategoryTemplate(currItem); // 获取子分类列表
+                }
+
+                template += '</li>';
             }
+            template += '</ul>';
 
-            template += '</li>';
-        }
-        template += '</ul>';
+            return template;
+        };
 
-        return template;
-    };
+        // 添加新分类项的DOM元素
+        var addItemTemplate = function(parentNode, cate) {
+            
+            var itemTemplate =  '<li>' + (getCategoryItemTemplate(cate)) + '</li>';
 
-    // 用于计算左对齐，只有在添加分类条目模板的时候才使用
-    var calcStartPadding = function(cid) {
-        var start = _startPadding;
-        while (cid && cid !== _topCatId) {
-            start += _incrPadding;
-            cid = store.data(cid).pid;
-        }
-        return start;
-    }
-
-    // 添加新分类项的DOM元素
-    var addItemTemplate = function(parentNode, cate) {
-        var paddingLeft = calcStartPadding(cate.pid);
-        var itemTemplate =  '<li>'
-                            + getCategoryItemTemplate(cate, paddingLeft);
-                            + '</li>';
-
-        var child = $('ul', parentNode);
-        if (child) {
-            child.innerHTML += itemTemplate;
-        } else {
-            //用创建元素而不是innerHMTL的方式是为了阻止文档重新渲染parent下以前的元素导致引用失效
-            var ul = document.createElement('ul');
-            ul.innerHTML = itemTemplate;
-            parentNode.appendChild(ul);
-            // 老方法
-            // parentNode.innerHTML += '<ul>' + itemTemplate + '</ul>';
-        }
-    }
-
-    //添加分类
-    var addItem = function(cate) {
-        store.data(cate.cid, cate);
-        var parent = store.data(cate.pid);
-        parent.childCatList.push(cate.cid);
-        store.data(parent.cid, parent);
-    };
-
-    // 删除分类条目
-    var deleteItem = function(cid) {
-        store.remove(cid);
-    };
-
-    // 删除该分类以及所有子孙分类
-    var deleteCategory = function(cid) {
-        // 从父分类移出该分类
-        var cate = store.data(cid);
-        var parent = store.data(cate.pid);
-        var brothers = parent.childCatList;
-        brothers.splice(brothers.indexOf(cid), 1);
-        store.data(parent.cid, parent);
-
-        // 删除该分类和子孙分类
-        var childIds = getCateListIds(cid);
-        for (var i = 0, len = childIds.length; i < len; i++) {
-            deleteItem(childIds[i]);
-        }
-    };
-
-    // 移除分类
-    var removeCategory = function(cid) {
-        deleteCategory(cid);
-        updateAllTodoCount();
-    };
-
-    // 遍历分类表
-    var walkCategory = function(cid, callback) {
-        var item = store.data(cid);
-        if (!item) {
-            return;
-        }
-
-        // 由回调函数处理或者收集数据
-        callback(item);
-
-        // 遍历子分类列表
-        var childIds = item.childCatList;
-        for (var i = 0, len = childIds.length; i < len; i++) {
-            //下面这样做的缺点就是每次都要传callback，之所以不在外面包一层IIFE是为了简洁
-            walkCategory(childIds[i], callback);
-        }
-    }
-
-    // 获取所有子孙分类id
-    var getCateListIds = function(cid) {
-        var ids = [cid];
-        
-        walkCategory(cid, function(item) {
-            ids = ids.concat(item.childCatList);
-        });
-
-        return ids;
-    };
-
-    // 遍历分类获取子todo
-    var getTodoListIds = function(cid) {
-        var ids = [];
-        
-        walkCategory(cid, function(item) {
-            ids = ids.concat(item.childTodoList);
-        });
-
-        return ids;
-    };
-
-    var getAllTodoList = function() {
-        return getTodoListIds(_topCatId);
-    }
-
-    // 更新todo条数
-    var updateTodoCount = function(cid, n) {
-        var ele = $('.td-count', $('#' + cid));
-        if (ele) {
-            ele.innerHTML = '(' + (isNumber(n) ? n : store.data(cid).childTodoList.length) + ')';
-        }
-    };
-    
-    // 更新界面：所有todo数量
-    var updateAllTodoCount = function() {
-        updateTodoCount('#show-all-todo', getAllTodoList().length);
-    };
-
-    // 更新todo数量
-    var updateCount = function(cid, n) {
-        updateTodoCount(cid, n);
-        updateAllTodoCount();
-    };
-
-    // 添加任务到分类
-    var addChildTodo = function(cid, tid) {
-        var cate = store.data(cid);
-        var childTodo = cate.childTodoList;
-        
-        childTodo.push(tid);
-        store.data(cid, cate);
-
-        updateCount(cid, cate.childTodoList.length);
-    };
-
-    // 从分类移出任务
-    var removeChildTodo = function(cid, tid) {
-        var cate = store.data(cid);
-        var childTodo = cate.childTodoList;
-
-        childTodo.splice(childTodo.indexOf(tid), 1);
-        store.data(cid, cate);
-
-        updateCount(cid, cate.childTodoList.length);
-    };
-
-    var getItem = function(cid) {
-        return store.data(cid);
-    };
-
-    // 查看同级分类下是否有同名
-    var hasSameName = function(pid, name) {
-        var childIds = store.data(pid).childCatList;
-
-        for (var i = 0, len = childIds.length; i < len; i++) {
-            if (store.data(childIds[i]).title === name) {
-                return true;
-            }
-        }
-        return false;
-    };
-
-    // 获取一个有效分类名
-    var getValidName = function(pid) {
-        var namePrefix = '未命名分类';
-        
-        var parent = store.data(pid);
-        if (!parent) {
-            return namePrefix;
-        }
-        
-        var tmp = '';
-        var childIds = parent.childCatList;
-        for (var i = 0, len = childIds.length; i < len; i++) {
-            tmp = namePrefix + (i+1);
-            if (!hasSameName(pid, tmp)) {
-                return tmp;
-            }
-        }
-        tmp = namePrefix + (i+1);
-        return tmp;
-    };
-    
-    var getTopCatId = function() {
-        return _topCatId;
-    };
-
-    var getWrapperId = function() {
-        return _wrapperId;
-    };
-
-    return {
-        init: function(wrapperId) {
-            _wrapperId = wrapperId || _wrapperId;
-            var wrapper = $('#' + _wrapperId);
-            if (wrapper) {
-                wrapper.innerHTML = getCategoryTemplate(store.data(_topCatId));
-            }
-            updateAllTodoCount();
-        },
-
-        addItem: addItem,
-        getItem: getItem,
-        addItemTemplate: addItemTemplate,
-        addChildTodo: addChildTodo,
-        removeChildTodo: removeChildTodo,
-        removeCategory: removeCategory,
-        hasSameName: hasSameName,
-        getValidName: getValidName,
-        getTodoListIds: getTodoListIds,
-        getAllTodoList: getAllTodoList,
-        getTopCatId: getTopCatId,
-        getWrapperId: getWrapperId,
-    };
-})();
-
-
-
-var TodoListModule = (function() {
-
-    var _wrapperId = null;
-
-    // 加载todo列表
-    function getTodoList(todoIds, statu) {
-        // 获取todo列表
-        // 不过todo是单条数据存储的，所以要循环遍历getItem
-        // 按照日期进行聚类成列表的形式
-        var todoList = [];
-        for (var i = 0; i < todoIds.length; i++) {
-            var item = getItem(todoIds[i]);
-            if (!item) {
-                continue;
-            }
-            // 过滤符合状态的
-            // 不是bool值就获取全部，否则就直接对比
-            if (!isBool(statu) || statu === item.isFinish) {
-                todoList.push(item);
-            }
-        }
-
-        return todoList;
-    }
-
-    // 按照日期归档
-    function archiveByDate(todoList) {
-        var obj = {};
-        for (var i = 0, len = todoList.length; i < len; i++) {
-            var date = getFormatDate(todoList[i].expireTime);
-            if (!obj[date]) {
-                obj[date] = [];
-            }
-            obj[date].push(todoList[i]);
-        }
-
-        return obj;
-    }
-
-    // todo 列表模板
-    function getTodoListTemplate(todoIds, statu) {
-        var list = getTodoList(todoIds, statu);
-        if (!list || list.length <= 0) {
-            return '';
-        }
-        list = archiveByDate(list);
-
-        // 返回后的数据应该排序使用
-        var keys = Object.keys(list);
-        keys.sort(function(a, b) {
-            if (a > b) {
-                return -1;
-            } else if (a < b) {
-                return 1;
+            var child = $('ul', parentNode);
+            if (child) {
+                child.innerHTML += itemTemplate;
             } else {
-                return 0;
+                //用创建元素而不是innerHMTL的方式是为了阻止文档重新渲染parent下以前的元素导致引用失效
+                var ul = document.createElement('ul');
+                ul.innerHTML = itemTemplate;
+                parentNode.appendChild(ul);
+                // 老方法
+                // parentNode.innerHTML += '<ul>' + itemTemplate + '</ul>';
             }
-        });
+        };
 
-        // 创建模板
-        var template = '<ul>';
+        //添加分类
+        var addItem = function(pid, title) {
+            var parent = store.data(pid);
+            var cate = new Category(pid, parent.level+1, title);
+            store.data(cate.cid, cate);
 
-        for (var i = 0, len = keys.length; i < len; i++) {
-            template += getTodoGroupTemplate(keys[i], list[keys[i]]);
-        }
+            parent.childCatList.push(cate.cid);
+            store.data(parent.cid, parent);
 
-        template += '</ul>';
+            return cate;
+        };
 
-        return template;
-    }
+        // 删除分类条目
+        var deleteItem = function(cid) {
+            store.remove(cid);
+        };
 
-    // 创建按照日期聚类的一组todo模板
-    function getTodoGroupTemplate(time, list) {
-        var template = '';
+        // 删除该分类以及所有子孙分类
+        var deleteCategory = function(cid) {
+            // 从父分类移出该分类
+            var cate = store.data(cid);
+            var parent = store.data(cate.pid);
+            var brothers = parent.childCatList;
+            brothers.splice(brothers.indexOf(cid), 1);
+            store.data(parent.cid, parent);
 
-        template += '<li>';
-        template += '<time>' + time + '</time>';
-        template += '<ul>';
+            // 删除该分类和子孙分类
+            var childIds = getCateListIds(cid);
+            for (var i = 0, len = childIds.length; i < len; i += 1) {
+                deleteItem(childIds[i]);
+            }
+        };
+
+        // 移除分类
+        var removeCategory = function(cid) {
+            deleteCategory(cid);
+            updateAllTodoCount();
+        };
+
+        // 遍历分类表
+        var walkCategory = function(cid, callback) {
+            var item = store.data(cid);
+            if (!item) {
+                return;
+            }
+
+            // 由回调函数处理或者收集数据
+            callback(item);
+
+            // 遍历子分类列表
+            var childIds = item.childCatList;
+            for (var i = 0, len = childIds.length; i < len; i += 1) {
+                //下面这样做的缺点就是每次都要传callback，之所以不在外面包一层IIFE是为了简洁
+                walkCategory(childIds[i], callback);
+            }
+        };
+
+        // 获取所有子孙分类id
+        var getCateListIds = function(cid) {
+            var ids = [cid];
+            
+            walkCategory(cid, function(item) {
+                ids = ids.concat(item.childCatList);
+            });
+
+            return ids;
+        };
+
+        // 遍历分类获取子todo
+        var getTodoListIds = function(cid) {
+            var ids = [];
+            
+            walkCategory(cid, function(item) {
+                ids = ids.concat(item.childTodoList);
+            });
+
+            return ids;
+        };
+
+        var getAllTodoList = function() {
+            return getTodoListIds(_topCatId);
+        };
+
+        // 更新todo条数
+        var updateTodoCount = function(cid, n) {
+            var ele = $('.td-count', $('#' + cid));
+            if (ele) {
+                ele.innerHTML = '(' + (isNumber(n) ? n : store.data(cid).childTodoList.length) + ')';
+            }
+        };
         
-        for (var k = 0, len = list.length; k < len; k++) {
-            template += getTodoItemTemplate(list[k]);
+        // 更新界面：所有todo数量
+        var updateAllTodoCount = function() {
+            updateTodoCount('#show-all-todo', getAllTodoList().length);
+        };
+
+        // 更新todo数量
+        var updateCount = function(cid, n) {
+            updateTodoCount(cid, n);
+            updateAllTodoCount();
+        };
+
+        // 添加任务到分类
+        var addChildTodo = function(cid, tid) {
+            var cate = store.data(cid);
+            var childTodo = cate.childTodoList;
+            
+            childTodo.push(tid);
+            store.data(cid, cate);
+
+            updateCount(cid, cate.childTodoList.length);
+        };
+
+        // 从分类移出任务
+        var removeChildTodo = function(cid, tid) {
+            var cate = store.data(cid);
+            var childTodo = cate.childTodoList;
+
+            childTodo.splice(childTodo.indexOf(tid), 1);
+            store.data(cid, cate);
+
+            updateCount(cid, cate.childTodoList.length);
+        };
+
+        var getItem = function(cid) {
+            return store.data(cid);
+        };
+
+        // 查看同级分类下是否有同名
+        var hasSameName = function(pid, name) {
+            var childIds = store.data(pid).childCatList;
+
+            for (var i = 0, len = childIds.length; i < len; i += 1) {
+                if (store.data(childIds[i]).title === name) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        // 获取一个有效分类名
+        var getValidName = function(pid) {
+            var namePrefix = '未命名分类';
+            
+            var parent = store.data(pid);
+            if (!parent) {
+                return namePrefix;
+            }
+            
+            var tmp = '';
+            var childIds = parent.childCatList;
+            for (var i = 0, len = childIds.length; i < len; i += 1) {
+                tmp = namePrefix + (i+1);
+                if (!hasSameName(pid, tmp)) {
+                    return tmp;
+                }
+            }
+            tmp = namePrefix + (i+1);
+            return tmp;
+        };
+        
+        var getTopCatId = function() {
+            return _topCatId;
+        };
+
+        var getWrapperId = function() {
+            return _wrapperId;
+        };
+
+        return {
+            init: function(wrapperId) {
+                _wrapperId = wrapperId || _wrapperId;
+                var wrapper = $('#' + _wrapperId);
+                if (wrapper) {
+                    wrapper.innerHTML = getCategoryTemplate(store.data(_topCatId));
+                }
+                updateAllTodoCount();
+            },
+
+            addItem: addItem,
+            getItem: getItem,
+            addItemTemplate: addItemTemplate,
+            addChildTodo: addChildTodo,
+            removeChildTodo: removeChildTodo,
+            removeCategory: removeCategory,
+            hasSameName: hasSameName,
+            getValidName: getValidName,
+            getTodoListIds: getTodoListIds,
+            getAllTodoList: getAllTodoList,
+            getTopCatId: getTopCatId,
+            getWrapperId: getWrapperId,
+        };
+    })();
+    // 任务模块
+    var TodoModule = (function() {
+
+        var _wrapperId = null;
+
+        // 加载todo列表
+        function getTodoList(todoIds, statu) {
+            // 获取todo列表
+            // 不过todo是单条数据存储的，所以要循环遍历getItem
+            // 按照日期进行聚类成列表的形式
+            var todoList = [];
+            for (var i = 0; i < todoIds.length; i += 1) {
+                var item = getItem(todoIds[i]);
+                if (!item) {
+                    continue;
+                }
+                // 过滤符合状态的
+                // 不是bool值就获取全部，否则就直接对比
+                if (!isBool(statu) || statu === item.isFinish) {
+                    todoList.push(item);
+                }
+            }
+
+            return todoList;
         }
 
-        template += '</ul>'
-        template += '</li>';
-
-        return template;
-    }
-
-    // todo项模板
-    function getTodoItemTemplate(item) {
-        return  ''
-                + '<li>'
-                +   '<a id="' + item.tid + '" class="item item-todo '+ (item.isFinish ? 'done-item' : '') +'">'
-                +       '<span>'+ item.title +'</span>'
-                +       '<span class="act-done" data-action="mark-todo"></span>'
-                +       '<span class="act-del" data-action="delete-todo"></span>'
-                +   '</a>'
-                + '</li>';
-    }
-
-    function getItem(tid) {
-        return store.get(tid);
-    }
-
-    function setItem(item) {
-        store.set(item.tid, item);
-    }
-
-    function deleteItem(tid) {
-        store.remove(tid);
-    }
-
-    function deleteItemList(todoIds) {
-        todoIds.forEach(function(id) {
-            deleteItem(id);
-        });
-    }
-
-    // 标记完成
-    function toggleMark(tid) {
-        var todo = getItem(tid);
-        todo.isFinish = !todo.isFinish;
-        setItem(todo);
-    }
-
-    var getWrapperId = function() {
-        return _wrapperId;
-    };
-
-    return {
-        init: function(wrapperId) {
-            _wrapperId = wrapperId || _wrapperId;
-        },
-        reload: function(todoIds, statu) {
-            var wrapper = $('#' + _wrapperId);
-            if (wrapper) {
-                wrapper.innerHTML = getTodoListTemplate(todoIds, statu);
+        // 按照日期归档
+        function archiveByDate(todoList) {
+            var obj = {};
+            for (var i = 0, len = todoList.length; i < len; i += 1) {
+                var date = getFormatDate(todoList[i].expireTime);
+                if (!obj[date]) {
+                    obj[date] = [];
+                }
+                obj[date].push(todoList[i]);
             }
-        },
 
-        getItem: getItem,
-        setItem: setItem,
-        addItem: setItem,
-        getWrapperId: getWrapperId,
-        deleteItem: deleteItem,
-        deleteItemList: deleteItemList,
-        toggleMark: toggleMark,
-    };
-})();
+            return obj;
+        }
 
-var todoDetail = (function() {
-    var _wrapperId = null;
+        // todo 列表模板
+        function getTodoListTemplate(todoIds, statu) {
+            var list = getTodoList(todoIds, statu);
+            if (!list || list.length <= 0) {
+                return '';
+            }
+            list = archiveByDate(list);
 
-    var getShowTemplate = function(todo) {
-        todo = todo || { title: '', expireTime: '', content: ''};
+            // 返回后的数据应该排序使用
+            var keys = Object.keys(list);
+            keys.sort(function(a, b) {
+                if (a > b) {
+                    return -1;
+                } else if (a < b) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            });
 
-        return ''
-                + '<header class="td-head">'
-                +    '<label>标题：</label>'
-                +    '<span class="title">' + todo.title + '</span>'
-                + '</header>'
-                + '<div class="td-date">'
-                +    '<label>日期：</label>'
-                +    '<time>'+ getFormatDate(todo.expireTime) +'</time>'
-                + '</div>'
-                + '<div class="td-desc">'
-                +    '<label>描述：</label>'
-                +    '<div class="content">'+ todo.content +'</div>'
-                + '</div>';
-    }
+            // 创建模板
+            var template = '<ul>';
 
-    var getEditTemplate = function(todo) {
-        todo = todo || { title: '未命名任务', expireTime: Date.now(), content: ''};
+            for (var i = 0, len = keys.length; i < len; i += 1) {
+                template += getTodoGroupTemplate(keys[i], list[keys[i]]);
+            }
 
-        return ''
-                + '<header class="td-head">'
-                +    '<label for="todo-title">标题：</label>'
-                +    '<input type="text" id="todo-title" maxlength="30" value="'+ todo.title +'" placeholder="请输入标题">'
-                +    '<span class="warning">&lt; 30</span>'
-                + '</header>'
-                + '<div class="td-date">'
-                +    '<label for="todo-expire">日期：</label>'
-                +    '<input type="date" id="todo-expire" value="'+ getFormatDate(todo.expireTime) +'" placeholder="请输入日期如 2017-01-02">'
+            template += '</ul>';
 
-                +    '<span class="warning">2000-01-02</span>'
-                + '</div>'
-                + '<div class="td-desc">'
-                +    '<label for="todo-content">描述：</label>'
-                +    '<textarea id="todo-content" placeholder="请输入任务内容">'+ todo.content +'</textarea>'
-                + '</div>';
-    }
+            return template;
+        }
 
-    return {
-        init: function(wrapperId) {
-            _wrapperId = wrapperId || _wrapperId;
-        },
-        showItem: function(todo) {
+        // 创建按照日期聚类的一组todo模板
+        function getTodoGroupTemplate(time, list) {
+            var template = '';
+
+            template += '<li>';
+            template += '<time>' + time + '</time>';
+            template += '<ul>';
+            
+            for (var k = 0, len = list.length; k < len; k += 1) {
+                template += getTodoItemTemplate(list[k]);
+            }
+
+            template += '</ul>';
+            template += '</li>';
+
+            return template;
+        }
+
+        // todo项模板
+        function getTodoItemTemplate(item) {
+            // jshint ignore:start
+            return  ''
+                    + '<li>'
+                    +   '<a id="' + item.tid + '" class="item item-todo '+ (item.isFinish ? 'done-item' : '') +'">'
+                    +       '<span>'+ item.title +'</span>'
+                    +       '<span class="act-done" data-action="mark-todo"></span>'
+                    +       '<span class="act-del" data-action="delete-todo"></span>'
+                    +   '</a>'
+                    + '</li>';
+            // jshint ignore:end
+        }
+
+        // 获取任务
+        function getItem(tid) {
+            return store.data(tid);
+        }
+
+        // 保存任务
+        function setItem(item) {
+            store.data(item.tid, item);
+        }
+
+        // 新增任务
+        function addItem(cid, title, content, expire) {
+            var todo = new Todo(cid, title, content, expire);
+            setItem(todo);
+            return todo;
+        }
+
+        // 删除任务
+        function deleteItem(tid) {
+            store.remove(tid);
+        }
+
+        // 删除任务列表
+        function deleteItemList(todoIds) {
+            todoIds.forEach(function(id) {
+                deleteItem(id);
+            });
+        }
+
+        // 标记完成
+        function toggleMark(tid) {
+            var todo = getItem(tid);
+            todo.isFinish = !todo.isFinish;
+            setItem(todo);
+        }
+
+        var getWrapperId = function() {
+            return _wrapperId;
+        };
+
+        return {
+            init: function(wrapperId) {
+                _wrapperId = wrapperId || _wrapperId;
+            },
+            reload: function(todoIds, statu) {
+                var wrapper = $('#' + _wrapperId);
+                if (wrapper) {
+                    wrapper.innerHTML = getTodoListTemplate(todoIds, statu);
+                }
+            },
+
+            getItem: getItem,
+            setItem: setItem,
+            addItem: addItem,
+            getWrapperId: getWrapperId,
+            deleteItem: deleteItem,
+            deleteItemList: deleteItemList,
+            toggleMark: toggleMark,
+        };
+    })();
+    // 任务详情
+    var TodoDetail = (function() {
+        var _wrapperId = null;
+
+        var getShowTemplate = function(todo) {
+            todo = todo || { title: '', expireTime: '', content: ''};
+            // jshint ignore:start
+            return ''
+                    + '<header class="td-head">'
+                    +    '<label>标题：</label>'
+                    +    '<span class="title">' + todo.title + '</span>'
+                    + '</header>'
+                    + '<div class="td-date">'
+                    +    '<label>日期：</label>'
+                    +    '<time>'+ getFormatDate(todo.expireTime) +'</time>'
+                    + '</div>'
+                    + '<div class="td-desc">'
+                    +    '<label>描述：</label>'
+                    +    '<div class="content">'+ todo.content +'</div>'
+                    + '</div>';
+            // jshint ignore:end
+        };
+
+        var getEditTemplate = function(todo) {
+            todo = todo || { title: '未命名任务', expireTime: Date.now(), content: ''};
+
+            // jshint ignore:start
+            return ''
+                    + '<header class="td-head">'
+                    +    '<label for="todo-title">标题：</label>'
+                    +    '<input type="text" id="todo-title" maxlength="30" value="'+ todo.title +'" placeholder="请输入标题">'
+                    +    '<span class="warning">&lt; 30</span>'
+                    + '</header>'
+                    + '<div class="td-date">'
+                    +    '<label for="todo-expire">日期：</label>'
+                    +    '<input type="date" id="todo-expire" value="'+ getFormatDate(todo.expireTime) +'" placeholder="请输入日期如 2017-01-02">'
+                    +    '<span class="warning">2000-01-02</span>'
+                    + '</div>'
+                    + '<div class="td-desc">'
+                    +    '<label for="todo-content">描述：</label>'
+                    +    '<textarea id="todo-content" placeholder="请输入任务内容">'+ todo.content +'</textarea>'
+                    + '</div>';
+            // jshint ignore:end
+        };
+
+        var showItem = function(todo) {
             var wrapper = $('#' + _wrapperId);
             wrapper.innerHTML = getShowTemplate(todo);
 
@@ -600,70 +578,73 @@ var todoDetail = (function() {
 
             hiddenEle($('#' + 'save-btns'), parent);
             showEle($('#' + 'edit-btns', parent));
-        },
-        editItem: function(todo) {
+        };
+
+        var editItem = function(todo) {
             var wrapper = $('#' + _wrapperId);
             wrapper.innerHTML = getEditTemplate(todo);
 
             var parent = wrapper.parentNode;
             showEle($('#' + 'save-btns'), parent);
             hiddenEle($('#' + 'edit-btns', parent));
+        };
+
+        return {
+            init: function(wrapperId) {
+                _wrapperId = wrapperId || _wrapperId;
+            },
+            showItem: showItem,
+            editItem: editItem,
+        };
+    })();
+
+    var _UI = {
+        prompt: function(title, placeholder) {
+            return window.prompt(title, placeholder);
+        },
+        alert: function(msg) {
+            return window.alert(msg);
+        },
+        confirm: function(msg) {
+            return window.confirm(msg);
+        },
+        showInfo: (function() {
+            var timer = null;
+            var panel = $('#show-info');
+
+            return function(msg) {
+                clearTimeout(timer);
+                panel.innerHTML = msg;
+                addClass(panel, 'anim');
+                console.log(Date.now() +': '+ msg);
+                
+                timer = setTimeout(function () {
+                    removeClass(panel, 'anim');
+                }, 3000);
+            };
+        })(),
+
+        need: function(name, msg, placeholder) {
+            switch(name) {
+                case 'add-category':
+                    msg = msg || '请输入分类名称';
+                    return this.prompt(msg, placeholder || '');
+                case 'delete-category':
+                case 'delete-todo':
+                    msg = msg || '你确定删除选中项和相关数据吗？';
+                    return this.confirm(msg);
+                default:
+                    break;
+            }
         }
-    }
-})();
+    };
 
-var _UI = {
-    prompt: function(title, placeholder) {
-        return window.prompt(title, placeholder);
-    },
-    alert: function(msg) {
-        return window.alert(msg);
-    },
-    confirm: function(msg) {
-        return window.confirm(msg);
-    },
-    showInfo: (function() {
-        var timer = null;
-        var panel = $('#show-info');
+    // Controller
 
-        return function(msg) {
-            clearTimeout(timer);
-            panel.innerHTML = msg;
-            addClass(panel, 'anim');
-            console.log(Date.now() +': '+ msg);
-            
-            timer = setTimeout(function () {
-                removeClass(panel, 'anim');
-            }, 3000);
-        }
-    })(),
-
-    need: function(name, msg, placeholder) {
-        switch(name) {
-            case 'add-category':
-                msg = msg || '请输入分类名称';
-                return this.prompt(msg, placeholder || '');
-            case 'delete-category':
-            case 'delete-todo':
-                msg = msg || '你确定删除选中项和相关数据吗？';
-                return this.confirm(msg);
-            default:
-                break;
-        }
-    }
-};
-
-// 用于将模块立即表达式绑定到事件
-// function library(module) {
-//     if (module.init) {
-//         window.onload = module.init();
-//     }
-//     return module;
-// }
-
-// 模块模式
-var todoModule = (function(_CL, _TL, _TD) {
-    var _appName = 'GTD Tool';
+    // 别名
+    var _CL = CategoryModule;
+    var _TL = TodoModule;
+    var _TD = TodoDetail;
 
     var _currentCatEle  = null; // 选中的分类元素
     var _currentTodoEle = null; // 选中的todo元素
@@ -675,7 +656,7 @@ var todoModule = (function(_CL, _TL, _TD) {
     var _pages = ["#menu", "#list", "#detail"];
     var _pageIndex = 0;
     
-    // 事件处理函数
+    //关键事件处理函数，负责整个应用的调度
     function eventHandler(event) {
         event = getEvent(event);
         cancelBubble(event);
@@ -692,6 +673,9 @@ var todoModule = (function(_CL, _TL, _TD) {
             isItem = false;
         }
 
+        var msg = null;
+        var cid = null;
+        var todo = null;
         switch(action) {
             case 'add-category':
                 // 输入分类名称
@@ -713,11 +697,10 @@ var todoModule = (function(_CL, _TL, _TD) {
                 }
 
                 var name = _CL.getValidName(pid);
-                var msg = '请输入在 <' + _CL.getItem(pid).title + '> 下创建的子分类名称：';
+                msg = '请输入在 <' + _CL.getItem(pid).title + '> 下创建的子分类名称：';
+                var isValid = true;
                 do {
-                    var isValid = true;
                     name = _UI.need(action, msg, name);
-                    
                     name = name && name.replace(/[\s]+/, ' ');
                     
                     if (name === null) { //用户点击取消按钮后返回null
@@ -726,7 +709,7 @@ var todoModule = (function(_CL, _TL, _TD) {
 
                     } else if (name === '') { //空白字符串
                         isValid = false;
-                        msg = '注意：名称不能为空！'
+                        msg = '注意：名称不能为空！';
 
                         // _UI.showInfo('分类名称不能为空！');
                         
@@ -744,12 +727,11 @@ var todoModule = (function(_CL, _TL, _TD) {
                 } while (!isValid); // 反复尝试直到用户输入有效数据 或者取消
                 
                 if (isValid) {
-                    var category = new Category(name, pid);
-                    _CL.addItem(category);
+                    var category = _CL.addItem(pid, name);
                     _CL.addItemTemplate(_currentCatEle.parentNode, category);
 
                     // 新的子分类创建后，无论父分类是否是展开状态，都要展开
-                    openParentCategory(_currentCatEle);
+                    openChildCategory(_currentCatEle);
                     // 选中新创建的子分类，使其处于激活状态
                     // selectCategory($('#' + category.cid));
                 }
@@ -760,9 +742,9 @@ var todoModule = (function(_CL, _TL, _TD) {
                 // 删除分类
                 // 删除todo列表
                 // 删除dom
-                var cid = target.id;
+                cid = target.id;
                 
-                var msg = '你确定删除 <'+ _CL.getItem(cid).title +'> 以及该分类下的子分类和任务吗？';
+                msg = '你确定删除 <'+ _CL.getItem(cid).title +'> 以及该分类下的子分类和任务吗？';
                 if (!_UI.need(action, msg)) {
                     return;
                 }
@@ -786,7 +768,7 @@ var todoModule = (function(_CL, _TL, _TD) {
                 // 保存todo id 到该分类的childCatList列表中
                 // 更新todo列表
 
-                var cid = _currentCatEle.id;
+                cid = _currentCatEle.id;
                 if (cid.indexOf('cid_') < 0) {
                     _UI.showInfo('请选中分类列表中的一个分类！');
                     return;
@@ -833,16 +815,9 @@ var todoModule = (function(_CL, _TL, _TD) {
                 content = stripTag(content);
                 expire = (new Date(expire)).getTime();
                 
-                var todo;
                 // 通过行为状态判断是添加还是删除
                 if (_saveAction === 'add-todo') {
-
-                    todo = new Todo(_currentCatEle.id, title, content, expire);
-                    // 如果是在已完成列表添加的任务将任务标记为已完成
-                    if (_currentStatuEle.id === 'statu-done') {
-                        todo.isFinish = true;
-                    }
-                    _TL.addItem(todo);
+                    todo = _TL.addItem(_currentCatEle.id, title, content, expire);
                     _CL.addChildTodo(todo.cid, todo.tid);
 
                 } else if (_saveAction === 'edit-todo') {
@@ -877,7 +852,7 @@ var todoModule = (function(_CL, _TL, _TD) {
                     return ;
                 }
 
-                var todo = _TL.getItem(target.id);
+                todo = _TL.getItem(target.id);
                 _TL.deleteItem(todo.tid);
                 _CL.removeChildTodo(todo.cid, todo.tid);
 
@@ -922,7 +897,7 @@ var todoModule = (function(_CL, _TL, _TD) {
                 break;
         } // end switch
 
-    }; // end handler
+    } // end handler
 
     // 初始化事件
     function initEvents() {
@@ -935,7 +910,7 @@ var todoModule = (function(_CL, _TL, _TD) {
         // 给touch事件空处理程序在ipad上能获得更流畅的体验
         addEvent(document.body, 'touchstart', function(event) {});
         addEvent(document.body, 'touchend', function(event) {});
-    };
+    }
 
     // 翻到上一页
     function slidePagePrev() {
@@ -963,7 +938,6 @@ var todoModule = (function(_CL, _TL, _TD) {
         // addClass($(_pages[_pageIndex]), 'page-active');
         removeClass($(_pages[_pageIndex]), 'page-next');
         
-
         showBack(_pageIndex);
     }
 
@@ -978,14 +952,14 @@ var todoModule = (function(_CL, _TL, _TD) {
 
     // 去除html标签
     function stripTag(str) {
-        return str.replace(/\<\/?([^>]+)\>/g, ''); //$1
+        return str.replace(/<\/?([^>]+)>/g, ''); //$1
     }
 
     // 交换类名
     function switchClass(oldEle, newEle, className) {
-        oldEle && removeClass(oldEle, className);
-        newEle && addClass(newEle, className);
-    };
+        removeClass(oldEle, className);
+        addClass(newEle, className);
+    }
     // 交换选择类名
     function switchSelect(oldEle, newEle) {
         switchClass(oldEle, newEle, 'selected');
@@ -1030,7 +1004,7 @@ var todoModule = (function(_CL, _TL, _TD) {
     }
 
     // 强制展开父节点
-    function openParentCategory(target) {
+    function openChildCategory(target) {
         if (!hasClass(target, 'item-cat')) {
             return;
         }
@@ -1055,6 +1029,7 @@ var todoModule = (function(_CL, _TL, _TD) {
     function selectTodo(target) {
         switchSelectLastTodo(target);
     }
+
     // 选中todo列表中的第一项
     function selectFirstTodoItem(wrapper) {
         wrapper = wrapper || $('#' + _TL.getWrapperId());
@@ -1082,6 +1057,7 @@ var todoModule = (function(_CL, _TL, _TD) {
         // 加载todo列表
         loadTodoInCurrentCat();
     }
+
     // 切换状态
     function selectStatu(target) {
         target = target || $('#statu-all');
@@ -1118,8 +1094,32 @@ var todoModule = (function(_CL, _TL, _TD) {
         }
     }
 
+    // 格式化日期
+    function getFormatDate(timestamp, spliter) {
+        if (!timestamp) {
+            return '';
+        }
+        spliter = spliter || '-';
+        var date = new Date(timestamp);
+        var y = date.getFullYear(), m = date.getMonth()+1, d = date.getDate();
+        return [ y, 
+                 m < 10 ? '0'+m : m,
+                 d < 10 ? '0'+d : d
+                ].join(spliter);
+    }
+
+    function hiddenEle(ele) {
+        // ele.style.display = "none";
+        addClass(ele, 'hidden');
+    }
+
+    function showEle(ele) {
+        // ele.style.display = "";
+        removeClass(ele, 'hidden');
+    }
+
     return {
-        init: function(catListId, todoListId, todoDetailId) {
+        init: function() {
             _CL.init('category-list');
             _TL.init('todo-list');
             _TD.init('detail-wrap');
@@ -1129,4 +1129,4 @@ var todoModule = (function(_CL, _TL, _TD) {
             initEvents();
         }
     };
-})(CategoryListModule, TodoListModule, todoDetail);// 引入模块
+})();

@@ -100,9 +100,16 @@
             
         </div>
     </main>
-    
     <div id="show-info" class="warning"></div>    
+
     <script src="js/util.js"></script>
     <script src="js/todo.js"></script>
+    <script type="text/javascript">
+        if (!window.localStorage) {
+            alert('该应用不支持低版本浏览器！');
+        } else {
+            library(todo);
+        }
+    </script>
 </body>
 </html>
