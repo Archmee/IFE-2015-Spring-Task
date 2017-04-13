@@ -24,7 +24,7 @@ body {
     height: 100%;
     color: #555;
     word-spacing: 1px;
-    
+
     /*兼容*/
     /*使用click会出现绑定点击区域闪一下的情况*/
     -webkit-tap-highlight-color: transparent;
@@ -165,7 +165,7 @@ textarea {
     min-width: 72px;
     margin-right: 5px;
     padding: 0 5%;
-    
+
     /*border: 1px outset #AAA;
     background-color: #A8AAC5;*/
 
@@ -248,7 +248,7 @@ textarea {
 }
 
 /* 完成和删除标记 */
-.act-del, 
+.act-del,
 .act-done {
     position: absolute;
 }
@@ -336,7 +336,7 @@ textarea {
 #detail .td-desc .content {
     display: inline-block;
     vertical-align: top;
-    
+
     white-space: pre-wrap;
     word-wrap: break-word; /*按照单字分割*/
     /*word-break: break-all;*/ /*任意分割*/
@@ -373,76 +373,3 @@ textarea {
     font-size: .9rem;
     color: #999;
 }
-
-/*用户提示*/
-#show-info {
-    position: absolute;
-    z-index: 100;
-    top: -100%;
-    left: 0;
-    right: 0;
-    height: 20px;
-    line-height: 20px;
-    overflow: hidden;
-    
-    padding: 12px;
-    border-radius: 5px;
-    box-shadow: 0 0 30px  #FFFF9D;
-
-    color: #444;
-    text-align: center;
-    background: #FFFF9D;
-}
-
-.anim {
-    -webkit-animation: easeInOut 2.5s ease-in-out 2 alternate;
-       -moz-animation: easeInOut 2.5s ease-in-out 2 alternate;
-         -o-animation: easeInOut 2.5s ease-in-out 2 alternate;
-            animation: easeInOut 2.5s ease-in-out 2 alternate;
-}
-
-@-webkit-keyframes easeInOut {
-    0% {
-        top: -100%;
-    }
-    15% {
-        top: 0%;
-    }
-    100% {
-        top: 0;
-    }
-}
-@-moz-keyframes easeInOut {
-    0% {
-        top: -100%;
-    }
-    15% {
-        top: 0%;
-    }
-    100% {
-        top: 0;
-    }
-}
-@-o-keyframes easeInOut {
-    0% {
-        top: -100%;
-    }
-    15% {
-        top: 0%;
-    }
-    100% {
-        top: 0;
-    }
-}
-@keyframes easeInOut {
-    0% {
-        top: -100%;
-    }
-    15% {
-        top: 0%;
-    }
-    100% {
-        top: 0;
-    }
-}
-

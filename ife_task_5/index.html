@@ -6,16 +6,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no"/>
 
-    <!-- 适配 iPhone 6 和 iPhone 6plus 则需要写 -->
-    <!-- <meta name="viewport" content="width=375"> -->
-    <!-- <meta name="viewport" content="width=414"> -->
-
     <!-- 添加到主屏 -->
     <meta name="mobile-web-app-capable" content="yes">
-    
+
     <!-- Web 应用的名称（仅当网站被用作为一个应用时才使用）-->
     <meta name="application-name" content="GTD Toool">
-    
+
     <!-- ios -->
     <meta name="apple-mobile-web-app-capable" content="yes" /><!-- 删除苹果默认的工具栏和菜单栏,启用 WebApp 全屏模式 -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black" /><!-- 设置苹果工具栏颜色 -->
@@ -43,7 +39,6 @@
     <link rel="stylesheet" href="src/css/common.css">
     <link rel="stylesheet" href="src/css/todo-mobile.css" media="screen and (max-width:768px)">
     <link rel="stylesheet" href="src/css/todo-pc.css" media="screen and (min-width:769px)">
-    <!-- <link rel="stylesheet" href="css/todo-pc-max.css" media="screen and (min-width: 1024px)"> -->
 </head>
 <body>
     <header id="header">
@@ -97,12 +92,13 @@
                     </div>
                 </div>
             </footer>
-            
+
         </div>
     </main>
     <div id="show-info" class="warning"></div>
 
-    <!-- artTemplate -->
+    <!-- start artTemplate -->
+
     <script id="category-item-tpl" type="text/template">
         <a id="{{ cid }}" class="item item-cat icon-folder" style="padding-left:{{ paddingLeft }}px">
             <span>{{ title }}</span>
@@ -131,7 +127,7 @@
             </ul>
         </li>
     </script>
-    
+
     <script id="show-item-tpl" type="text/template">
         <header class="td-head">
             <label>标题：</label>
@@ -164,7 +160,7 @@
         </div>
     </script>
 
-
+    <!-- end artTemplate -->
 
     <script src="src/js/thirdParty/template.js"></script>
     <script src="src/js/util.js"></script>

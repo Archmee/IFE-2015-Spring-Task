@@ -1,10 +1,5 @@
 var todo = (function (store, tpl) {
     'use strict';
-    var clog = console.log;
-
-    var appName = 'GTD Tool';
-    var appVersion = '0.2';
-
 
     // Category 类
     function Category(pid, level, title) {
@@ -31,7 +26,7 @@ var todo = (function (store, tpl) {
 
     // 分类模块
     var CategoryModule = (function() {
-        
+
         // 层级对齐距离
         var _startPadding = 0;
         var _incrPadding = 20;
@@ -39,8 +34,8 @@ var todo = (function (store, tpl) {
 
         var _topKey = 'topCatId'; // 顶级分类id
         var _topCatId = store.data(_topKey); //获取顶级分类id
-        
-        if (!_topCatId) { 
+
+        if (!_topCatId) {
             // 如果还没有分类
 
             // 首先新建顶级分类
@@ -48,10 +43,10 @@ var todo = (function (store, tpl) {
             //将时间戳-1是为了防止程序运行太快导致默认分类和顶级分类id重复了(都是时间戳取的)
             topCat.addTime = topCat.addTime-1;
             topCat.cid = 'cid_' + topCat.addTime;
-            
+
             _topCatId = topCat.cid;
             store.data(_topKey, _topCatId);
-            
+
             // 再新建一个默认分类并保存
             var firstCat = new Category(_topCatId, topCat.level+1, '默认分类');
             store.data(firstCat.cid, firstCat);
@@ -59,16 +54,61 @@ var todo = (function (store, tpl) {
             // 将默认分类添加到顶级分类中
             topCat.childCatList.push(firstCat.cid);
             store.data(_topCatId, topCat);
-            
+
             topCat = null;
             firstCat = null;
-            
+
         }
+
+
+        // 遍历分类表
+        var walkCategory = function(cid, callback) {
+            var item = store.data(cid);
+            if (!item) {
+                return;
+            }
+
+            // 由回调函数处理或者收集数据
+            callback(item);
+
+            // 遍历子分类列表
+            var childIds = item.childCatList;
+            for (var i = 0, len = childIds.length; i < len; i += 1) {
+                //下面这样做的缺点就是每次都要传callback，之所以不在外面包一层IIFE是为了简洁
+                walkCategory(childIds[i], callback);
+            }
+        };
+
+        // 获取所有子孙分类id
+        var getCateListIds = function(cid) {
+            var ids = [];
+
+            walkCategory(cid, function(item) {
+                ids = ids.concat(item.childCatList);
+            });
+
+            return ids;
+        };
+
+        // 遍历分类获取子todo
+        var getTodoListIds = function(cid) {
+            var ids = [];
+
+            walkCategory(cid, function(item) {
+                ids = ids.concat(item.childTodoList);
+            });
+
+            return ids;
+        };
+
+        var getAllTodoList = function() {
+            return getTodoListIds(_topCatId);
+        };
 
         // 模板：单条分类
         var getCategoryItemTemplate = function(cate) {
             cate.paddingLeft = _startPadding + _incrPadding*cate.level;
-            
+
             return tpl('category-item-tpl', cate);
         };
 
@@ -77,9 +117,9 @@ var todo = (function (store, tpl) {
             if (!catItem) {
                 return '';
             }
-            
+
             var childIds = catItem.childCatList;
-            
+
             // 顶级分类列表默认显示，而下级隐藏
             var template = (!catItem.pid) ? '<ul>' : '<ul class="hidden">';
 
@@ -89,7 +129,7 @@ var todo = (function (store, tpl) {
                 if (!currItem) {
                     continue;
                 }
-                
+
                 // 加载模板
                 template += '<li>';
                 template += getCategoryItemTemplate(currItem);
@@ -107,7 +147,7 @@ var todo = (function (store, tpl) {
 
         // 添加新分类项的DOM元素
         var addItemTemplate = function(parentNode, cate) {
-            
+
             var itemTemplate =  '<li>' + (getCategoryItemTemplate(cate)) + '</li>';
 
             var child = $('ul', parentNode);
@@ -151,6 +191,7 @@ var todo = (function (store, tpl) {
 
             // 删除该分类和子孙分类
             var childIds = getCateListIds(cid);
+            childIds.push(cid);
             for (var i = 0, len = childIds.length; i < len; i += 1) {
                 deleteItem(childIds[i]);
             }
@@ -162,50 +203,6 @@ var todo = (function (store, tpl) {
             updateAllTodoCount();
         };
 
-        // 遍历分类表
-        var walkCategory = function(cid, callback) {
-            var item = store.data(cid);
-            if (!item) {
-                return;
-            }
-
-            // 由回调函数处理或者收集数据
-            callback(item);
-
-            // 遍历子分类列表
-            var childIds = item.childCatList;
-            for (var i = 0, len = childIds.length; i < len; i += 1) {
-                //下面这样做的缺点就是每次都要传callback，之所以不在外面包一层IIFE是为了简洁
-                walkCategory(childIds[i], callback);
-            }
-        };
-
-        // 获取所有子孙分类id
-        var getCateListIds = function(cid) {
-            var ids = [cid];
-            
-            walkCategory(cid, function(item) {
-                ids = ids.concat(item.childCatList);
-            });
-
-            return ids;
-        };
-
-        // 遍历分类获取子todo
-        var getTodoListIds = function(cid) {
-            var ids = [];
-            
-            walkCategory(cid, function(item) {
-                ids = ids.concat(item.childTodoList);
-            });
-
-            return ids;
-        };
-
-        var getAllTodoList = function() {
-            return getTodoListIds(_topCatId);
-        };
-
         // 更新todo条数
         var updateTodoCount = function(cid, n) {
             var ele = $('.td-count', $('#' + cid));
@@ -213,7 +210,7 @@ var todo = (function (store, tpl) {
                 ele.innerHTML = '(' + (isNumber(n) ? n : store.data(cid).childTodoList.length) + ')';
             }
         };
-        
+
         // 更新界面：所有todo数量
         var updateAllTodoCount = function() {
             updateTodoCount('#show-all-todo', getAllTodoList().length);
@@ -229,7 +226,7 @@ var todo = (function (store, tpl) {
         var addChildTodo = function(cid, tid) {
             var cate = store.data(cid);
             var childTodo = cate.childTodoList;
-            
+
             childTodo.push(tid);
             store.data(cid, cate);
 
@@ -266,12 +263,12 @@ var todo = (function (store, tpl) {
         // 获取一个有效分类名
         var getValidName = function(pid) {
             var namePrefix = '未命名分类';
-            
+
             var parent = store.data(pid);
             if (!parent) {
                 return namePrefix;
             }
-            
+
             var tmp = '';
             var childIds = parent.childCatList;
             for (var i = 0, len = childIds.length; i < len; i += 1) {
@@ -283,7 +280,7 @@ var todo = (function (store, tpl) {
             tmp = namePrefix + (i+1);
             return tmp;
         };
-        
+
         var getTopCatId = function() {
             return _topCatId;
         };
@@ -448,6 +445,7 @@ var todo = (function (store, tpl) {
             toggleMark: toggleMark,
         };
     })();
+
     // 任务详情
     var TodoDetail = (function() {
         var _wrapperId = null;
@@ -459,7 +457,7 @@ var todo = (function (store, tpl) {
 
         var getShowTemplate = function(todo) {
             todo = todo || { title: '', expireTime: '', content: ''};
-            
+
             return tpl('show-item-tpl', todo);
         };
 
@@ -507,21 +505,9 @@ var todo = (function (store, tpl) {
         confirm: function(msg) {
             return window.confirm(msg);
         },
-        showInfo: (function() {
-            var timer = null;
-            var panel = $('#show-info');
-
-            return function(msg) {
-                clearTimeout(timer);
-                panel.innerHTML = msg;
-                addClass(panel, 'anim');
-                console.log(Date.now() +': '+ msg);
-                
-                timer = setTimeout(function () {
-                    removeClass(panel, 'anim');
-                }, 3000);
-            };
-        })(),
+        showInfo: function(msg) {
+            window.alert(msg);
+        },
 
         need: function(name, msg, placeholder) {
             switch(name) {
@@ -554,7 +540,7 @@ var todo = (function (store, tpl) {
     // 用于手机端的翻页动画，按照先后顺序存放的页面id
     var _pages = ["#menu", "#list", "#detail"];
     var _pageIndex = 0;
-    
+
     //关键事件处理函数，负责整个应用的调度
     function eventHandler(event) {
         event = getEvent(event);
@@ -601,7 +587,7 @@ var todo = (function (store, tpl) {
                 do {
                     name = _UI.need(action, msg, name);
                     name = name && name.replace(/[\s]+/, ' ');
-                    
+
                     if (name === null) { //用户点击取消按钮后返回null
                         isValid = false;
                         break;
@@ -611,7 +597,7 @@ var todo = (function (store, tpl) {
                         msg = '注意：名称不能为空！';
 
                         // _UI.showInfo('分类名称不能为空！');
-                        
+
                     } else if (/[^\w\u4E00-\u9FA5]+/g.test(name)) { //不允许非数字字母下环线汉字
                         isValid = false;
                         msg = '注意：名称只能包含汉字、字母、数字、下划线！';
@@ -624,7 +610,7 @@ var todo = (function (store, tpl) {
                     }
 
                 } while (!isValid); // 反复尝试直到用户输入有效数据 或者取消
-                
+
                 if (isValid) {
                     var category = _CL.addItem(pid, name);
                     _CL.addItemTemplate(_currentCatEle.parentNode, category);
@@ -642,7 +628,7 @@ var todo = (function (store, tpl) {
                 // 删除todo列表
                 // 删除dom
                 cid = target.id;
-                
+
                 msg = '你确定删除 <'+ _CL.getItem(cid).title +'> 以及该分类下的子分类和任务吗？';
                 if (!_UI.need(action, msg)) {
                     return;
@@ -658,7 +644,7 @@ var todo = (function (store, tpl) {
                 if (cid === _currentCatEle.id) { //如果刚才选中的项被删除了，要重新选中同级下的第一个，或父元素
                     selectFirstCatItem($('li', ul.parentNode) || ul.parentNode);
                 }
-                
+
                 break;
             case 'add-todo':
                 // 显示编辑界面获取用户输入
@@ -676,11 +662,11 @@ var todo = (function (store, tpl) {
                 _TD.editItem();
 
                 slidePageNext(); //Mobile:翻到编辑页
-                
+
                 break;
             case 'edit-todo':
                 // 如果正在编辑，则不操作
-                
+
                 if (_currentTodoEle) {
                     _saveAction = action;
                     _TD.editItem(_TL.getItem(_currentTodoEle.id));
@@ -693,7 +679,7 @@ var todo = (function (store, tpl) {
                 if (!_saveAction) {
                     return;
                 }
-                
+
                 var title   = $('#' + 'todo-title').value;
                 var expire  = $('#' + 'todo-expire').value;
                 var content = $('#' + 'todo-content').value;
@@ -713,7 +699,7 @@ var todo = (function (store, tpl) {
                 title = stripTag(title);
                 content = stripTag(content);
                 expire = (new Date(expire)).getTime();
-                
+
                 // 通过行为状态判断是添加还是删除
                 if (_saveAction === 'add-todo') {
                     todo = _TL.addItem(_currentCatEle.id, title, content, expire);
@@ -764,15 +750,15 @@ var todo = (function (store, tpl) {
                 _TL.toggleMark(target.id); //数据更新
                 loadTodoInCurrentCat(); //重新加载列表
                 //也可以dom局部更新，但不会及时刷新界面
-                // toggleClass(target, 'done-item'); 
+                // toggleClass(target, 'done-item');
 
                 break;
             case 'switch-statu':
                 selectStatu(target);
                 break;
-            case 'act-back': 
+            case 'act-back':
                 //Mobile:客户端翻页的返回行为
-                slidePagePrev(); 
+                slidePagePrev();
                 break;
             default:
                 //选中条目
@@ -801,14 +787,9 @@ var todo = (function (store, tpl) {
     // 初始化事件
     function initEvents() {
         addEvent(document.body, 'click', eventHandler);
-        addEvent(document.body, 'contextmenu', function(event) {
-            // event = getEvent(event);
-            // var target = getEventTarget(event);
-            // preventDefault(event);
-        });
         // 给touch事件空处理程序在ipad上能获得更流畅的体验
-        addEvent(document.body, 'touchstart', function(event) {});
-        addEvent(document.body, 'touchend', function(event) {});
+        addEvent(document.body, 'touchstart', function() {});
+        addEvent(document.body, 'touchend', function() {});
     }
 
     // 翻到上一页
@@ -816,9 +797,8 @@ var todo = (function (store, tpl) {
         // 当前页归位
         addClass($(_pages[_pageIndex]), 'page-next');
         // removeClass($(_pages[_pageIndex]), 'page-active');
-        
-        _pageIndex = --_pageIndex < 0 ? 0 : _pageIndex;
 
+        _pageIndex = (_pageIndex - 1) < 0 ? 0 : _pageIndex - 1;
 
         //上一页回来
         // addClass($(_pages[_pageIndex]), 'page-active');
@@ -832,11 +812,11 @@ var todo = (function (store, tpl) {
         addClass($(_pages[_pageIndex]), 'page-prev');
         // removeClass($(_pages[_pageIndex]), 'page-active');
 
-        _pageIndex = ++_pageIndex >= _pages.length ? 0 : _pageIndex;
+        _pageIndex = (_pageIndex + 1) >= _pages.length ? _pageIndex : _pageIndex + 1;
 
         // addClass($(_pages[_pageIndex]), 'page-active');
         removeClass($(_pages[_pageIndex]), 'page-next');
-        
+
         showBack(_pageIndex);
     }
 
@@ -935,7 +915,7 @@ var todo = (function (store, tpl) {
         var ele = $('.item-todo',  wrapper) || $('.item',  wrapper);
         switchSelectLastTodo(ele);
     }
-    
+
     // 显示当前元素 没有则显示空
     function showCurrItem() {
         if (_currentTodoEle) {
@@ -960,7 +940,7 @@ var todo = (function (store, tpl) {
     // 切换状态
     function selectStatu(target) {
         target = target || $('#statu-all');
-        switchSelectLastStatu(target);   
+        switchSelectLastStatu(target);
     }
 
     // 根据分类id和状态码来加载todo列表
@@ -1001,7 +981,7 @@ var todo = (function (store, tpl) {
         spliter = spliter || '-';
         var date = new Date(timestamp);
         var y = date.getFullYear(), m = date.getMonth()+1, d = date.getDate();
-        return [ y, 
+        return [ y,
                  m < 10 ? '0'+m : m,
                  d < 10 ? '0'+d : d
                 ].join(spliter);
