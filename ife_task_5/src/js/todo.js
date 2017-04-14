@@ -796,12 +796,12 @@ var todo = (function (store, tpl) {
     function slidePagePrev() {
         // 当前页归位
         addClass($(_pages[_pageIndex]), 'page-next');
-        // removeClass($(_pages[_pageIndex]), 'page-active');
+        removeClass($(_pages[_pageIndex]), 'page-active');
 
         _pageIndex = (_pageIndex - 1) < 0 ? 0 : _pageIndex - 1;
 
         //上一页回来
-        // addClass($(_pages[_pageIndex]), 'page-active');
+        addClass($(_pages[_pageIndex]), 'page-active');
         removeClass($(_pages[_pageIndex]), 'page-prev');
 
         showBack(_pageIndex);
@@ -810,11 +810,12 @@ var todo = (function (store, tpl) {
     // 翻到下一页
     function slidePageNext() {
         addClass($(_pages[_pageIndex]), 'page-prev');
-        // removeClass($(_pages[_pageIndex]), 'page-active');
+        removeClass($(_pages[_pageIndex]), 'page-active');
 
+        console.log(_pageIndex);
         _pageIndex = (_pageIndex + 1) >= _pages.length ? _pageIndex : _pageIndex + 1;
-
-        // addClass($(_pages[_pageIndex]), 'page-active');
+        console.log(_pageIndex);
+        addClass($(_pages[_pageIndex]), 'page-active');
         removeClass($(_pages[_pageIndex]), 'page-next');
 
         showBack(_pageIndex);
