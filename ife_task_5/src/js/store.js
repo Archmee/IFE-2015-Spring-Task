@@ -1,4 +1,4 @@
-var store = (function() {
+define(function() {
     var db = window.localStorage;
 
     var get = function(key) {
@@ -24,11 +24,11 @@ var store = (function() {
     var clear = function() {
         db.clear();
     };
-    
+
     return {
         get: get,
         set: set,
         data: data,
         remove: remove
     };
-})();
+});

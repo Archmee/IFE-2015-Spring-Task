@@ -1,4 +1,5 @@
-var todo = (function (store, tpl) {
+define(['util', 'store', 'template'],
+function(_, store, tpl) {
     'use strict';
 
     // Category 类
@@ -150,7 +151,7 @@ var todo = (function (store, tpl) {
 
             var itemTemplate =  '<li>' + (getCategoryItemTemplate(cate)) + '</li>';
 
-            var child = $('ul', parentNode);
+            var child = _.$('ul', parentNode);
             if (child) {
                 child.innerHTML += itemTemplate;
             } else {
@@ -205,9 +206,9 @@ var todo = (function (store, tpl) {
 
         // 更新todo条数
         var updateTodoCount = function(cid, n) {
-            var ele = $('.td-count', $('#' + cid));
+            var ele = _.$('.td-count', _.$('#' + cid));
             if (ele) {
-                ele.innerHTML = '(' + (isNumber(n) ? n : store.data(cid).childTodoList.length) + ')';
+                ele.innerHTML = '(' + (_.isNumber(n) ? n : store.data(cid).childTodoList.length) + ')';
             }
         };
 
@@ -292,7 +293,7 @@ var todo = (function (store, tpl) {
         return {
             init: function(wrapperId) {
                 _wrapperId = wrapperId || _wrapperId;
-                var wrapper = $('#' + _wrapperId);
+                var wrapper = _.$('#' + _wrapperId);
                 if (wrapper) {
                     wrapper.innerHTML = getCategoryTemplate(store.data(_topCatId));
                 }
@@ -331,7 +332,7 @@ var todo = (function (store, tpl) {
                 }
                 // 过滤符合状态的
                 // 不是bool值就获取全部，否则就直接对比
-                if (!isBool(statu) || statu === item.isFinish) {
+                if (!_.isBool(statu) || statu === item.isFinish) {
                     todoList.push(item);
                 }
             }
@@ -421,16 +422,16 @@ var todo = (function (store, tpl) {
             setItem(todo);
         }
 
-        var getWrapperId = function() {
+        function getWrapperId() {
             return _wrapperId;
-        };
+        }
 
         return {
             init: function(wrapperId) {
                 _wrapperId = wrapperId || _wrapperId;
             },
             reload: function(todoIds, statu) {
-                var wrapper = $('#' + _wrapperId);
+                var wrapper = _.$('#' + _wrapperId);
                 if (wrapper) {
                     wrapper.innerHTML = getTodoListTemplate(todoIds, statu);
                 }
@@ -468,22 +469,22 @@ var todo = (function (store, tpl) {
         };
 
         var showItem = function(todo) {
-            var wrapper = $('#' + _wrapperId);
+            var wrapper = _.$('#' + _wrapperId);
             wrapper.innerHTML = getShowTemplate(todo);
 
             var parent = wrapper.parentNode;
 
-            hiddenEle($('#' + 'save-btns'), parent);
-            showEle($('#' + 'edit-btns', parent));
+            hiddenEle(_.$('#' + 'save-btns'), parent);
+            showEle(_.$('#' + 'edit-btns', parent));
         };
 
         var editItem = function(todo) {
-            var wrapper = $('#' + _wrapperId);
+            var wrapper = _.$('#' + _wrapperId);
             wrapper.innerHTML = getEditTemplate(todo);
 
             var parent = wrapper.parentNode;
-            showEle($('#' + 'save-btns'), parent);
-            hiddenEle($('#' + 'edit-btns', parent));
+            showEle(_.$('#' + 'save-btns'), parent);
+            hiddenEle(_.$('#' + 'edit-btns', parent));
         };
 
         return {
@@ -543,18 +544,18 @@ var todo = (function (store, tpl) {
 
     //关键事件处理函数，负责整个应用的调度
     function eventHandler(event) {
-        event = getEvent(event);
-        cancelBubble(event);
+        event = _.getEvent(event);
+        _.cancelBubble(event);
 
-        var target = getEventTarget(event);
+        var target = _.getEventTarget(event);
         var action = (target.dataset && target.dataset.action) || target.getAttribute('data-action');
 
         // 纠正目标 并 判断是否为item
         var isItem = true;
-        if (hasClass(target.parentNode, 'item')) {
+        if (_.hasClass(target.parentNode, 'item')) {
             target = target.parentNode;
         }
-        if (!hasClass(target, 'item')) {
+        if (!_.hasClass(target, 'item')) {
             isItem = false;
         }
 
@@ -618,7 +619,7 @@ var todo = (function (store, tpl) {
                     // 新的子分类创建后，无论父分类是否是展开状态，都要展开
                     openChildCategory(_currentCatEle);
                     // 选中新创建的子分类，使其处于激活状态
-                    // selectCategory($('#' + category.cid));
+                    // selectCategory(_.$('#' + category.cid));
                 }
 
                 break;
@@ -642,7 +643,7 @@ var todo = (function (store, tpl) {
                 var ul = li.parentNode; //ul
                 ul.removeChild(li); //ul.removeChild
                 if (cid === _currentCatEle.id) { //如果刚才选中的项被删除了，要重新选中同级下的第一个，或父元素
-                    selectFirstCatItem($('li', ul.parentNode) || ul.parentNode);
+                    selectFirstCatItem(_.$('li', ul.parentNode) || ul.parentNode);
                 }
 
                 break;
@@ -680,9 +681,9 @@ var todo = (function (store, tpl) {
                     return;
                 }
 
-                var title   = $('#' + 'todo-title').value;
-                var expire  = $('#' + 'todo-expire').value;
-                var content = $('#' + 'todo-content').value;
+                var title   = _.trim(_.$('#' + 'todo-title').value);
+                var expire  = _.$('#' + 'todo-expire').value;
+                var content = _.$('#' + 'todo-content').value;
 
                 if (!title.length || title.length > 30 ) {
                     _UI.showInfo('任务名称不能为空，也不能超过30字！');
@@ -716,7 +717,7 @@ var todo = (function (store, tpl) {
                 }
 
                 selectStatu(_currentStatuEle);
-                selectTodo($('#' + todo.tid));
+                selectTodo(_.$('#' + todo.tid));
                 _saveAction = null;
 
                 break;
@@ -750,7 +751,7 @@ var todo = (function (store, tpl) {
                 _TL.toggleMark(target.id); //数据更新
                 loadTodoInCurrentCat(); //重新加载列表
                 //也可以dom局部更新，但不会及时刷新界面
-                // toggleClass(target, 'done-item');
+                // _.toggleClass(target, 'done-item');
 
                 break;
             case 'switch-statu':
@@ -766,10 +767,10 @@ var todo = (function (store, tpl) {
                     return;
                 }
                 // 有item class 再判断类型
-                if (hasClass(target, 'item-cat')) { // 分类条目
+                if (_.hasClass(target, 'item-cat')) { // 分类条目
                     selectCategory(target);
                     slidePageNext(); //Mobile:翻页
-                } else if (hasClass(target, 'item-todo')) { //todo条目
+                } else if (_.hasClass(target, 'item-todo')) { //todo条目
                     selectTodo(target);
                     slidePageNext(); //Mobile:翻页
                 } else if (target.id === 'show-all-cat') {
@@ -786,37 +787,36 @@ var todo = (function (store, tpl) {
 
     // 初始化事件
     function initEvents() {
-        addEvent(document.body, 'click', eventHandler);
+        _.addEvent(document.body, 'click', eventHandler);
         // 给touch事件空处理程序在ipad上能获得更流畅的体验
-        addEvent(document.body, 'touchstart', function() {});
-        addEvent(document.body, 'touchend', function() {});
+        _.addEvent(document.body, 'touchstart', function() {});
+        _.addEvent(document.body, 'touchend', function() {});
     }
 
     // 翻到上一页
     function slidePagePrev() {
         // 当前页归位
-        addClass($(_pages[_pageIndex]), 'page-next');
-        removeClass($(_pages[_pageIndex]), 'page-active');
+        _.addClass(_.$(_pages[_pageIndex]), 'page-next');
+        _.removeClass(_.$(_pages[_pageIndex]), 'page-active');
 
         _pageIndex = (_pageIndex - 1) < 0 ? 0 : _pageIndex - 1;
 
         //上一页回来
-        addClass($(_pages[_pageIndex]), 'page-active');
-        removeClass($(_pages[_pageIndex]), 'page-prev');
+        _.addClass(_.$(_pages[_pageIndex]), 'page-active');
+        _.removeClass(_.$(_pages[_pageIndex]), 'page-prev');
 
         showBack(_pageIndex);
     }
 
     // 翻到下一页
     function slidePageNext() {
-        addClass($(_pages[_pageIndex]), 'page-prev');
-        removeClass($(_pages[_pageIndex]), 'page-active');
+        _.addClass(_.$(_pages[_pageIndex]), 'page-prev');
+        _.removeClass(_.$(_pages[_pageIndex]), 'page-active');
 
-        console.log(_pageIndex);
         _pageIndex = (_pageIndex + 1) >= _pages.length ? _pageIndex : _pageIndex + 1;
-        console.log(_pageIndex);
-        addClass($(_pages[_pageIndex]), 'page-active');
-        removeClass($(_pages[_pageIndex]), 'page-next');
+
+        _.addClass(_.$(_pages[_pageIndex]), 'page-active');
+        _.removeClass(_.$(_pages[_pageIndex]), 'page-next');
 
         showBack(_pageIndex);
     }
@@ -824,9 +824,9 @@ var todo = (function (store, tpl) {
     // 根据当前页判断是否显示back按钮
     function showBack(index) {
         if (index > 0) {
-            showEle($('#page-back'));
+            showEle(_.$('#page-back'));
         } else {
-            hiddenEle($('#page-back'));
+            hiddenEle(_.$('#page-back'));
         }
     }
 
@@ -837,8 +837,8 @@ var todo = (function (store, tpl) {
 
     // 交换类名
     function switchClass(oldEle, newEle, className) {
-        removeClass(oldEle, className);
-        addClass(newEle, className);
+        _.removeClass(oldEle, className);
+        _.addClass(newEle, className);
     }
     // 交换选择类名
     function switchSelect(oldEle, newEle) {
@@ -866,32 +866,32 @@ var todo = (function (store, tpl) {
 
     // 选中分类项
     function selectCategory(target) {
-        var child = $('ul', target.parentNode); //展开子节点
+        var child = _.$('ul', target.parentNode); //展开子节点
         if (child) {
-            toggleClass(child, 'hidden');
+            _.toggleClass(child, 'hidden');
         }
-        if (hasClass(target, 'icon-folder')) {
-            toggleClass(target, 'folder-opened');
+        if (_.hasClass(target, 'icon-folder')) {
+            _.toggleClass(target, 'folder-opened');
         }
 
         switchSelectLastCat(target);
     }
     // 选中分类列表中的第一项
     function selectFirstCatItem(wrapper) {
-        wrapper = wrapper || $('#' + _CL.getWrapperId());
-        var ele = $('.item-cat',  wrapper) || $('.item',  wrapper);
+        wrapper = wrapper || _.$('#' + _CL.getWrapperId());
+        var ele = _.$('.item-cat',  wrapper) || _.$('.item',  wrapper);
         switchSelectLastCat(ele);
     }
 
     // 强制展开父节点
     function openChildCategory(target) {
-        if (!hasClass(target, 'item-cat')) {
+        if (!_.hasClass(target, 'item-cat')) {
             return;
         }
-        var child = $('ul', target.parentNode); //展开子节点
+        var child = _.$('ul', target.parentNode); //展开子节点
         if (child) {
-            removeClass(child, 'hidden');
-            addClass(target, 'folder-opened');
+            _.removeClass(child, 'hidden');
+            _.addClass(target, 'folder-opened');
         }
     }
 
@@ -912,8 +912,8 @@ var todo = (function (store, tpl) {
 
     // 选中todo列表中的第一项
     function selectFirstTodoItem(wrapper) {
-        wrapper = wrapper || $('#' + _TL.getWrapperId());
-        var ele = $('.item-todo',  wrapper) || $('.item',  wrapper);
+        wrapper = wrapper || _.$('#' + _TL.getWrapperId());
+        var ele = _.$('.item-todo',  wrapper) || _.$('.item',  wrapper);
         switchSelectLastTodo(ele);
     }
 
@@ -940,7 +940,7 @@ var todo = (function (store, tpl) {
 
     // 切换状态
     function selectStatu(target) {
-        target = target || $('#statu-all');
+        target = target || _.$('#statu-all');
         switchSelectLastStatu(target);
     }
 
@@ -990,12 +990,12 @@ var todo = (function (store, tpl) {
 
     function hiddenEle(ele) {
         // ele.style.display = "none";
-        addClass(ele, 'hidden');
+        _.addClass(ele, 'hidden');
     }
 
     function showEle(ele) {
         // ele.style.display = "";
-        removeClass(ele, 'hidden');
+        _.removeClass(ele, 'hidden');
     }
 
     return {
@@ -1003,10 +1003,10 @@ var todo = (function (store, tpl) {
             _CL.init('category-list');
             _TL.init('todo-list');
             _TD.init('detail-wrap');
-            selectStatu($('#statu-all'));
-            selectFirstCatItem($('#' + 'category-list'));
+            selectStatu(_.$('#statu-all'));
+            selectFirstCatItem(_.$('#' + 'category-list'));
 
             initEvents();
         }
     };
-})(store, template);
+});

@@ -97,6 +97,8 @@
     </main>
     <div id="show-info" class="warning"></div>
 
+    <script src="lib/require.js" data-main="main"></script>
+
     <!-- start artTemplate -->
 
     <script id="category-item-tpl" type="text/template">
@@ -121,7 +123,7 @@
         <li>
             <time>{{ time }}</time>
             <ul>
-                {{each list as todo i}}
+                {{each list as todo}}
                     {{include 'todo-item-tpl' todo}}
                 {{/each}}
             </ul>
@@ -161,17 +163,5 @@
     </script>
 
     <!-- end artTemplate -->
-
-    <script src="src/js/thirdParty/template.js"></script>
-    <script src="src/js/util.js"></script>
-    <script src="src/js/store.js"></script>
-    <script src="src/js/todo.js"></script>
-    <script type="text/javascript">
-        if (!window.localStorage) {
-            alert('该应用不支持低版本浏览器！');
-        } else {
-            library(todo);
-        }
-    </script>
 </body>
 </html>

@@ -334,7 +334,7 @@ textarea {
     padding-top: 10px;
 }
 #detail .td-desc .content {
-    display: inline-block;
+    display: inline;
     vertical-align: top;
 
     white-space: pre-wrap;
