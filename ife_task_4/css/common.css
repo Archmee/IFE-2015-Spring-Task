@@ -24,7 +24,7 @@ body {
     height: 100%;
     color: #555;
     word-spacing: 1px;
-    
+
     /*兼容*/
     /*使用click会出现绑定点击区域闪一下的情况*/
     -webkit-tap-highlight-color: transparent;
@@ -165,7 +165,7 @@ textarea {
     min-width: 72px;
     margin-right: 5px;
     padding: 0 5%;
-    
+
     /*border: 1px outset #AAA;
     background-color: #A8AAC5;*/
 
@@ -248,7 +248,7 @@ textarea {
 }
 
 /* 完成和删除标记 */
-.act-del, 
+.act-del,
 .act-done {
     position: absolute;
 }
@@ -332,13 +332,13 @@ textarea {
 #detail .td-desc {
     line-height: 1.5;
     padding-top: 10px;
+}
+#detail .td-desc .content {
+    display: inline;
+    vertical-align: top;
     white-space: pre-wrap;
     word-wrap: break-word; /*按照单字分割*/
     /*word-break: break-all;*/ /*任意分割*/
-}
-#detail .td-desc .content {
-    display: inline-block;
-    vertical-align: top;
 }
 #detail input,
 #detail textarea {
@@ -383,7 +383,7 @@ textarea {
     height: 20px;
     line-height: 20px;
     overflow: hidden;
-    
+
     padding: 12px;
     border-radius: 5px;
     box-shadow: 0 0 30px  #FFFF9D;
