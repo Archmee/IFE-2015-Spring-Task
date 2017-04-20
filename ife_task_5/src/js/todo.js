@@ -6,7 +6,7 @@ function(_, store, tpl) {
     function Category(pid, level, title) {
         this.addTime = Date.now();
         this.cid = 'cid_' + this.addTime;
-        this.pid =  pid || null;
+        this.pid = pid || null;
         this.level = level || 0; // 记录目录层级
         this.title = title || '';
         this.childCatList = [];
@@ -31,7 +31,7 @@ function(_, store, tpl) {
         // 层级对齐距离
         var _startPadding = 0;
         var _incrPadding = 20;
-        var _wrapperId = null;    // 包含分类列表的容器
+        var _wrapperId = null; // 包含分类列表的容器
 
         var _topKey = 'topCatId'; // 顶级分类id
         var _topCatId = store.data(_topKey); //获取顶级分类id
@@ -42,14 +42,14 @@ function(_, store, tpl) {
             // 首先新建顶级分类
             var topCat = new Category(null, 0, '顶级分类');
             //将时间戳-1是为了防止程序运行太快导致默认分类和顶级分类id重复了(都是时间戳取的)
-            topCat.addTime = topCat.addTime-1;
+            topCat.addTime = topCat.addTime - 1;
             topCat.cid = 'cid_' + topCat.addTime;
 
             _topCatId = topCat.cid;
             store.data(_topKey, _topCatId);
 
             // 再新建一个默认分类并保存
-            var firstCat = new Category(_topCatId, topCat.level+1, '默认分类');
+            var firstCat = new Category(_topCatId, topCat.level + 1, '默认分类');
             store.data(firstCat.cid, firstCat);
 
             // 将默认分类添加到顶级分类中
@@ -108,7 +108,7 @@ function(_, store, tpl) {
 
         // 模板：单条分类
         var getCategoryItemTemplate = function(cate) {
-            cate.paddingLeft = _startPadding + _incrPadding*cate.level;
+            cate.paddingLeft = _startPadding + _incrPadding * cate.level;
 
             return tpl('category-item-tpl', cate);
         };
@@ -149,7 +149,7 @@ function(_, store, tpl) {
         // 添加新分类项的DOM元素
         var addItemTemplate = function(parentNode, cate) {
 
-            var itemTemplate =  '<li>' + (getCategoryItemTemplate(cate)) + '</li>';
+            var itemTemplate = '<li>' + (getCategoryItemTemplate(cate)) + '</li>';
 
             var child = _.$('ul', parentNode);
             if (child) {
@@ -167,7 +167,7 @@ function(_, store, tpl) {
         //添加分类
         var addItem = function(pid, title) {
             var parent = store.data(pid);
-            var cate = new Category(pid, parent.level+1, title);
+            var cate = new Category(pid, parent.level + 1, title);
             store.data(cate.cid, cate);
 
             parent.childCatList.push(cate.cid);
@@ -273,12 +273,12 @@ function(_, store, tpl) {
             var tmp = '';
             var childIds = parent.childCatList;
             for (var i = 0, len = childIds.length; i < len; i += 1) {
-                tmp = namePrefix + (i+1);
+                tmp = namePrefix + (i + 1);
                 if (!hasSameName(pid, tmp)) {
                     return tmp;
                 }
             }
-            tmp = namePrefix + (i+1);
+            tmp = namePrefix + (i + 1);
             return tmp;
         };
 
@@ -320,7 +320,7 @@ function(_, store, tpl) {
         var _wrapperId = null;
 
         // 加载todo列表
-        function getTodoList(todoIds, statu) {
+        var getTodoList = function(todoIds, statu) {
             // 获取todo列表
             // 不过todo是单条数据存储的，所以要循环遍历getItem
             // 按照日期进行聚类成列表的形式
@@ -338,10 +338,10 @@ function(_, store, tpl) {
             }
 
             return todoList;
-        }
+        };
 
         // 按照日期归档
-        function archiveByDate(todoList) {
+        var archiveByDate = function(todoList) {
             var obj = {};
             for (var i = 0, len = todoList.length; i < len; i += 1) {
                 var date = getFormatDate(todoList[i].expireTime);
@@ -352,10 +352,10 @@ function(_, store, tpl) {
             }
 
             return obj;
-        }
+        };
 
         // todo 列表模板
-        function getTodoListTemplate(todoIds, statu) {
+        var getTodoListTemplate = function(todoIds, statu) {
             var list = getTodoList(todoIds, statu);
             if (!list || list.length <= 0) {
                 return '';
@@ -378,53 +378,53 @@ function(_, store, tpl) {
             var template = '<ul>';
             var tmp = null;
             for (var i = 0, len = keys.length; i < len; i += 1) {
-                tmp = {time: keys[i], list: list[keys[i]]};
+                tmp = { time: keys[i], list: list[keys[i]] };
                 template += tpl('todo-group-tpl', tmp);
             }
             template += '</ul>';
 
             return template;
-        }
+        };
 
         // 获取任务
-        function getItem(tid) {
+        var getItem = function(tid) {
             return store.data(tid);
-        }
+        };
 
         // 保存任务
-        function setItem(item) {
+        var setItem = function(item) {
             store.data(item.tid, item);
-        }
+        };
 
         // 新增任务
-        function addItem(cid, title, content, expire) {
+        var addItem = function(cid, title, content, expire) {
             var todo = new Todo(cid, title, content, expire);
             setItem(todo);
             return todo;
-        }
+        };
 
         // 删除任务
-        function deleteItem(tid) {
+        var deleteItem = function(tid) {
             store.remove(tid);
-        }
+        };
 
         // 删除任务列表
-        function deleteItemList(todoIds) {
+        var deleteItemList = function(todoIds) {
             todoIds.forEach(function(id) {
                 deleteItem(id);
             });
-        }
+        };
 
         // 标记完成
-        function toggleMark(tid) {
+        var toggleMark = function(tid) {
             var todo = getItem(tid);
             todo.isFinish = !todo.isFinish;
             setItem(todo);
-        }
+        };
 
-        function getWrapperId() {
+        var getWrapperId = function() {
             return _wrapperId;
-        }
+        };
 
         return {
             init: function(wrapperId) {
@@ -457,13 +457,13 @@ function(_, store, tpl) {
         });
 
         var getShowTemplate = function(todo) {
-            todo = todo || { title: '', expireTime: '', content: ''};
+            todo = todo || { title: '', expireTime: '', content: '' };
 
             return tpl('show-item-tpl', todo);
         };
 
         var getEditTemplate = function(todo) {
-            todo = todo || { title: '未命名任务', expireTime: Date.now(), content: ''};
+            todo = todo || { title: '未命名任务', expireTime: Date.now(), content: '' };
 
             return tpl('edit-item-tpl', todo);
         };
@@ -511,7 +511,7 @@ function(_, store, tpl) {
         },
 
         need: function(name, msg, placeholder) {
-            switch(name) {
+            switch (name) {
                 case 'add-category':
                     msg = msg || '请输入分类名称';
                     return this.prompt(msg, placeholder || '');
@@ -532,7 +532,7 @@ function(_, store, tpl) {
     var _TL = TodoModule;
     var _TD = TodoDetail;
 
-    var _currentCatEle  = null; // 选中的分类元素
+    var _currentCatEle = null; // 选中的分类元素
     var _currentTodoEle = null; // 选中的todo元素
     var _currentStatuEle = null; //选中的状态元素
 
@@ -543,7 +543,7 @@ function(_, store, tpl) {
     var _pageIndex = 0;
 
     //关键事件处理函数，负责整个应用的调度
-    function eventHandler(event) {
+    var eventHandler = function(event) {
         event = _.getEvent(event);
         _.cancelBubble(event);
 
@@ -562,7 +562,7 @@ function(_, store, tpl) {
         var msg = null;
         var cid = null;
         var todo = null;
-        switch(action) {
+        switch (action) {
             case 'add-category':
                 // 输入分类名称
                 // 检测名称有效性
@@ -630,7 +630,7 @@ function(_, store, tpl) {
                 // 删除dom
                 cid = target.id;
 
-                msg = '你确定删除 <'+ _CL.getItem(cid).title +'> 以及该分类下的子分类和任务吗？';
+                msg = '你确定删除 <' + _CL.getItem(cid).title + '> 以及该分类下的子分类和任务吗？';
                 if (!_UI.need(action, msg)) {
                     return;
                 }
@@ -681,11 +681,11 @@ function(_, store, tpl) {
                     return;
                 }
 
-                var title   = _.trim(_.$('#' + 'todo-title').value);
-                var expire  = _.$('#' + 'todo-expire').value;
+                var title = _.trim(_.$('#' + 'todo-title').value);
+                var expire = _.$('#' + 'todo-expire').value;
                 var content = _.$('#' + 'todo-content').value;
 
-                if (!title.length || title.length > 30 ) {
+                if (!title.length || title.length > 30) {
                     _UI.showInfo('任务名称不能为空，也不能超过30字！');
                     return;
                 }
@@ -693,12 +693,13 @@ function(_, store, tpl) {
                     _UI.showInfo('过期时间不能为空！');
                     return;
                 }
-                if (!content.length) {
-                    _UI.showInfo('任务内容不能为空！');
+                if (!content.length || content.length > 800) {
+                    _UI.showInfo('任务内容不能为空，也不能超过800字！');
                     return;
                 }
-                title = stripTag(title);
-                content = stripTag(content);
+
+                title = _.htmlEncode(title);// stripTag(title);
+                content = _.htmlEncode(content);// stripTag(content);
                 expire = (new Date(expire)).getTime();
 
                 // 通过行为状态判断是添加还是删除
@@ -716,7 +717,7 @@ function(_, store, tpl) {
 
                 }
 
-                selectStatu(_currentStatuEle);
+                selectStatu();
                 selectTodo(_.$('#' + todo.tid));
                 _saveAction = null;
 
@@ -735,7 +736,7 @@ function(_, store, tpl) {
             case 'delete-todo':
 
                 if (!_UI.need(action, '你确定删除该任务吗？')) {
-                    return ;
+                    return;
                 }
 
                 todo = _TL.getItem(target.id);
@@ -745,11 +746,18 @@ function(_, store, tpl) {
                 var parent = target.parentNode;
                 parent.parentNode.removeChild(parent);
 
+                if (_currentTodoEle.id === target.id) { //如果选中者被删除了，则选中列表第一个
+                    selectFirstTodoItem();
+                }
+
                 break;
             case 'mark-todo':
+                var tid = target.id;
+                _TL.toggleMark(tid); //数据更新
 
-                _TL.toggleMark(target.id); //数据更新
-                loadTodoInCurrentCat(); //重新加载列表
+                var lastId = _currentTodoEle.id;
+                selectStatu();
+                selectTodo(_.$('#' + lastId));
                 //也可以dom局部更新，但不会及时刷新界面
                 // _.toggleClass(target, 'done-item');
 
@@ -783,18 +791,18 @@ function(_, store, tpl) {
                 break;
         } // end switch
 
-    } // end handler
+    }; // end handler
 
     // 初始化事件
-    function initEvents() {
+    var initEvents = function() {
         _.addEvent(document.body, 'click', eventHandler);
         // 给touch事件空处理程序在ipad上能获得更流畅的体验
         _.addEvent(document.body, 'touchstart', function() {});
         _.addEvent(document.body, 'touchend', function() {});
-    }
+    };
 
     // 翻到上一页
-    function slidePagePrev() {
+    var slidePagePrev = function() {
         // 当前页归位
         _.addClass(_.$(_pages[_pageIndex]), 'page-next');
         _.removeClass(_.$(_pages[_pageIndex]), 'page-active');
@@ -806,10 +814,10 @@ function(_, store, tpl) {
         _.removeClass(_.$(_pages[_pageIndex]), 'page-prev');
 
         showBack(_pageIndex);
-    }
+    };
 
     // 翻到下一页
-    function slidePageNext() {
+    var slidePageNext = function() {
         _.addClass(_.$(_pages[_pageIndex]), 'page-prev');
         _.removeClass(_.$(_pages[_pageIndex]), 'page-active');
 
@@ -819,53 +827,48 @@ function(_, store, tpl) {
         _.removeClass(_.$(_pages[_pageIndex]), 'page-next');
 
         showBack(_pageIndex);
-    }
+    };
 
     // 根据当前页判断是否显示back按钮
-    function showBack(index) {
+    var showBack = function(index) {
         if (index > 0) {
             showEle(_.$('#page-back'));
         } else {
             hiddenEle(_.$('#page-back'));
         }
-    }
-
-    // 去除html标签
-    function stripTag(str) {
-        return str.replace(/<\/?([^>]+)>/g, ''); //$1
-    }
+    };
 
     // 交换类名
-    function switchClass(oldEle, newEle, className) {
+    var switchClass = function(oldEle, newEle, className) {
         _.removeClass(oldEle, className);
         _.addClass(newEle, className);
-    }
+    };
     // 交换选择类名
-    function switchSelect(oldEle, newEle) {
+    var switchSelect = function(oldEle, newEle) {
         switchClass(oldEle, newEle, 'selected');
-    }
+    };
 
     // 和新分类交换选择
-    function switchSelectLastCat(newEle) {
+    var switchSelectLastCat = function(newEle) {
         switchSelect(_currentCatEle, newEle);
         _currentCatEle = newEle || _currentCatEle;
 
         loadTodoInCurrentCat();
-    }
+    };
 
     // 分类相关
 
     // 选中显示所有任务
-    function showAllTodo(target) {
+    var showAllTodo = function(target) {
         switchSelectLastCat(target);
-    }
+    };
     // 选中顶级分类
-    function showAllCat(target) {
+    var showAllCat = function(target) {
         switchSelectLastCat(target);
-    }
+    };
 
     // 选中分类项
-    function selectCategory(target) {
+    var selectCategory = function(target) {
         var child = _.$('ul', target.parentNode); //展开子节点
         if (child) {
             _.toggleClass(child, 'hidden');
@@ -875,16 +878,16 @@ function(_, store, tpl) {
         }
 
         switchSelectLastCat(target);
-    }
+    };
     // 选中分类列表中的第一项
-    function selectFirstCatItem(wrapper) {
+    var selectFirstCatItem = function(wrapper) {
         wrapper = wrapper || _.$('#' + _CL.getWrapperId());
-        var ele = _.$('.item-cat',  wrapper) || _.$('.item',  wrapper);
+        var ele = _.$('.item-cat', wrapper) || _.$('.item', wrapper);
         switchSelectLastCat(ele);
-    }
+    };
 
     // 强制展开父节点
-    function openChildCategory(target) {
+    var openChildCategory = function(target) {
         if (!_.hasClass(target, 'item-cat')) {
             return;
         }
@@ -893,62 +896,67 @@ function(_, store, tpl) {
             _.removeClass(child, 'hidden');
             _.addClass(target, 'folder-opened');
         }
-    }
+    };
 
     // todo相关
 
     // 和新todo交换选择
-    function switchSelectLastTodo(newEle) {
+    var switchSelectLastTodo = function(newEle) {
         switchSelect(_currentTodoEle, newEle);
         _currentTodoEle = newEle;
 
         showCurrItem();
-    }
-
-    // 选中todo
-    function selectTodo(target) {
-        switchSelectLastTodo(target);
-    }
+    };
 
     // 选中todo列表中的第一项
-    function selectFirstTodoItem(wrapper) {
+    var selectFirstTodoItem = function(wrapper) {
         wrapper = wrapper || _.$('#' + _TL.getWrapperId());
-        var ele = _.$('.item-todo',  wrapper) || _.$('.item',  wrapper);
+        var ele = _.$('.item-todo', wrapper) || _.$('.item', wrapper);
         switchSelectLastTodo(ele);
-    }
+    };
+
+    // 选中todo
+    var selectTodo = function(target) {
+        if (target) {
+            switchSelectLastTodo(target);
+        } else {
+            selectFirstTodoItem();
+        }
+    };
 
     // 显示当前元素 没有则显示空
-    function showCurrItem() {
+    var showCurrItem = function() {
         if (_currentTodoEle) {
             _TD.showItem(_TL.getItem(_currentTodoEle.id));
         } else {
             _TD.showItem();
         }
-    }
+    };
 
 
     // 切换状态相关
 
     // 和新状态交换
-    function switchSelectLastStatu(newEle) {
+    var switchSelectLastStatu = function(newEle) {
         switchSelect(_currentStatuEle, newEle);
         _currentStatuEle = newEle || _currentStatuEle;
 
         // 加载todo列表
         loadTodoInCurrentCat();
-    }
+    };
 
     // 切换状态
-    function selectStatu(target) {
-        target = target || _.$('#statu-all');
+    var selectStatu = function(target) {
+        target = target || _currentStatuEle || _.$('#statu-all');
+
         switchSelectLastStatu(target);
-    }
+    };
 
     // 根据分类id和状态码来加载todo列表
-    function loadTodoInCurrentCat() {
+    var loadTodoInCurrentCat = function() {
         if (_currentCatEle) {
             var todoList = [];
-            switch(_currentCatEle.id) {
+            switch (_currentCatEle.id) {
                 case 'show-all-cat':
                     break;
                 case 'show-all-todo':
@@ -960,7 +968,7 @@ function(_, store, tpl) {
             }
 
             var statu = null;
-            switch(_currentStatuEle.id) {
+            switch (_currentStatuEle.id) {
                 case 'statu-not':
                     statu = false;
                     break;
@@ -972,31 +980,33 @@ function(_, store, tpl) {
             _TL.reload(todoList, statu);
             selectFirstTodoItem();
         }
-    }
+    };
 
     // 格式化日期
-    function getFormatDate(timestamp, spliter) {
+    var getFormatDate = function(timestamp, spliter) {
         if (!timestamp) {
             return '';
         }
         spliter = spliter || '-';
         var date = new Date(timestamp);
-        var y = date.getFullYear(), m = date.getMonth()+1, d = date.getDate();
-        return [ y,
-                 m < 10 ? '0'+m : m,
-                 d < 10 ? '0'+d : d
-                ].join(spliter);
-    }
+        var y = date.getFullYear(),
+            m = date.getMonth() + 1,
+            d = date.getDate();
+        return [y,
+            m < 10 ? '0' + m : m,
+            d < 10 ? '0' + d : d
+        ].join(spliter);
+    };
 
-    function hiddenEle(ele) {
+    var hiddenEle = function(ele) {
         // ele.style.display = "none";
         _.addClass(ele, 'hidden');
-    }
+    };
 
-    function showEle(ele) {
+    var showEle = function(ele) {
         // ele.style.display = "";
         _.removeClass(ele, 'hidden');
-    }
+    };
 
     return {
         init: function() {
