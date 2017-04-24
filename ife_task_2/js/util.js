@@ -64,15 +64,15 @@ function cloneObject(src) {
         newValue = new Date(src);
     } else if (isArray(src) || isObject(src)){ //array and object
         newValue = isArray(src) ? [] : {};
-        
+
         for (var item in src) { //用forin遍历数组或对象是为了访问扩展的属性（不是通过索引，类似对象属性）
-            if (src.hasOwnProperty(item) 
+            if (src.hasOwnProperty(item)
                 && !isFunction(src[item])
                 && !isRegExp(src[item])) {  //防止继承属性和函数和正则
                 newValue[item] = arguments.callee(src[item]);//还是用key的方式保持原样(允许有关联数组）
             }
         }//end for
-       
+
     }//end else
 
     return newValue;
@@ -151,7 +151,7 @@ function uniqArray(arr) {
     	} else if (isString(arr[i])) {
     		newArr['s_'+arr[i]] = arr[i]; //区别类型，例如hash 1 和 '1' 不能覆盖
     	}
-    	
+
     }
 
     return newArr;
@@ -164,7 +164,7 @@ function trim(str) {
 }
 
 // 实现一个遍历数组的方法，针对数组中每一个元素执行fn函数，并将数组索引和元素作为参数传递
-function each(arr, fn) { 
+function each(arr, fn) {
 	if (!isFunction(fn)) {
 		return false;
 	}
@@ -226,7 +226,7 @@ function getObjectLength(obj) {
 			}
 		}
 	}
-	
+
 	return count;
 }
 
@@ -322,9 +322,9 @@ function traversalNodes(element, isMatch) {
 
 	// getElementsByTagName('*')的方法已经放弃，原因有：
 	// 1 返回IE的注释节点，2 在遍历节点时要执行回调函数
-	
+
 	if (document.createNodeIterator) { //HTML5遍历方法，兼容IE9+
-		
+
 		var iterator = document.createNodeIterator(element, NodeFilter.SHOW_ELEMENT, null, false);
 		var node = iterator.nextNode(); //node现在是传入的根节点
 
@@ -334,8 +334,8 @@ function traversalNodes(element, isMatch) {
 			// else 如果没有传入匹配函数，则全部保存
 
 			// 如果没有函数 或者 有函数且函数返回真就保存节点
-			if (!isFunction(isMatch) || isMatch(node)) { 
-				nodeList.push(node); 
+			if (!isFunction(isMatch) || isMatch(node)) {
+				nodeList.push(node);
 			}
 		}
 	} else { //兼容IE8以及更低版本
@@ -434,7 +434,7 @@ function getBySelector(element, selector) {
 
 	if (/^[\w]+$/.test(selector)) { //By TagName (tag中可能还有数字如h2)
 		res = getByTag(element, selector);
-		
+
 	} else if (/^#([-\w]+)$/.test(selector)) { //By ID
 		selector = RegExp.$1;
 		res = getById(element, selector);
@@ -471,7 +471,7 @@ function $(selector) {
 
 		currentIndex++; //每一级递归都有自己的currentIndex，保证了回溯过程
 		for (var i = 0, len = matchList.length; i < len; i++) {
-			var ret = arguments.callee(matchList[i], currentIndex); 
+			var ret = arguments.callee(matchList[i], currentIndex);
 			if (ret != null) {
 				return ret;
 			}
@@ -597,7 +597,7 @@ function setCookie(cookieName, cookieValue, expiredays) {
 	expiredays = expiredays || 0;
     var expireMS = new Date(Date.now() + expiredays*24*60*60*1000);
     document.cookie = encodeURIComponent(cookieName) + '=' +
-    				  encodeURIComponent(cookieValue) + 
+    				  encodeURIComponent(cookieValue) +
     				  (!expiredays ? '' : '; expires=' + expireMS.toString()); //toUTCString
     // TODO: UTC并非当地时间
 }
@@ -654,7 +654,7 @@ function ajax(url, options) {
 
     var params = '';
     if (options.data) {
-    	
+
         // 如果传入的数据是字符串形式的，那就要转换成json形式
     	if (typeof options.data === "string") {//split for encodeURIComponent
     		params = options.data.split('&');
@@ -665,7 +665,7 @@ function ajax(url, options) {
     		}
     	}
 
-    	params = encodeObject(options.data);
+    	params = encodeObjectToString(options.data);
     }
 
     options.type = !options.type ? "GET" : options.type.toUpperCase();
@@ -682,7 +682,7 @@ function ajax(url, options) {
 function encodeObjectToString(data) {
     var plist = [];
     for (var item in data) {
-        plist.push( encodeURIComponent(item) + '=' + 
+        plist.push( encodeURIComponent(item) + '=' +
                     encodeURIComponent(data[item]) );
     }
     return plist.join('&');
