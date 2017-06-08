@@ -1,0 +1,1 @@
+"use strict";define(function(){var t=window.localStorage,n=function(n){return JSON.parse(t.getItem(n))},e=function(n,e){t.setItem(n,JSON.stringify(e))},r=function(t,r){return null===r||void 0===r?n(t):e(t,r)},o=function(n){t.removeItem(n)},i=function(t){"string"==typeof t?o(t):t instanceof Array&&t.forEach(function(t){o(t)})};return{get:n,set:e,data:r,remove:i}});
